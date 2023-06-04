@@ -1,17 +1,17 @@
-export type SiteConfig = typeof siteConfig;
-
 export const siteConfig = {
-    name: "Next.js",
-    description: "Beautifully designed components built with Radix UI and Tailwind CSS.",
+    name: "Banjo RSS",
+    description: "A super simple RSS feed reader. Not much more than that actually.",
     mainNav: [
         {
-            title: "Home",
-            href: "/",
+            title: "Dashboard",
+            href: "/dashboard",
+            public: false,
         },
     ],
     links: {
-        twitter: "https://twitter.com/shadcn",
-        github: "https://github.com/shadcn/ui",
-        docs: "https://ui.shadcn.com",
+        twitter: "https://twitter.com/banjo_dev",
+        github: "https://github.com/banjo",
     },
 };
+
+export type SiteConfig = typeof siteConfig;

@@ -1,21 +1,20 @@
-# next-template
+# banjo-rss
 
-A Next.js 13 template for building apps with Radix UI and Tailwind CSS.
+A simple RSS reader built with Next.js.
 
-## Usage
+## Database
 
 ```bash
-npx create-next-app -e https://github.com/shadcn/next-template
+# connect locally
+pscale connect banjo-rss initial-setup --port 3309
+
+# add changes to database
+npx prisma db push
+
+# open prisma studio
+npx prisma studio
 ```
-
-## Features
-
-- Next.js 13 App Directory
-- Radix UI Primitives
-- Tailwind CSS
-- Icons from [Lucide](https://lucide.dev)
-- Dark mode with `next-themes`
-- Tailwind CSS class sorting, merging and linting.
+```
 
 ## License
 
