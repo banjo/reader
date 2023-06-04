@@ -1,6 +1,6 @@
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -9,16 +9,51 @@ generator client {
 }
 
 model Feed {
-  id       Int     @id @default(autoincrement())
-  title    String
-  link     String
-  items    Item[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  link  String
+  ttl   Int
+  items Item[]
+  users User[]
 }
 
 model Item {
-  id       Int     @id @default(autoincrement())
-  title    String
-  link     String
-  feed     Feed    @relation(fields: [feedId], references: [id])
-  feedId   Int
+  id            Int         @id @default(autoincrement())
+  feed          Feed        @relation(fields: [feedId], references: [id])
+  feedId        Int
+  content       ItemContent @relation(fields: [itemContentId], references: [id])
+  itemContentId Int
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  hasRead       Boolean     @default(false)
+  hasBookmarked Boolean     @default(false)
+  tags          Tag[]
+}
+
+model ItemContent {
+  id        Int      @id @default(autoincrement())
+  title     String
+  link      String
+  content   String
+  html      String
+  lastFetch DateTime
+  pubDate   DateTime
+  items     Item[]
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  feeds Feed[]
+  items Item[]
+  tags  Tag[]
+}
+
+model Tag {
+  id     Int    @id @default(autoincrement())
+  name   String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  items  Item[]
 }
