@@ -1,25 +1,44 @@
 import { buttonVariants } from "@/components/ui/button";
-import { auth } from "@clerk/nextjs";
+import { Feed } from "@prisma/client";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { fetcher } from "../lib/fetcher";
 
 export const revalidate = 0;
 
-// const getFeed = async (): Promise<Feed[]> => {
-//     const feed = await fetch(`${getUrl()}/api/feed`);
-//     const res: Result<Feed[]> = await feed.json();
+// const getFeed = async (externalUserId: string): Promise<Feed[]> => {
+//     const userId = await UserRepository.getIdByExternalId(externalUserId);
 
-//     if (!res.success) throw new Error(res.error);
+//     if (!userId.success) {
+//         return [];
+//     }
 
-//     return res.data;
+//     const feed = await FeedRepository.getAllUserFeeds(userId.data);
+
+//     if (!feed.success) {
+//         return [];
+//     }
+
+//     return feed.data;
 // };
 
-export default function IndexPage() {
-    const { userId } = auth();
+const getFeed = async () => {
+    const res = await fetcher.GET<Feed[]>("/api/feed");
 
-    if (userId) {
-        redirect("/dashboard");
+    console.log({ res });
+
+    if (res) {
+        return res;
     }
+
+    return [];
+};
+
+export default async function IndexPage() {
+    // if (userId) {
+    //     redirect("/dashboard");
+    // }
+
+    const feed = await getFeed();
 
     return (
         <section
@@ -33,6 +52,7 @@ export default function IndexPage() {
                 <p className="max-w-[700px] text-lg text-muted-foreground">
                     A super simple RSS feed reader. Not much more than that actually.
                 </p>
+                {feed.length}
             </div>
             <div className="flex gap-4">
                 <Link href="/sign-in" className={buttonVariants()}>

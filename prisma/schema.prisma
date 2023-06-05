@@ -11,43 +11,37 @@ generator client {
 model Feed {
   id    Int    @id @default(autoincrement())
   name  String
-  link  String
+  link  String @unique
   ttl   Int
   items Item[]
   users User[]
 }
 
 model Item {
-  id            Int         @id @default(autoincrement())
-  feed          Feed        @relation(fields: [feedId], references: [id])
+  id            Int      @id @default(autoincrement())
+  feed          Feed     @relation(fields: [feedId], references: [id])
   feedId        Int
-  content       ItemContent @relation(fields: [itemContentId], references: [id])
-  itemContentId Int
-  user          User        @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
   userId        Int
-  hasRead       Boolean     @default(false)
-  hasBookmarked Boolean     @default(false)
+  hasRead       Boolean  @default(false)
+  hasBookmarked Boolean  @default(false)
+  title         String
+  link          String
+  content       String
+  html          String
+  lastFetch     DateTime
+  pubDate       DateTime
   tags          Tag[]
 }
 
-model ItemContent {
-  id        Int      @id @default(autoincrement())
-  title     String
-  link      String
-  content   String
-  html      String
-  lastFetch DateTime
-  pubDate   DateTime
-  items     Item[]
-}
-
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  feeds Feed[]
-  items Item[]
-  tags  Tag[]
+  id         Int     @id @default(autoincrement())
+  email      String  @unique
+  name       String?
+  externalId String  @unique
+  feeds      Feed[]
+  items      Item[]
+  tags       Tag[]
 }
 
 model Tag {
