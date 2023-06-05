@@ -3,6 +3,7 @@
 import { Icons } from "@/components/icons";
 import { Category } from "@/components/sidemenu/category";
 import { Divider } from "@/components/sidemenu/divider";
+import { Input } from "@/components/sidemenu/input";
 import { Item } from "@/components/sidemenu/item";
 import { Sidemenu } from "@/components/sidemenu/menu";
 import { SubMenu } from "@/components/sidemenu/sub-menu";
@@ -28,7 +29,11 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
 
     return (
         <Sidemenu>
+            <Divider size="sm" />
+            <Category title="Add feed" />
             <Divider size="md" />
+            <Input />
+            <Divider size="lg" />
             <Category title="Menu" />
             <SubMenu>
                 <Item
