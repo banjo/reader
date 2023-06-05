@@ -8,6 +8,8 @@ type Props = {
     children: React.ReactNode;
 };
 
+export const revalidate = 0; // TODO: set revalidate to 60 seconds when done with development
+
 export default async function DashboardLayout({ children }: Props) {
     const { userId: externalUserId } = auth();
 
@@ -32,7 +34,7 @@ export default async function DashboardLayout({ children }: Props) {
     return (
         <section className="flex">
             <SideMenuContainer prefix="/dashboard" feeds={feeds.data} />
-            <main className="p-16">{children}</main>
+            <main className="flex-1 p-16">{children}</main>
         </section>
     );
 }
