@@ -1,0 +1,9 @@
+import { FC, ReactNode } from "react";
+
+type Props = {
+    children: ReactNode;
+};
+
+export const SubMenu: FC<Props> = ({ children }) => {
+    return <ul className="flex flex-col items-center justify-start gap-2 py-2">{children}</ul>;
+};

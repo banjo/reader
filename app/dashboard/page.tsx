@@ -1,3 +1,4 @@
+import { SideMenuContainer } from "@/components/sidemenu/side-menu-container";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -8,5 +9,10 @@ export default function IndexPage() {
         redirect("/");
     }
 
-    return <section className="container ">signed in</section>;
+    return (
+        <section className="flex">
+            <SideMenuContainer />
+            <main className="px-16">main</main>
+        </section>
+    );
 }
