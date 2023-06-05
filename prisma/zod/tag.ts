@@ -1,8 +1,11 @@
 import * as z from "zod";
-import { CompleteItem, CompleteUser, RelatedItemModel, RelatedUserModel } from "./index";
+import * as imports from "../null";
+import { CompleteUser, RelatedUserModel, CompleteItem, RelatedItemModel } from "./index";
 
 export const TagModel = z.object({
     id: z.number().int(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     name: z.string(),
     userId: z.number().int(),
 });

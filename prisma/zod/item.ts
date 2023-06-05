@@ -1,15 +1,18 @@
 import * as z from "zod";
+import * as imports from "../null";
 import {
     CompleteFeed,
-    CompleteTag,
-    CompleteUser,
     RelatedFeedModel,
-    RelatedTagModel,
+    CompleteUser,
     RelatedUserModel,
+    CompleteTag,
+    RelatedTagModel,
 } from "./index";
 
 export const ItemModel = z.object({
     id: z.number().int(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     feedId: z.number().int(),
     userId: z.number().int(),
     hasRead: z.boolean(),

@@ -1,11 +1,16 @@
 import * as z from "zod";
-import { CompleteItem, CompleteUser, RelatedItemModel, RelatedUserModel } from "./index";
+import * as imports from "../null";
+import { CompleteItem, RelatedItemModel, CompleteUser, RelatedUserModel } from "./index";
 
 export const FeedModel = z.object({
     id: z.number().int(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     name: z.string(),
     link: z.string(),
-    ttl: z.number().int(),
+    imageUrl: z.string().nullish(),
+    publicUrl: z.string(),
+    ttl: z.number().int().nullish(),
 });
 
 export interface CompleteFeed extends z.infer<typeof FeedModel> {

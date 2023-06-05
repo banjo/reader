@@ -1,15 +1,18 @@
 import * as z from "zod";
+import * as imports from "../null";
 import {
     CompleteFeed,
-    CompleteItem,
-    CompleteTag,
     RelatedFeedModel,
+    CompleteItem,
     RelatedItemModel,
+    CompleteTag,
     RelatedTagModel,
 } from "./index";
 
 export const UserModel = z.object({
     id: z.number().int(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     email: z.string(),
     name: z.string().nullish(),
     externalId: z.string(),

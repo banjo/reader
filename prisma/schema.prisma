@@ -9,39 +9,45 @@ generator client {
 }
 
 generator zod {
-  provider                 = "zod-prisma"
-  output                   = "./zod" // (default) the directory where generated zod schemas will be saved
+  provider = "zod-prisma"
+  output   = "./zod" // (default) the directory where generated zod schemas will be saved
 
-  relationModel            = true // (default) Create and export both plain and related models.
+  relationModel = true // (default) Create and export both plain and related models.
   // relationModel         = "default" // Do not export model without relations.
   // relationModel         = false // Do not generate related model
 
-  modelCase                = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+  modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
   // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
 
-  modelSuffix              = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
+  modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
 
   // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
-  useDecimalJs             = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+  useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
 
-  imports                  = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
+  imports = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
 
   // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
-  prismaJsonNullability    = true // (default) uses prisma's scheme for JSON field nullability
+  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
   // prismaJsonNullability = false // allows null assignment to optional JSON fields
 }
 
 model Feed {
-  id    Int    @id @default(autoincrement())
-  name  String
-  link  String @unique
-  ttl   Int
-  items Item[]
-  users User[]
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  link      String   @unique
+  imageUrl  String?
+  publicUrl String  @unique @default(uuid())
+  ttl       Int?
+  items     Item[]
+  users     User[]
 }
 
 model Item {
   id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   feed          Feed     @relation(fields: [feedId], references: [id])
   feedId        Int
   user          User     @relation(fields: [userId], references: [id])
@@ -58,19 +64,23 @@ model Item {
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  email      String  @unique
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  email      String   @unique
   name       String?
-  externalId String  @unique
+  externalId String   @unique
   feeds      Feed[]
   items      Item[]
   tags       Tag[]
 }
 
 model Tag {
-  id     Int    @id @default(autoincrement())
-  name   String
-  userId Int
-  user   User   @relation(fields: [userId], references: [id])
-  items  Item[]
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  items     Item[]
 }
