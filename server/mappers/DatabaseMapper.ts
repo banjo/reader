@@ -1,44 +1,56 @@
-import { CleanFeed, CleanUser } from "@/models/entities";
-import { Feed, Item, User } from "@prisma/client";
+import { CleanFeedWithItems, CleanUser, FeedWithItems } from "@/models/entities";
+import { Item, User } from "@prisma/client";
 
-const feed = (feed: Feed): CleanFeed => ({
-    id: feed.id,
-    name: feed.name,
-    link: feed.link,
-    imageUrl: feed.imageUrl,
-    publicUrl: feed.publicUrl,
-    createdAt: feed.createdAt,
-    updatedAt: feed.updatedAt,
-});
+function item(item: Item): Omit<Item, "feedId" | "userId"> {
+    return {
+        id: item.id,
+        hasRead: item.hasRead,
+        hasBookmarked: item.hasBookmarked,
+        title: item.title,
+        link: item.link,
+        content: item.content,
+        html: item.html,
+        lastFetch: item.lastFetch,
+        pubDate: item.pubDate,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+    };
+}
 
-const feeds = (feeds: Feed[]): CleanFeed[] => feeds.map(element => feed(element));
+function items(items: Item[]): Omit<Item, "feedId" | "userId">[] {
+    return items.map(element => item(element));
+}
 
-const user = (user: User): CleanUser => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-});
+function feed(feed: FeedWithItems): CleanFeedWithItems {
+    return {
+        id: feed.id,
+        name: feed.name,
+        link: feed.link,
+        imageUrl: feed.imageUrl,
+        publicUrl: feed.publicUrl,
+        createdAt: feed.createdAt,
+        updatedAt: feed.updatedAt,
+        items: feed.items ? items(feed.items) : undefined,
+    };
+}
 
-const users = (users: User[]): CleanUser[] => users.map(element => user(element));
+function feeds(feeds: FeedWithItems[]): CleanFeedWithItems[] {
+    return feeds.map(element => feed(element));
+}
 
-const item = (item: Item): Omit<Item, "feedId" | "userId"> => ({
-    id: item.id,
-    hasRead: item.hasRead,
-    hasBookmarked: item.hasBookmarked,
-    title: item.title,
-    link: item.link,
-    content: item.content,
-    html: item.html,
-    lastFetch: item.lastFetch,
-    pubDate: item.pubDate,
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
-});
+function user(user: User): CleanUser {
+    return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+    };
+}
 
-const items = (items: Item[]): Omit<Item, "feedId" | "userId">[] =>
-    items.map(element => item(element));
+function users(users: User[]): CleanUser[] {
+    return users.map(element => user(element));
+}
 
 export const DatabaseMapper = {
     feed,

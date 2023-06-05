@@ -1,4 +1,4 @@
-import { CleanFeed } from "@/models/entities";
+import { CleanFeedWithItems } from "@/models/entities";
 import { Result } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
@@ -8,7 +8,7 @@ import "server-only";
 
 const logger = createLogger("FeedRepository");
 
-const getAllUserFeeds = async (userId: number): Promise<Result<CleanFeed[]>> => {
+const getAllUserFeeds = async (userId: number): Promise<Result<CleanFeedWithItems[]>> => {
     const feeds = await prisma.feed.findMany({
         where: {
             users: {
@@ -16,6 +16,9 @@ const getAllUserFeeds = async (userId: number): Promise<Result<CleanFeed[]>> => 
                     id: userId,
                 },
             },
+        },
+        include: {
+            items: true,
         },
     });
 
@@ -27,7 +30,7 @@ const getAllUserFeeds = async (userId: number): Promise<Result<CleanFeed[]>> => 
     return Result.ok(DatabaseMapper.feeds(feeds));
 };
 
-const getFeedById = async (feedId: number): Promise<Result<CleanFeed>> => {
+const getFeedById = async (feedId: number): Promise<Result<CleanFeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
             id: feedId,
@@ -42,7 +45,7 @@ const getFeedById = async (feedId: number): Promise<Result<CleanFeed>> => {
     return Result.ok(DatabaseMapper.feed(feed));
 };
 
-const getFeedByUrl = async (feedUrl: string): Promise<Result<CleanFeed>> => {
+const getFeedByUrl = async (feedUrl: string): Promise<Result<CleanFeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
             link: feedUrl,
@@ -57,7 +60,7 @@ const getFeedByUrl = async (feedUrl: string): Promise<Result<CleanFeed>> => {
     return Result.ok(DatabaseMapper.feed(feed));
 };
 
-const createFeed = async (feed: Feed): Promise<Result<CleanFeed>> => {
+const createFeed = async (feed: Feed): Promise<Result<CleanFeedWithItems>> => {
     const createdFeed = await prisma.feed.create({
         data: feed,
     });

@@ -1,4 +1,5 @@
 import { IconType } from "@/components/icons";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 
@@ -41,7 +42,7 @@ export const Item: FC<ItemProps> = ({
                 {image && <img src={image} className="h-5 w-5 rounded-full" />}
                 <span className="text-md">{title}</span>
             </div>
-            {notification}
+            {notification && <Badge>{notification}</Badge>}
         </Link>
     );
 };

@@ -7,13 +7,14 @@ import { Input } from "@/components/sidemenu/input";
 import { Item } from "@/components/sidemenu/item";
 import { Sidemenu } from "@/components/sidemenu/menu";
 import { SubMenu } from "@/components/sidemenu/sub-menu";
-import { CleanFeed } from "@/models/entities";
+import { avatarUrl } from "@/lib/utils";
+import { CleanFeedWithItems } from "@/models/entities";
 import { usePathname } from "next/navigation";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 
 type Props = {
     prefix?: string;
-    feeds: CleanFeed[];
+    feeds: CleanFeedWithItems[];
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
@@ -27,7 +28,16 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
         return pathname === prefixUrl(url);
     };
 
-    console.log("🪕%c Banjo | side-menu-container.tsx:30 |", "color: #E91E63", feeds);
+    const totalUnread = useMemo(() => {
+        // eslint-disable-next-line unicorn/no-array-reduce
+        return feeds.reduce((acc, feed) => {
+            if (!feed.items) {
+                return acc;
+            }
+
+            return acc + feed.items.filter(item => !item.hasRead).length;
+        }, 0);
+    }, [feeds]);
 
     return (
         <Sidemenu>
@@ -43,8 +53,8 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     url={prefixUrl("")}
                     Icon={Icons.home}
                     selected={isSelected("")}
-                    highlight={true}
-                    notification={4}
+                    highlight={Boolean(totalUnread)}
+                    notification={totalUnread}
                 />
                 <Item
                     title="Bookmarks"
@@ -63,15 +73,21 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     Icon={Icons.layout}
                     selected={isSelected("/all")}
                 />
-                {feeds.map(feed => (
-                    <Item
-                        key={feed.id}
-                        title={feed.name}
-                        url={prefixUrl(`/feed/${feed.publicUrl}`)}
-                        image={feed.imageUrl}
-                        selected={isSelected(`/feed/${feed.id}`)}
-                    />
-                ))}
+                {feeds.map(feed => {
+                    const unread = feed.items?.filter(item => !item.hasRead).length || "";
+
+                    return (
+                        <Item
+                            key={feed.id}
+                            title={feed.name}
+                            url={prefixUrl(`/feed/${feed.publicUrl}`)}
+                            image={feed.imageUrl ?? avatarUrl(feed.publicUrl)}
+                            selected={isSelected(`/feed/${feed.publicUrl}`)}
+                            notification={unread}
+                            highlight={Boolean(unread)}
+                        />
+                    );
+                })}
             </SubMenu>
         </Sidemenu>
     );
