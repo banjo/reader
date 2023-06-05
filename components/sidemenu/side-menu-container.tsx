@@ -35,7 +35,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                 return acc;
             }
 
-            return acc + feed.items.filter(item => !item.hasRead).length;
+            return acc + feed.items.filter(item => !item.isRead).length;
         }, 0);
     }, [feeds]);
 
@@ -46,7 +46,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                 return acc;
             }
 
-            return acc + feed.items.filter(item => !item.hasRead && item.hasBookmarked).length;
+            return acc + feed.items.filter(item => !item.isRead && item.isBookmarked).length;
         }, 0);
     }, [feeds]);
 
@@ -87,7 +87,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     selected={isSelected("/all")}
                 />
                 {feeds.map(feed => {
-                    const unread = feed.items?.filter(item => !item.hasRead).length ?? 0;
+                    const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
 
                     return (
                         <Item

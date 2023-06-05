@@ -1,18 +1,18 @@
-import * as z from "zod";
-import * as imports from "../null";
-import { CompleteUser, RelatedUserModel, CompleteItem, RelatedItemModel } from "./index";
+import * as z from "zod"
+import * as imports from "../null"
+import { CompleteUser, RelatedUserModel, CompleteItem, RelatedItemModel } from "./index"
 
 export const TagModel = z.object({
-    id: z.number().int(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
-    name: z.string(),
-    userId: z.number().int(),
-});
+  id: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  name: z.string(),
+  userId: z.number().int(),
+})
 
 export interface CompleteTag extends z.infer<typeof TagModel> {
-    user: CompleteUser;
-    items: CompleteItem[];
+  user: CompleteUser
+  items: CompleteItem[]
 }
 
 /**
@@ -20,9 +20,7 @@ export interface CompleteTag extends z.infer<typeof TagModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
-export const RelatedTagModel: z.ZodSchema<CompleteTag> = z.lazy(() =>
-    TagModel.extend({
-        user: RelatedUserModel,
-        items: RelatedItemModel.array(),
-    })
-);
+export const RelatedTagModel: z.ZodSchema<CompleteTag> = z.lazy(() => TagModel.extend({
+  user: RelatedUserModel,
+  items: RelatedItemModel.array(),
+}))

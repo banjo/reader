@@ -4,8 +4,8 @@ import { Item, User } from "@prisma/client";
 function item(item: Item): Omit<Item, "feedId" | "userId"> {
     return {
         id: item.id,
-        hasRead: item.hasRead,
-        hasBookmarked: item.hasBookmarked,
+        isRead: item.isRead,
+        isBookmarked: item.isBookmarked,
         title: item.title,
         link: item.link,
         content: item.content,

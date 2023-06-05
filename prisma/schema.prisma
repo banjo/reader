@@ -38,29 +38,29 @@ model Feed {
   name      String
   link      String   @unique
   imageUrl  String?
-  publicUrl String  @unique @default(uuid())
+  publicUrl String   @unique @default(uuid())
   ttl       Int?
   items     Item[]
   users     User[]
 }
 
 model Item {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  feed          Feed     @relation(fields: [feedId], references: [id])
-  feedId        Int
-  user          User     @relation(fields: [userId], references: [id])
-  userId        Int
-  hasRead       Boolean  @default(false)
-  hasBookmarked Boolean  @default(false)
-  title         String
-  link          String
-  content       String
-  html          String
-  lastFetch     DateTime
-  pubDate       DateTime
-  tags          Tag[]
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  feed         Feed     @relation(fields: [feedId], references: [id])
+  feedId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+  isRead       Boolean  @default(false)
+  isBookmarked Boolean  @default(false)
+  title        String
+  link         String
+  content      String
+  html         String
+  lastFetch    DateTime
+  pubDate      DateTime
+  tags         Tag[]
 }
 
 model User {
