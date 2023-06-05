@@ -1,9 +1,11 @@
-import { Icon as IconType } from "@/components/icons";
+import { IconType } from "@/components/icons";
+import Link from "next/link";
 import { FC, ReactNode } from "react";
 
 type ItemProps = {
     title: string;
     Icon: IconType;
+    url: string;
     selected: boolean;
     highlight?: boolean;
     notification?: ReactNode;
@@ -13,6 +15,7 @@ export const Item: FC<ItemProps> = ({
     title,
     Icon,
     notification,
+    url,
     selected = false,
     highlight = false,
 }) => {
@@ -22,8 +25,11 @@ export const Item: FC<ItemProps> = ({
 
     const highlightClasses = highlight ? "font-semibold" : "";
 
+    console.log(url);
+
     return (
-        <li
+        <Link
+            href={url}
             className={`flex h-10 w-72 cursor-pointer items-center justify-between gap-4 rounded
          px-4 text-foreground
          ${selectedClasses}
@@ -35,6 +41,6 @@ export const Item: FC<ItemProps> = ({
                 <span className="text-md">{title}</span>
             </div>
             {notification}
-        </li>
+        </Link>
     );
 };

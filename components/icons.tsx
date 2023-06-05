@@ -9,7 +9,7 @@ import {
     type Icon as LucideIcon,
 } from "lucide-react";
 
-export type Icon = LucideIcon;
+export type IconType = LucideIcon;
 
 export const Icons = {
     home: Home,
