@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { FeedRepository } from "../../../repositories/FeedRepository";
 import { RequestService } from "../../../services/RequestService";
+import { ResponseService } from "../../../services/ResponseService";
 
 export async function GET(req: Request) {
     const userId = RequestService.getUserId(req);
@@ -8,8 +8,8 @@ export async function GET(req: Request) {
     const feed = await FeedRepository.getAllUserFeeds(userId);
 
     if (!feed.success) {
-        return NextResponse.error();
+        return ResponseService.error(feed.message, feed.type);
     }
 
-    return NextResponse.json({ data: feed.data });
+    return ResponseService.success(feed.data);
 }

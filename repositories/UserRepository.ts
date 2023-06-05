@@ -1,3 +1,4 @@
+import "server-only";
 import { Result } from "../models/result";
 import prisma from "./prisma";
 
@@ -9,7 +10,7 @@ const getIdByExternalId = async (externalId: string): Promise<Result<number>> =>
     });
 
     if (!user) {
-        return Result.error("NotFound", "User not found");
+        return Result.error("User not found", "NotFound");
     }
 
     return Result.ok(user.id);

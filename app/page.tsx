@@ -22,12 +22,12 @@ export const revalidate = 0;
 // };
 
 const getFeed = async () => {
-    const res = await fetcher.GET<Feed[]>("/api/feed");
+    const res = await fetcher.GET<Feed[]>("feed");
 
     console.log({ res });
 
-    if (res) {
-        return res;
+    if (res.success) {
+        return res.data;
     }
 
     return [];

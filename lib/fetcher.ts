@@ -1,38 +1,80 @@
 import { auth } from "@clerk/nextjs";
-import ky from "ky-universal";
-import { getUrl } from "./url";
+import ky, { HTTPError } from "ky-universal";
+import { ErrorType, Result, SuccessResult } from "../models/result";
+import { getUrl } from "../shared/lib/url";
 
 /**
  * HELPERS
  */
 
-const getHeaders = () => {
-    const { userId } = auth();
+const handleError = async <T>(error: unknown): Promise<Result<T>> => {
+    const errorTyped = error as HTTPError;
+    const errorMessage = await errorTyped.response.text();
+    const type = errorTyped.response.statusText as ErrorType; // TODO: validate this later
 
-    if (!userId) {
-        throw new Error("User is not authenticated");
-    }
-
-    const updatedHeaders = new Headers();
-    updatedHeaders.set("X-External-User-Id", userId);
-    return updatedHeaders;
+    return Result.error(errorMessage, type);
 };
+
+const api = ky.create({
+    prefixUrl: `${getUrl()}/api`,
+    hooks: {
+        beforeRequest: [
+            options => {
+                const { userId } = auth();
+
+                if (!userId) {
+                    throw new Error("User is not authenticated");
+                }
+
+                options.headers.set("X-External-User-Id", userId);
+            },
+        ],
+    },
+});
 
 /**
  * FETCHER
  **/
 
-const GET = async <T>(path: string): Promise<T | null> => {
+const GET = async <T>(path: string): Promise<Result<T>> => {
     try {
-        const res = await ky
-            .get(`${getUrl()}${path}`, { headers: getHeaders() })
-            .json<{ data: T; success: boolean }>();
+        const res = await api.get(path).json<SuccessResult<T>>();
 
-        return res.data;
-    } catch (error: any) {
-        console.log(error.message);
-        return null;
+        return Result.ok(res.data);
+    } catch (error: unknown) {
+        console.log(error);
+        return handleError(error);
     }
 };
 
-export const fetcher = { GET };
+const POST = async <T>(path: string, body: unknown): Promise<Result<T>> => {
+    try {
+        const res = await api.post(path, { json: body }).json<SuccessResult<T>>();
+
+        return Result.ok(res.data);
+    } catch (error: unknown) {
+        return handleError(error);
+    }
+};
+
+const PUT = async <T>(path: string, body: unknown): Promise<Result<T>> => {
+    try {
+        const res = await api.put(path, { json: body }).json<SuccessResult<T>>();
+
+        return Result.ok(res.data);
+    } catch (error: unknown) {
+        return handleError(error);
+    }
+};
+
+const DELETE = async <T>(path: string): Promise<Result<T>> => {
+    try {
+        const res = await api.delete(path).json<SuccessResult<T>>();
+
+        return Result.ok(res.data);
+    } catch (error: unknown) {
+        return handleError(error);
+    }
+};
+
+export const fetcher = { GET, POST, PUT, DELETE };

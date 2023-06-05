@@ -1,6 +1,7 @@
 import { Result } from "@/models/result";
 import prisma from "@/repositories/prisma";
 import { Feed } from "@prisma/client";
+import "server-only";
 
 const getAllUserFeeds = async (userId: number): Promise<Result<Feed[]>> => {
     const feeds = await prisma.feed.findMany({
@@ -14,7 +15,7 @@ const getAllUserFeeds = async (userId: number): Promise<Result<Feed[]>> => {
     });
 
     if (!feeds) {
-        return Result.error("NotFound", "No feeds found");
+        return Result.error("No feeds found", "NotFound");
     }
 
     return Result.ok(feeds);
@@ -28,7 +29,7 @@ const getFeedById = async (feedId: number): Promise<Result<Feed>> => {
     });
 
     if (!feed) {
-        return Result.error("NotFound", "Feed not found");
+        return Result.error("Feed not found", "NotFound");
     }
 
     return Result.ok(feed);
@@ -42,7 +43,7 @@ const getFeedByUrl = async (feedUrl: string): Promise<Result<Feed>> => {
     });
 
     if (!feed) {
-        return Result.error("NotFound", "Feed not found");
+        return Result.error("Feed not found", "NotFound");
     }
 
     return Result.ok(feed);
@@ -54,7 +55,7 @@ const createFeed = async (feed: Feed): Promise<Result<Feed>> => {
     });
 
     if (!createdFeed) {
-        return Result.error("InternalError", "Could not create feed");
+        return Result.error("Could not create feed", "InternalError");
     }
 
     return Result.ok(createdFeed);
