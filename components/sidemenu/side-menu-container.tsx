@@ -6,14 +6,16 @@ import { Divider } from "@/components/sidemenu/divider";
 import { Item } from "@/components/sidemenu/item";
 import { Sidemenu } from "@/components/sidemenu/menu";
 import { SubMenu } from "@/components/sidemenu/sub-menu";
+import { Feed } from "@prisma/client";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
 
 type Props = {
     prefix?: string;
+    feeds: Feed[];
 };
 
-export const SideMenuContainer: FC<Props> = ({ prefix }) => {
+export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
     const pathname = usePathname();
 
     const prefixUrl = (url: string) => {
@@ -54,6 +56,15 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     Icon={Icons.layout}
                     selected={isSelected("/all")}
                 />
+                {feeds.map(feed => (
+                    <Item
+                        key={feed.id}
+                        title={feed.name}
+                        url={prefixUrl(`/feed/${feed.id}`)}
+                        Icon={Icons.moon}
+                        selected={isSelected(`/feed/${feed.id}`)}
+                    />
+                ))}
             </SubMenu>
         </Sidemenu>
     );
