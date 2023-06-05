@@ -27,6 +27,8 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
         return pathname === prefixUrl(url);
     };
 
+    console.log("🪕%c Banjo | side-menu-container.tsx:30 |", "color: #E91E63", feeds);
+
     return (
         <Sidemenu>
             <Divider size="sm" />
@@ -65,8 +67,8 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     <Item
                         key={feed.id}
                         title={feed.name}
-                        url={prefixUrl(`/feed/${feed.id}`)}
-                        Icon={Icons.moon}
+                        url={prefixUrl(`/feed/${feed.publicUrl}`)}
+                        image={feed.imageUrl}
                         selected={isSelected(`/feed/${feed.id}`)}
                     />
                 ))}

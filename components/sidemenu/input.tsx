@@ -6,8 +6,7 @@ type Props = {
     test?: boolean;
 };
 
-export const Input: FC<Props> = ({ test }) => {
-    console.log(test);
+export const Input: FC<Props> = () => {
     return (
         <div className="flex items-center gap-2">
             <InputComponent className="ml-8 flex h-10 w-56" placeholder="Feed URL..." />

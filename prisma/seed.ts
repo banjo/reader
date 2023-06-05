@@ -55,19 +55,24 @@ const items: Item[] = [
 ];
 
 async function main() {
-    for (const user of users) {
-        await prisma.user.upsert({
-            where: { id: user.id },
-            update: {},
-            create: user,
-        });
-    }
-
     for (const feed of feeds) {
         await prisma.feed.upsert({
             where: { id: feed.id },
             update: {},
             create: feed,
+        });
+    }
+
+    for (const user of users) {
+        await prisma.user.upsert({
+            where: { id: user.id },
+            update: {},
+            create: {
+                ...user,
+                feeds: {
+                    connect: feeds.map(feed => ({ id: feed.id })),
+                },
+            },
         });
     }
 

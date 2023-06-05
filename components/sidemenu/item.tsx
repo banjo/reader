@@ -4,7 +4,8 @@ import { FC, ReactNode } from "react";
 
 type ItemProps = {
     title: string;
-    Icon: IconType;
+    Icon?: IconType;
+    image?: string | null;
     url: string;
     selected: boolean;
     highlight?: boolean;
@@ -16,6 +17,7 @@ export const Item: FC<ItemProps> = ({
     Icon,
     notification,
     url,
+    image,
     selected = false,
     highlight = false,
 }) => {
@@ -24,8 +26,6 @@ export const Item: FC<ItemProps> = ({
         : "hover:bg-slate-50 dark:hover:bg-slate-900";
 
     const highlightClasses = highlight ? "font-semibold" : "";
-
-    console.log(url);
 
     return (
         <Link
@@ -37,7 +37,8 @@ export const Item: FC<ItemProps> = ({
          `}
         >
             <div className="flex items-center gap-4">
-                <Icon className="h-5 w-5" />
+                {Icon && <Icon className="h-5 w-5" />}
+                {image && <img src={image} className="h-5 w-5 rounded-full" />}
                 <span className="text-md">{title}</span>
             </div>
             {notification}
