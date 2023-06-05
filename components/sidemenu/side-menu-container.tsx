@@ -7,13 +7,13 @@ import { Input } from "@/components/sidemenu/input";
 import { Item } from "@/components/sidemenu/item";
 import { Sidemenu } from "@/components/sidemenu/menu";
 import { SubMenu } from "@/components/sidemenu/sub-menu";
-import { Feed } from "@prisma/client";
+import { CleanFeed } from "@/models/entities";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
 
 type Props = {
     prefix?: string;
-    feeds: Feed[];
+    feeds: CleanFeed[];
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {

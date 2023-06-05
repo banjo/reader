@@ -49,6 +49,9 @@ dependencies:
   tslog:
     specifier: ^4.8.2
     version: 4.8.2
+  type-fest:
+    specifier: ^3.11.1
+    version: 3.11.1
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -4672,6 +4675,11 @@ packages:
   /type-fest@2.19.0:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
+    dev: false
+
+  /type-fest@3.11.1:
+    resolution: {integrity: sha512-aCuRNRERRVh33lgQaJRlUxZqzfhzwTrsE98Mc3o3VXqmiaQdHacgUtJ0esp+7MvZ92qhtzKPeusaX6vIEcoreA==}
+    engines: {node: '>=14.16'}
     dev: false
 
   /typed-array-length@1.0.4:
