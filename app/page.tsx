@@ -2,6 +2,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { Feed } from "@prisma/client";
 import Link from "next/link";
 import { fetcher } from "../lib/fetcher";
+import { FeedModel } from "../prisma/zod";
+import { safeParseArray } from "../shared/lib/zod";
 
 export const revalidate = 0;
 
@@ -24,13 +26,17 @@ export const revalidate = 0;
 const getFeed = async () => {
     const res = await fetcher.GET<Feed[]>("feed");
 
-    console.log({ res });
-
-    if (res.success) {
-        return res.data;
+    if (!res.success) {
+        return [];
     }
 
-    return [];
+    const parsedResult = safeParseArray(res.data, FeedModel);
+
+    if (!parsedResult.success) {
+        return [];
+    }
+
+    return parsedResult.data;
 };
 
 export default async function IndexPage() {
