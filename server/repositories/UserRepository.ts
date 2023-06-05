@@ -1,5 +1,5 @@
 import "server-only";
-import { Result } from "../models/result";
+import { Result } from "../../models/result";
 import prisma from "./prisma";
 
 const getIdByExternalId = async (externalId: string): Promise<Result<number>> => {

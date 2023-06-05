@@ -11,6 +11,9 @@ pscale connect banjo-rss initial-setup --port 3309
 # add changes to database
 npx prisma db push
 
+# generate prisma client
+npx prisma generate # this will also generate the types for zod
+
 # open prisma studio
 npx prisma studio
 ```
@@ -20,8 +23,11 @@ npx prisma studio
 -   [ ] Add all prisma functions
 -   [ ] Add all api functions
 -   [ ] Create user in database on sign up
--   [ ] Fix problem with externalId and local id, auth() only contains externalId
+-   [x] Fix problem with externalId and local id, auth() only contains externalId
 -   [ ] Add createdAt and updatedAt to all models
+-   [ ] Add validation and workflow with zod
+-   [ ] Add logging
+-   [ ] Add tests with vitest
 
 
 

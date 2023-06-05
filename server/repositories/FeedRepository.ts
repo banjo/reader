@@ -1,5 +1,5 @@
 import { Result } from "@/models/result";
-import prisma from "@/repositories/prisma";
+import prisma from "@/server/repositories/prisma";
 import { Feed } from "@prisma/client";
 import "server-only";
 

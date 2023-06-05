@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ErrorStatus, ErrorType } from "../models/result";
+import { ErrorStatus, ErrorType } from "../../models/result";
 
 const success = <T>(data: T) => {
     return NextResponse.json({ data, success: true });
