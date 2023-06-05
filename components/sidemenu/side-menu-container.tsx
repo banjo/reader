@@ -39,6 +39,17 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
         }, 0);
     }, [feeds]);
 
+    const bookmarksUnread = useMemo(() => {
+        // eslint-disable-next-line unicorn/no-array-reduce
+        return feeds.reduce((acc, feed) => {
+            if (!feed.items) {
+                return acc;
+            }
+
+            return acc + feed.items.filter(item => !item.hasRead && item.hasBookmarked).length;
+        }, 0);
+    }, [feeds]);
+
     return (
         <Sidemenu>
             <Divider size="sm" />
@@ -54,13 +65,15 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     Icon={Icons.home}
                     selected={isSelected("")}
                     highlight={Boolean(totalUnread)}
-                    notification={totalUnread}
+                    notification={totalUnread > 0 ? totalUnread : undefined}
                 />
                 <Item
                     title="Bookmarks"
                     url={prefixUrl("/bookmarks")}
                     Icon={Icons.bookmark}
                     selected={isSelected("/bookmarks")}
+                    highlight={Boolean(bookmarksUnread)}
+                    notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
                 />
             </SubMenu>
 
@@ -74,7 +87,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     selected={isSelected("/all")}
                 />
                 {feeds.map(feed => {
-                    const unread = feed.items?.filter(item => !item.hasRead).length || "";
+                    const unread = feed.items?.filter(item => !item.hasRead).length ?? 0;
 
                     return (
                         <Item
@@ -83,7 +96,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                             url={prefixUrl(`/feed/${feed.publicUrl}`)}
                             image={feed.imageUrl ?? avatarUrl(feed.publicUrl)}
                             selected={isSelected(`/feed/${feed.publicUrl}`)}
-                            notification={unread}
+                            notification={unread > 0 ? unread : undefined}
                             highlight={Boolean(unread)}
                         />
                     );
