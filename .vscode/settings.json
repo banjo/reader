@@ -1,5 +1,6 @@
 {
     "typescript.tsdk": "../../node_modules/.pnpm/typescript@4.9.5/node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true,
-    "javascript.preferences.importModuleSpecifier": "shortest"
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+    "typescript.preferences.importModuleSpecifier": "non-relative"
 }

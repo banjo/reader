@@ -1,27 +1,11 @@
 import { buttonVariants } from "@/components/ui/button";
+import { fetcher } from "@/lib/fetcher";
+import { FeedModel } from "@/prisma/zod";
+import { safeParseArray } from "@/shared/lib/zod";
 import { Feed } from "@prisma/client";
 import Link from "next/link";
-import { fetcher } from "../lib/fetcher";
-import { FeedModel } from "../prisma/zod";
-import { safeParseArray } from "../shared/lib/zod";
 
 export const revalidate = 0;
-
-// const getFeed = async (externalUserId: string): Promise<Feed[]> => {
-//     const userId = await UserRepository.getIdByExternalId(externalUserId);
-
-//     if (!userId.success) {
-//         return [];
-//     }
-
-//     const feed = await FeedRepository.getAllUserFeeds(userId.data);
-
-//     if (!feed.success) {
-//         return [];
-//     }
-
-//     return feed.data;
-// };
 
 const getFeed = async () => {
     const res = await fetcher.GET<Feed[]>("feed");

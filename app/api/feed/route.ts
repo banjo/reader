@@ -1,6 +1,6 @@
-import { FeedRepository } from "../../../server/repositories/FeedRepository";
-import { RequestService } from "../../../server/services/RequestService";
-import { ResponseService } from "../../../server/services/ResponseService";
+import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { RequestService } from "@/server/services/RequestService";
+import { ResponseService } from "@/server/services/ResponseService";
 
 export async function GET(req: Request) {
     const userId = RequestService.getUserId(req);

@@ -1,5 +1,5 @@
+import { Result } from "@/models/result";
 import * as z from "zod";
-import { Result } from "../../models/result";
 
 type Error = {
     code: string;

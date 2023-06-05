@@ -1,7 +1,7 @@
+import { ErrorType, Result, SuccessResult } from "@/models/result";
+import { getUrl } from "@/shared/lib/url";
 import { auth } from "@clerk/nextjs";
 import ky, { HTTPError } from "ky-universal";
-import { ErrorType, Result, SuccessResult } from "../models/result";
-import { getUrl } from "../shared/lib/url";
 
 /**
  * HELPERS
