@@ -1,7 +1,10 @@
 import { Result } from "@/models/result";
+import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
 import { Feed } from "@prisma/client";
 import "server-only";
+
+const logger = createLogger("FeedRepository");
 
 const getAllUserFeeds = async (userId: number): Promise<Result<Feed[]>> => {
     const feeds = await prisma.feed.findMany({
@@ -15,6 +18,7 @@ const getAllUserFeeds = async (userId: number): Promise<Result<Feed[]>> => {
     });
 
     if (!feeds) {
+        logger.error("No feeds found");
         return Result.error("No feeds found", "NotFound");
     }
 
@@ -29,6 +33,7 @@ const getFeedById = async (feedId: number): Promise<Result<Feed>> => {
     });
 
     if (!feed) {
+        logger.error("Feed not found");
         return Result.error("Feed not found", "NotFound");
     }
 
@@ -43,6 +48,7 @@ const getFeedByUrl = async (feedUrl: string): Promise<Result<Feed>> => {
     });
 
     if (!feed) {
+        logger.error("Feed not found");
         return Result.error("Feed not found", "NotFound");
     }
 
@@ -55,6 +61,7 @@ const createFeed = async (feed: Feed): Promise<Result<Feed>> => {
     });
 
     if (!createdFeed) {
+        logger.error("Could not create feed");
         return Result.error("Could not create feed", "InternalError");
     }
 
