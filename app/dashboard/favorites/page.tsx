@@ -1,4 +1,4 @@
-import { TableContainer } from "@/components/table/table-container";
+import { FavoriteContainer } from "@/components/features/feed/containers/favorite-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 
@@ -9,22 +9,8 @@ export default async function FavoritePage() {
     const feedResponse = await FeedService.getAllFeedsByUserId(userId);
 
     if (!feedResponse.success) {
-        console.log("no feed found in db");
-        return <div>feed not found</div>; // TODO: create error page
+        throw new Error(feedResponse.message);
     }
 
-    const filtered = feedResponse.data.map(feed => {
-        return {
-            ...feed,
-            items: feed.items.filter(item => item.isFavorite),
-        };
-    });
-
-    return (
-        <div className="flex flex-col gap-4">
-            All
-            <TableContainer feeds={filtered} />
-            <div></div>
-        </div>
-    );
+    return <FavoriteContainer feeds={feedResponse.data} />;
 }
