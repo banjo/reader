@@ -1,6 +1,5 @@
+import { Size } from "@/models/size";
 import { FC } from "react";
-
-type Size = "sm" | "md" | "lg";
 
 type Props = {
     size: Size;

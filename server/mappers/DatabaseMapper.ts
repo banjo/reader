@@ -6,6 +6,8 @@ function item(item: Item): Omit<Item, "feedId" | "userId"> {
         id: item.id,
         isRead: item.isRead,
         isBookmarked: item.isBookmarked,
+        isFavorite: item.isFavorite,
+        image: item.image,
         title: item.title,
         link: item.link,
         content: item.content,

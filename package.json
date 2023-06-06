@@ -13,7 +13,7 @@
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
     "add": "npx shadcn-ui add",
-    "db:update": "npx prisma migrate reset && npx prisma db push && npx prisma generate && nr format:write && npx prisma db seed"
+    "db:update": "npx prisma migrate reset --skip-seed --skip-generate --force && npx prisma db push && npx prisma generate && nr format:write && npx prisma db seed"
   },
   "prisma": {
     "seed": "esno prisma/seed.ts"

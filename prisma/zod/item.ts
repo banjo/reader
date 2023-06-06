@@ -17,6 +17,7 @@ export const ItemModel = z.object({
     userId: z.number().int(),
     isRead: z.boolean(),
     isBookmarked: z.boolean(),
+    isFavorite: z.boolean(),
     image: z.string().nullish(),
     title: z.string(),
     description: z.string(),
