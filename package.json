@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
-    "add": "npx shadcn-ui add"
+    "add": "npx shadcn-ui add",
+    "db:update": "npx prisma migrate reset && npx prisma db push && npx prisma generate && nr format:write && npx prisma db seed"
   },
   "prisma": {
     "seed": "esno prisma/seed.ts"
@@ -39,6 +40,7 @@
     "zod-prisma": "^0.5.4"
   },
   "devDependencies": {
+    "@antfu/ni": "^0.21.3",
     "@banjoanton/eslint-config": "^0.1.8",
     "@banjoanton/prettier-config": "^0.1.3",
     "@banjoanton/utils": "^0.1.43",

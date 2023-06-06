@@ -4,7 +4,9 @@ import {
     LayoutList,
     LucideProps,
     Moon,
+    MoreHorizontal,
     PlusCircle,
+    Star,
     SunMedium,
     Twitter,
     type Icon as LucideIcon,
@@ -20,6 +22,8 @@ export const Icons = {
     bookmark: Bookmark,
     layout: LayoutList,
     add: PlusCircle,
+    star: Star,
+    horizontalMenu: MoreHorizontal,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path

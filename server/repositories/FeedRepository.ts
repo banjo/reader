@@ -35,6 +35,9 @@ const getFeedById = async (feedId: number): Promise<Result<CleanFeedWithItems>> 
         where: {
             id: feedId,
         },
+        include: {
+            items: true,
+        },
     });
 
     if (!feed) {
@@ -49,6 +52,27 @@ const getFeedByUrl = async (feedUrl: string): Promise<Result<CleanFeedWithItems>
     const feed = await prisma.feed.findUnique({
         where: {
             link: feedUrl,
+        },
+        include: {
+            items: true,
+        },
+    });
+
+    if (!feed) {
+        logger.error("Feed not found");
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    return Result.ok(DatabaseMapper.feed(feed));
+};
+
+const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<Result<CleanFeedWithItems>> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            publicUrl: feedPublicUrl,
+        },
+        include: {
+            items: true,
         },
     });
 
@@ -77,5 +101,6 @@ export const FeedRepository = {
     getAllUserFeeds,
     getFeedById,
     getFeedByUrl,
+    getFeedByPublicUrl,
     createFeed,
 };

@@ -9,6 +9,7 @@ function item(item: Item): Omit<Item, "feedId" | "userId"> {
         title: item.title,
         link: item.link,
         content: item.content,
+        description: item.description,
         html: item.html,
         lastFetch: item.lastFetch,
         pubDate: item.pubDate,

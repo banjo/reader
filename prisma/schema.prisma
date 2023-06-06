@@ -54,7 +54,9 @@ model Item {
   userId       Int
   isRead       Boolean  @default(false)
   isBookmarked Boolean  @default(false)
+  image        String?
   title        String
+  description  String
   link         String
   content      String
   html         String
