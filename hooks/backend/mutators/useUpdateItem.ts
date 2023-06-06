@@ -3,11 +3,11 @@ import { CleanItem } from "@/models/entities";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
 
-type In = {
-    refetch: () => Promise<void>;
+type In<T> = {
+    refetch: (item: T) => Promise<void>;
 };
 
-export const useUpdateItem = <T extends CleanItem>({ refetch }: In) => {
+export const useUpdateItem = <T extends CleanItem>({ refetch }: In<T>) => {
     const { userId } = useAuth();
 
     if (!userId) {
@@ -23,9 +23,15 @@ export const useUpdateItem = <T extends CleanItem>({ refetch }: In) => {
 
         if (!res.success) {
             toast.error(res.message);
+            return;
         }
 
-        await refetch();
+        const updatedItem = {
+            ...item,
+            isRead: !item.isRead,
+        };
+
+        await refetch(updatedItem);
     };
 
     return {

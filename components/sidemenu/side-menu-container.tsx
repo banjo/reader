@@ -7,6 +7,7 @@ import { Input } from "@/components/sidemenu/input";
 import { Item } from "@/components/sidemenu/item";
 import { Sidemenu } from "@/components/sidemenu/menu";
 import { SubMenu } from "@/components/sidemenu/sub-menu";
+import { useGet } from "@/hooks/backend/useGet";
 import { avatarUrl } from "@/lib/utils";
 import { CleanFeedWithItems } from "@/models/entities";
 import { usePathname } from "next/navigation";
@@ -18,7 +19,13 @@ type Props = {
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
+    const { data: fetchData } = useGet({ key: "/feed", fallbackData: feeds });
+
     const pathname = usePathname();
+
+    const data = useMemo(() => {
+        return fetchData ?? feeds;
+    }, [feeds, fetchData]);
 
     const prefixUrl = (url: string) => {
         return prefix ? `${prefix}${url}` : url;
@@ -30,36 +37,36 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
 
     const totalUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
-        return feeds.reduce((acc, feed) => {
+        return data.reduce((acc, feed) => {
             if (!feed.items) {
                 return acc;
             }
 
             return acc + feed.items.filter(item => !item.isRead).length;
         }, 0);
-    }, [feeds]);
+    }, [data]);
 
     const bookmarksUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
-        return feeds.reduce((acc, feed) => {
+        return data.reduce((acc, feed) => {
             if (!feed.items) {
                 return acc;
             }
 
             return acc + feed.items.filter(item => !item.isRead && item.isBookmarked).length;
         }, 0);
-    }, [feeds]);
+    }, [data]);
 
     const favoritesUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
-        return feeds.reduce((acc, feed) => {
+        return data.reduce((acc, feed) => {
             if (!feed.items) {
                 return acc;
             }
 
             return acc + feed.items.filter(item => !item.isRead && item.isFavorite).length;
         }, 0);
-    }, [feeds]);
+    }, [data]);
 
     return (
         <Sidemenu>
