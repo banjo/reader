@@ -133,6 +133,22 @@ const items: Item[] = [
         lastFetch: new Date(),
         pubDate: new Date(),
     },
+    {
+        id: 7,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 2,
+        userId: 1,
+        isRead: false,
+        isBookmarked: true,
+        title: "Intro to Vue.js",
+        description: "A beginner's guide to Vue.js",
+        link: "https://www.example.com/post/vue/beginners-guide",
+        content: "Get started with Vue.js and learn the basics",
+        html: "<p><strong>Vue.js</strong> can make your life easier!</p>",
+        lastFetch: new Date(),
+        pubDate: new Date(),
+    },
 ];
 
 async function main() {
