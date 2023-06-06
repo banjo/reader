@@ -37,5 +37,5 @@ export async function PUT(req: Request, { params }: PutProps) {
         return ResponseService.error(item.message, item.type);
     }
 
-    return ResponseService.success(item.data);
+    return ResponseService.emptySuccess();
 }

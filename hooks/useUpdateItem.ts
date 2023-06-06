@@ -19,10 +19,7 @@ export const useUpdateItem = <T extends CleanItem>() => {
 
         if (!res.success) {
             toast.error(res.message);
-            return;
         }
-
-        toast.success("Item updated");
     };
 
     return {

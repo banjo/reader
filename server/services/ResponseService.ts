@@ -7,6 +7,10 @@ const success = <T>(data: T): NextResponse<SuccessRequest<T>> => {
     return NextResponse.json({ data, success: true });
 };
 
+const emptySuccess = (): NextResponse<SuccessRequest<null>> => {
+    return NextResponse.json({ data: null, success: true });
+};
+
 const error = (message: string, type: ErrorType): NextResponse<RequestError> => {
     return NextResponse.json(
         {
@@ -32,4 +36,4 @@ const badRequest = (name: string, errors: ZodIssue[]): NextResponse<BadRequestEr
     );
 };
 
-export const ResponseService = { success, error, badRequest };
+export const ResponseService = { success, error, badRequest, emptySuccess };
