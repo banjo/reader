@@ -21,14 +21,15 @@ npx prisma studio
 ## TODO:
 -   [ ] Create user in database on sign up
 -   [x] Fix problem with externalId and local id, auth() only contains externalId
--   [ ] Add createdAt and updatedAt to all models
--   [ ] Add validation and workflow with zod
+-   [x] Add createdAt and updatedAt to all models
+-   [x] Add validation and workflow with zod
 -   [x] Add logging
 -   [ ] Add tests with vitest
--   [ ] Make own model separate from database model
--   [ ] Add feed image to feed model
--   [ ] Add public id for feed model (for url)
+-   [x] Make own model separate from database model
+-   [x] Add feed image to feed model
+-   [x] Add public id for feed model (for url)
 -   [ ] Do not return result from repository, return result from service?
+-   [ ] Fetch client side for dynamic data instead (or combo?)
 
 
 
