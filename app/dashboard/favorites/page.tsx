@@ -4,7 +4,7 @@ import { ServerComponentService } from "@/server/services/ServerComponentService
 
 export const revalidate = 0;
 
-export default async function BookmarksPage() {
+export default async function FavoritePage() {
     const userId = await ServerComponentService.getUserId();
     const feedResponse = await FeedRepository.getAllUserFeeds(userId);
 
@@ -16,7 +16,7 @@ export default async function BookmarksPage() {
     const filtered = feedResponse.data.map(feed => {
         return {
             ...feed,
-            items: feed.items.filter(item => item.isBookmarked),
+            items: feed.items.filter(item => item.isFavorite),
         };
     });
 

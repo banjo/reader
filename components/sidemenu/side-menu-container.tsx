@@ -79,7 +79,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     notification={totalUnread > 0 ? totalUnread : undefined}
                 />
                 <Item
-                    title="Bookmarks"
+                    title="Read later"
                     url={prefixUrl("/bookmarks")}
                     Icon={Icons.bookmark}
                     selected={isSelected("/bookmarks")}
