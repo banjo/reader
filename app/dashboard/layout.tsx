@@ -1,5 +1,5 @@
 import { SideMenuContainer } from "@/components/sidemenu/side-menu-container";
-import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 import { redirect } from "next/navigation";
 
@@ -11,7 +11,7 @@ export const revalidate = 0; // TODO: set revalidate to 60 seconds when done wit
 
 export default async function DashboardLayout({ children }: Props) {
     const userId = await ServerComponentService.getUserId();
-    const feeds = await FeedRepository.getAllUserFeeds(userId);
+    const feeds = await FeedService.getAllFeedsByUserId(userId);
 
     if (!feeds.success) {
         console.log("no feeds found in db");

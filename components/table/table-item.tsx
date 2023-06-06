@@ -1,4 +1,5 @@
 import { Icons } from "@/components/icons";
+import { Dropdown, MenuEntries } from "@/components/shared/Dropdown";
 import { Bookmark } from "@/components/shared/icons/bookmark";
 import { Favorite } from "@/components/shared/icons/favorite";
 import { TableType } from "@/components/table/table.types";
@@ -10,9 +11,16 @@ type CardProps = {
     type: TableType;
     showFeedName?: boolean;
     feedName?: string;
+    menuOptions?: MenuEntries[];
 };
 
-export const TableItem: FC<CardProps> = ({ item, type, showFeedName = false, feedName }) => {
+export const TableItem: FC<CardProps> = ({
+    item,
+    type,
+    showFeedName = false,
+    feedName,
+    menuOptions,
+}) => {
     if (type === "card") {
         throw new Error("not implemented");
     }
@@ -30,7 +38,11 @@ export const TableItem: FC<CardProps> = ({ item, type, showFeedName = false, fee
             )}
             <span className="min-w-max font-bold">{item.title}</span>
             <span className="w-0 max-w-full shrink grow truncate">{item.description}</span>
-            <Icons.horizontalMenu className="ml-auto h-5 w-5" />
+            {menuOptions && (
+                <Dropdown align="start" side="left" items={menuOptions}>
+                    <Icons.horizontalMenu className="ml-auto h-5 w-5" />
+                </Dropdown>
+            )}
         </div>
     );
 };

@@ -1,5 +1,5 @@
-import { TableContainer } from "@/components/table/table-container";
-import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { FeedContainer } from "@/components/features/feed/containers/feed-container";
+import { FeedService } from "@/server/services/FeedService";
 
 type Props = {
     params: {
@@ -16,21 +16,11 @@ export default async function FeedPage({ params }: Props) {
         return <div>invalid feed id</div>; // TODO: create error page
     }
 
-    // const userId = await ServerComponentService.getUserId(); // TODO: check if user has access to feed
-    const feedResponse = await FeedRepository.getFeedByPublicUrl(slug);
+    const feedResponse = await FeedService.getFeedByPublicUrl(slug);
 
     if (!feedResponse.success) {
-        console.log("no feed found in db");
-        return <div>feed not found</div>; // TODO: create error page
+        return <div>invalid feed id</div>; // TODO: create error page
     }
 
-    const feed = feedResponse.data;
-
-    return (
-        <div className="flex flex-col gap-4">
-            {feed.name}
-            <TableContainer feeds={[feed]} />
-            <div></div>
-        </div>
-    );
+    return <FeedContainer feed={feedResponse.data} slug={slug} />;
 }

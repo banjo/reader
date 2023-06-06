@@ -27,6 +27,7 @@ const api = ky.create({
                 }
 
                 options.headers.set("X-External-User-Id", userId);
+                options.headers.set("Content-Type", "application/json");
             },
         ],
     },

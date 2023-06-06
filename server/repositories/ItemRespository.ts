@@ -1,0 +1,81 @@
+import { Result } from "@/models/result";
+import createLogger from "@/server/lib/logger";
+import prisma from "@/server/repositories/prisma";
+import { Item } from "@prisma/client";
+import "server-only";
+
+const logger = createLogger("ItemRepository");
+
+const getAllItemsByFeed = async (feedId: number): Promise<Result<Item[]>> => {
+    let items: Item[];
+    try {
+        items = await prisma.item.findMany({
+            where: {
+                feedId: feedId,
+            },
+        });
+    } catch (error: unknown) {
+        logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
+        return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
+    }
+
+    return Result.ok(items);
+};
+
+const getItemById = async (itemId: number): Promise<Result<Item>> => {
+    let item: Item | null;
+    try {
+        item = await prisma.item.findUnique({
+            where: {
+                id: itemId,
+            },
+        });
+    } catch (error: unknown) {
+        logger.error(`Could not find item with id ${itemId} - ${error}`);
+        return Result.error(`Could not find item with id ${itemId}`, "InternalError");
+    }
+
+    if (!item) {
+        logger.info(`Could not find item with id ${itemId}`);
+        return Result.error(`Could not find item with id ${itemId}`, "NotFound");
+    }
+
+    return Result.ok(item);
+};
+
+const updateItem = async (item: Item): Promise<Result<Item>> => {
+    let updatedItem: Item;
+    try {
+        updatedItem = await prisma.item.update({
+            where: {
+                id: item.id,
+            },
+            data: item,
+        });
+    } catch (error: unknown) {
+        logger.error(`Could not update item with id ${item.id} - ${error}`);
+        return Result.error(`Could not update item with id ${item.id}`, "InternalError");
+    }
+
+    return Result.ok(updatedItem);
+};
+
+const createItem = async (item: Item): Promise<Result<Item>> => {
+    try {
+        const createdItem = await prisma.item.create({
+            data: item,
+        });
+
+        return Result.ok(createdItem);
+    } catch (error: unknown) {
+        logger.error(`Could not create item - ${error}`);
+        return Result.error(`Could not create item`, "InternalError");
+    }
+};
+
+export const ItemRepository = {
+    getAllItemsByFeed,
+    getItemById,
+    createItem,
+    updateItem,
+};

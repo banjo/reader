@@ -1,5 +1,6 @@
 "use client";
 
+import { MenuEntries } from "@/components/shared/Dropdown";
 import { Table } from "@/components/table/table";
 import { TableItem } from "@/components/table/table-item";
 import { CleanFeedWithItems, CleanItem } from "@/models/entities";
@@ -7,6 +8,7 @@ import { FC, useMemo } from "react";
 
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
+    menuOptions?: MenuEntries[];
 };
 
 type FormattedFeed = {
@@ -15,7 +17,7 @@ type FormattedFeed = {
     items: CleanItem[];
 };
 
-export const TableContainer: FC<TableContainerProps> = ({ feeds }) => {
+export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions }) => {
     const multipleFeeds = useMemo(() => feeds.length > 1, [feeds]);
 
     const data: FormattedFeed[] = useMemo(
@@ -41,6 +43,7 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds }) => {
                             type="list"
                             feedName={formattedFeed.name}
                             showFeedName={multipleFeeds}
+                            menuOptions={menuOptions}
                         />
                     );
                 });
