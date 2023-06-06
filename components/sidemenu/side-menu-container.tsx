@@ -50,6 +50,17 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
         }, 0);
     }, [feeds]);
 
+    const favoritesUnread = useMemo(() => {
+        // eslint-disable-next-line unicorn/no-array-reduce
+        return feeds.reduce((acc, feed) => {
+            if (!feed.items) {
+                return acc;
+            }
+
+            return acc + feed.items.filter(item => !item.isRead && item.isFavorite).length;
+        }, 0);
+    }, [feeds]);
+
     return (
         <Sidemenu>
             <Divider size="sm" />
@@ -75,6 +86,14 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     highlight={Boolean(bookmarksUnread)}
                     notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
                 />
+                <Item
+                    title="Favorites"
+                    url={prefixUrl("/favorites")}
+                    Icon={Icons.star}
+                    selected={isSelected("/favorites")}
+                    highlight={Boolean(favoritesUnread)}
+                    notification={favoritesUnread > 0 ? favoritesUnread : undefined}
+                />
             </SubMenu>
 
             <Divider size="lg" />
@@ -85,6 +104,8 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     url={prefixUrl("/all")}
                     Icon={Icons.layout}
                     selected={isSelected("/all")}
+                    highlight={Boolean(totalUnread)}
+                    notification={totalUnread > 0 ? totalUnread : undefined}
                 />
                 {feeds.map(feed => {
                     const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
