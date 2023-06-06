@@ -1,9 +1,10 @@
 import { useAuthFetcher } from "@/hooks/backend/useAuthFetcher";
 import { CleanFeedWithItems, CleanItem } from "@/models/entities";
+import { useMemo } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 
 type Out = {
-    data: CleanFeedWithItems | undefined;
+    data: CleanFeedWithItems;
     isLoading: boolean;
     refetch: (item: CleanItem) => Promise<void>;
 };
@@ -15,9 +16,13 @@ type In = {
 
 export const useFeedGet = ({ key, fallbackData }: In): Out => {
     const fetcher = useAuthFetcher();
-    const { data, mutate } = useSWR<CleanFeedWithItems, Error>(key, fetcher, {
+    const { data: fetchData, mutate } = useSWR<CleanFeedWithItems, Error>(key, fetcher, {
         fallbackData: fallbackData,
     });
+
+    const data = useMemo(() => {
+        return fetchData ?? fallbackData;
+    }, [fallbackData, fetchData]);
 
     const refetch = async (updatedItem: CleanItem) => {
         if (!data) {
