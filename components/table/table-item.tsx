@@ -26,10 +26,15 @@ export const TableItem = <T extends CleanItem>({
 
     return (
         <div
-            className="flex h-8 w-full cursor-pointer
-                items-center justify-start gap-3 rounded-md  bg-slate-100
+            className="relative flex h-8 w-full cursor-pointer
+                items-center justify-start gap-3 overflow-hidden  rounded-md
+                bg-slate-100
                 px-2 text-sm transition-colors hover:bg-slate-200"
         >
+            {item.isRead ? (
+                <div className="absolute inset-y-0 left-0 w-1 bg-slate-500"></div>
+            ) : null}
+
             <Favorite size="md" active={item.isFavorite} onClick={() => 0} />
             <Bookmark size="md" active={item.isBookmarked} onClick={() => 0} />
             {showFeedName && (

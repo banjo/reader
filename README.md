@@ -30,6 +30,7 @@ npx prisma studio
 -   [x] Add public id for feed model (for url)
 -   [ ] Do not return result from repository, return result from service?
 -   [ ] Fetch client side for dynamic data instead (or combo?)
+-   [ ] fix dark and white mode for table
 
 
 
