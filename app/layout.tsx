@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
     title: {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                         )}
                     >
                         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                            <Toaster position={"bottom-center"} />
                             <div className="relative flex min-h-screen flex-col">
                                 <SiteHeader />
                                 <div className="flex-1">{children}</div>

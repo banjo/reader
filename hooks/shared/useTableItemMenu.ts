@@ -7,7 +7,7 @@ type Out<T> = {
 };
 
 export const useTableItemMenu = <T extends CleanItem>(): Out<T> => {
-    const { toggleReadStatus } = useUpdateItem<T>();
+    const { toggleReadStatus } = useUpdateItem<CleanItem>();
 
     const menuOptions: MenuEntries<T>[] = [
         { label: "Edit", type: "label" },

@@ -1,11 +1,19 @@
-import { ErrorType, Result, ResultType, SuccessResult } from "@/models/result";
+import { BadRequestError, RequestError, SuccessRequest } from "@/models/request";
+import { ErrorType, Result, ResultType } from "@/models/result";
 import { getUrl } from "@/shared/lib/url";
 import ky, { HTTPError } from "ky-universal";
-// import "server-only";
 
 /**
  * HELPERS
  */
+
+const isBadRequestError = (body: any): body is BadRequestError => {
+    return body?.error?.errors;
+};
+
+const isRequestError = (body: any): body is RequestError => {
+    return body?.error?.message;
+};
 
 const handleError = async <T>(error: any): Promise<ResultType<T>> => {
     if (error?.message?.includes("prefixUrl")) {
@@ -14,6 +22,14 @@ const handleError = async <T>(error: any): Promise<ResultType<T>> => {
     }
 
     const errorTyped = error as HTTPError;
+    const body = await errorTyped.response.json();
+
+    if (isBadRequestError(body)) {
+        return Result.error(body.error.message, "BadRequest");
+    } else if (isRequestError(body)) {
+        return Result.error(body.error.message, "InternalError");
+    }
+
     const errorMessage = await errorTyped.response.text();
     const type = errorTyped.response.statusText as ErrorType; // TODO: validate this later
 
@@ -56,7 +72,7 @@ export const fetcher = (userId: string) => {
 
     const GET = async <T>(path: string): Promise<ResultType<T>> => {
         try {
-            const res = await api.get(updatePath(path)).json<SuccessResult<T>>();
+            const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
 
             return Result.ok(res.data);
         } catch (error: unknown) {
@@ -67,7 +83,7 @@ export const fetcher = (userId: string) => {
 
     const POST = async <T>(path: string, body: unknown): Promise<ResultType<T>> => {
         try {
-            const res = await api.post(updatePath(path), { json: body }).json<SuccessResult<T>>();
+            const res = await api.post(updatePath(path), { json: body }).json<SuccessRequest<T>>();
 
             return Result.ok(res.data);
         } catch (error: unknown) {
@@ -77,7 +93,7 @@ export const fetcher = (userId: string) => {
 
     const PUT = async <T>(path: string, body: unknown): Promise<ResultType<T>> => {
         try {
-            const res = await api.put(updatePath(path), { json: body }).json<SuccessResult<T>>();
+            const res = await api.put(updatePath(path), { json: body }).json<SuccessRequest<T>>();
 
             return Result.ok(res.data);
         } catch (error: unknown) {
@@ -87,7 +103,7 @@ export const fetcher = (userId: string) => {
 
     const DELETE = async <T>(path: string): Promise<ResultType<T>> => {
         try {
-            const res = await api.delete(updatePath(path)).json<SuccessResult<T>>();
+            const res = await api.delete(updatePath(path)).json<SuccessRequest<T>>();
 
             return Result.ok(res.data);
         } catch (error: unknown) {
