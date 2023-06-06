@@ -31,7 +31,7 @@ function feed(feed: FeedWithItems): CleanFeedWithItems {
         publicUrl: feed.publicUrl,
         createdAt: feed.createdAt,
         updatedAt: feed.updatedAt,
-        items: feed.items ? items(feed.items) : undefined,
+        items: feed.items ? items(feed.items) : [],
     };
 }
 

@@ -1,4 +1,4 @@
-import { TableItem } from "@/components/table/table-item";
+import { TableContainer } from "@/components/table/table-container";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 
 type Props = {
@@ -26,19 +26,10 @@ export default async function FeedPage({ params }: Props) {
 
     const feed = feedResponse.data;
 
-    if (!feed.items) {
-        console.log("Feed not included in database response");
-        return <div>feed not found</div>; // TODO: create error page
-    }
-
     return (
         <div className="flex flex-col gap-4">
             {feed.name}
-            <div className="flex flex-col gap-2">
-                {feed.items.map(item => {
-                    return <TableItem key={item.id} item={item} type={"list"} />;
-                })}
-            </div>
+            <TableContainer feed={feed} multipleFeeds={false} />
             <div></div>
         </div>
     );
