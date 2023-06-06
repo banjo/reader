@@ -16,8 +16,6 @@ export const TableItem: FC<CardProps> = ({ item, type, showFeedName = false, fee
         throw new Error("not implemented");
     }
 
-    console.log(item.isFavorite);
-
     return (
         <div
             className="flex h-8 w-full cursor-pointer
