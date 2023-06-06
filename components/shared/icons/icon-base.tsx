@@ -1,4 +1,6 @@
 import { Tooltip } from "@/components/shared/Tooltip";
+import { useBoop } from "@/hooks/animation/useBoop";
+import { motion } from "framer-motion";
 import { FC, ReactNode } from "react";
 
 type Props = {
@@ -7,5 +9,14 @@ type Props = {
 };
 
 export const IconBase: FC<Props> = ({ tooltip, children }) => {
-    return <Tooltip tooltip={tooltip}>{children}</Tooltip>;
+    const [isBooped, variants, trigger] = useBoop({
+        rotation: 5,
+        timing: 150,
+    });
+
+    return (
+        <motion.div onMouseEnter={trigger} animate={isBooped ? "boop" : "rest"} variants={variants}>
+            <Tooltip tooltip={tooltip}>{children}</Tooltip>
+        </motion.div>
+    );
 };
