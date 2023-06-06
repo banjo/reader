@@ -23,8 +23,8 @@ export const TableItem: FC<CardProps> = ({ item, type, showFeedName = false, fee
                 items-center justify-start gap-3 rounded-md  bg-slate-100
                 px-2 text-sm transition-colors hover:bg-slate-200"
         >
-            <Favorite size="md" filled={item.isFavorite} onClick={() => 0} />
-            <Bookmark size="md" filled={item.isBookmarked} onClick={() => 0} />
+            <Favorite size="md" active={item.isFavorite} onClick={() => 0} />
+            <Bookmark size="md" active={item.isBookmarked} onClick={() => 0} />
             {showFeedName && (
                 <span className="w-32 min-w-max text-sm font-light text-gray-600">{feedName}</span>
             )}
