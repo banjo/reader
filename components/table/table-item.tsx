@@ -1,5 +1,6 @@
 import { Icons } from "@/components/icons";
-import { Favorite } from "@/components/shared/favorite";
+import { Bookmark } from "@/components/shared/icons/bookmark";
+import { Favorite } from "@/components/shared/icons/favorite";
 import { TableType } from "@/components/table/table.types";
 import { CleanItem } from "@/models/entities";
 import { FC } from "react";
@@ -23,6 +24,7 @@ export const TableItem: FC<CardProps> = ({ item, type, showFeedName = false, fee
                 px-2 text-sm transition-colors hover:bg-slate-200"
         >
             <Favorite size="md" filled={item.isFavorite} onClick={() => 0} />
+            <Bookmark size="md" filled={item.isBookmarked} onClick={() => 0} />
             {showFeedName && (
                 <span className="w-32 min-w-max text-sm font-light text-gray-600">{feedName}</span>
             )}

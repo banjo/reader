@@ -1,3 +1,4 @@
+import { Size } from "@/models/size";
 import {
     Bookmark,
     Home,
@@ -13,6 +14,12 @@ import {
 } from "lucide-react";
 
 export type IconType = LucideIcon;
+
+export const iconSizeMapper: Record<Size, string> = {
+    sm: "h-4 w-4",
+    md: "h-5 w-5",
+    lg: "h-6 w-6",
+};
 
 export const Icons = {
     home: Home,
