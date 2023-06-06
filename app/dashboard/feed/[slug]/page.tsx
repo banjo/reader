@@ -29,7 +29,7 @@ export default async function FeedPage({ params }: Props) {
     return (
         <div className="flex flex-col gap-4">
             {feed.name}
-            <TableContainer feed={feed} multipleFeeds={false} />
+            <TableContainer feeds={[feed]} />
             <div></div>
         </div>
     );
