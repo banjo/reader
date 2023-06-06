@@ -1,12 +1,12 @@
 import { TableContainer } from "@/components/table/table-container";
-import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 
 export const revalidate = 0;
 
 export default async function FavoritePage() {
     const userId = await ServerComponentService.getUserId();
-    const feedResponse = await FeedRepository.getAllUserFeeds(userId);
+    const feedResponse = await FeedService.getAllFeedsByUserId(userId);
 
     if (!feedResponse.success) {
         console.log("no feed found in db");

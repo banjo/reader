@@ -31,9 +31,9 @@ export const TableItem = <T extends CleanItem>({
                 bg-slate-100
                 px-2 text-sm transition-colors hover:bg-slate-200"
         >
-            {item.isRead ? (
+            {item.isRead ? null : (
                 <div className="absolute inset-y-0 left-0 w-1 bg-slate-500"></div>
-            ) : null}
+            )}
 
             <Favorite size="md" active={item.isFavorite} onClick={() => 0} />
             <Bookmark size="md" active={item.isBookmarked} onClick={() => 0} />
