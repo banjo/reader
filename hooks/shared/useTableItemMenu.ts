@@ -13,7 +13,11 @@ export const useTableItemMenu = <T extends CleanItem>(): Out<T> => {
         { label: "Edit", type: "label" },
         { type: "separator" },
         { type: "select", content: "Read", onSelect: () => 0 },
-        { type: "select", content: "Mark as read", onSelect: toggleReadStatus },
+        {
+            type: "select",
+            content: item => (item.isRead ? "Mark as unread" : "Mark as read"),
+            onSelect: toggleReadStatus,
+        },
         { type: "select", content: "Visit site", onSelect: () => 0 },
     ];
 

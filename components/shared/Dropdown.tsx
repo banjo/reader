@@ -11,7 +11,7 @@ import { ReactNode } from "react";
 export type MenuEntries<T> =
     | {
           type: "select";
-          content: ReactNode;
+          content: ReactNode | ((item: T) => ReactNode);
           onSelect: (item: T) => void;
           disabled?: boolean;
       }
@@ -51,7 +51,9 @@ export const Dropdown = <T,>({
                                     onSelect={() => entry.onSelect(item)}
                                     disabled={entry.disabled}
                                 >
-                                    {entry.content}
+                                    {entry.content instanceof Function
+                                        ? entry.content(item)
+                                        : entry.content}
                                 </DropdownMenuItem>
                             );
                         }
