@@ -70,6 +70,17 @@ export const fetcher = (userId: string) => {
         },
     });
 
+    const SWR = async <T>(path: string): Promise<T> => {
+        try {
+            const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
+
+            return res.data;
+        } catch (error: unknown) {
+            console.log(error);
+            throw error;
+        }
+    };
+
     const GET = async <T>(path: string): Promise<ResultType<T>> => {
         try {
             const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
@@ -111,5 +122,5 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    return { GET, POST, PUT, DELETE };
+    return { GET, POST, PUT, DELETE, SWR };
 };

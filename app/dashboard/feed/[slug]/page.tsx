@@ -22,5 +22,5 @@ export default async function FeedPage({ params }: Props) {
         return <div>invalid feed id</div>; // TODO: create error page
     }
 
-    return <FeedContainer feed={feedResponse.data} slug={slug} />;
+    return <FeedContainer feed={feedResponse.data} publicUrl={slug} />;
 }

@@ -6,7 +6,7 @@ import { z } from "zod";
 const itemIdSchema = z.number();
 
 export async function GET(req: Request) {
-    const idResult = RequestService.getSearchParams(req, "id", itemIdSchema);
+    const idResult = RequestService.getSearchParams(req, "id", itemIdSchema); // TODO: remove, not correct
 
     if (!idResult.success) {
         return ResponseService.error(idResult.message, "BadRequest");

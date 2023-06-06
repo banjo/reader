@@ -8,7 +8,7 @@ import { FC, useMemo } from "react";
 
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
-    menuOptions?: MenuEntries[];
+    menuOptions?: MenuEntries<CleanItem>[];
 };
 
 type FormattedFeed = {

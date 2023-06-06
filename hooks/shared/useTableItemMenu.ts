@@ -6,8 +6,12 @@ type Out<T> = {
     menuOptions: MenuEntries<T>[];
 };
 
-export const useTableItemMenu = <T extends CleanItem>(): Out<T> => {
-    const { toggleReadStatus } = useUpdateItem<CleanItem>();
+type In = {
+    refetch: () => Promise<void>;
+};
+
+export const useTableItemMenu = <T extends CleanItem>({ refetch }: In): Out<T> => {
+    const { toggleReadStatus } = useUpdateItem<CleanItem>({ refetch });
 
     const menuOptions: MenuEntries<T>[] = [
         { label: "Edit", type: "label" },
