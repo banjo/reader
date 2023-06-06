@@ -2,11 +2,11 @@ import { ItemService } from "@/server/services/ItemService";
 import { ResponseService } from "@/server/services/ResponseService";
 import { z } from "zod";
 
-const itemPutSchema = z.object({
+const putBodySchema = z.object({
     markAsRead: z.boolean(),
 });
 
-const itemIdSchema = z.number();
+const putIdSchema = z.number();
 
 type PutProps = {
     params: {
@@ -17,19 +17,21 @@ type PutProps = {
 export async function PUT(req: Request, { params }: PutProps) {
     const id = params.id;
 
-    const idResult = itemIdSchema.safeParse(Number(id));
+    const idResult = putIdSchema.safeParse(Number(id));
 
     if (!idResult.success) {
-        return ResponseService.error(idResult.error.message, "BadRequest");
+        const { errors } = idResult.error;
+        return ResponseService.badRequest("id", errors);
     }
     const res = await req.json();
-    const parseResult = itemPutSchema.safeParse(res);
+    const bodyResult = putBodySchema.safeParse(res);
 
-    if (!parseResult.success) {
-        return ResponseService.error(parseResult.error.message, "BadRequest");
+    if (!bodyResult.success) {
+        const { errors } = bodyResult.error;
+        return ResponseService.badRequest("body", errors);
     }
 
-    const item = await ItemService.markAsRead(Number(idResult.data), parseResult.data.markAsRead);
+    const item = await ItemService.markAsRead(idResult.data, bodyResult.data.markAsRead);
 
     if (!item.success) {
         return ResponseService.error(item.message, item.type);
