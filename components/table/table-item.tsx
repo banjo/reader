@@ -4,23 +4,22 @@ import { Bookmark } from "@/components/shared/icons/bookmark";
 import { Favorite } from "@/components/shared/icons/favorite";
 import { TableType } from "@/components/table/table.types";
 import { CleanItem } from "@/models/entities";
-import { FC } from "react";
 
-type CardProps = {
-    item: CleanItem;
+type CardProps<T> = {
+    item: T;
     type: TableType;
     showFeedName?: boolean;
     feedName?: string;
-    menuOptions?: MenuEntries[];
+    menuOptions?: MenuEntries<T>[];
 };
 
-export const TableItem: FC<CardProps> = ({
+export const TableItem = <T extends CleanItem>({
     item,
     type,
     showFeedName = false,
     feedName,
     menuOptions,
-}) => {
+}: CardProps<T>) => {
     if (type === "card") {
         throw new Error("not implemented");
     }
@@ -39,7 +38,7 @@ export const TableItem: FC<CardProps> = ({
             <span className="min-w-max font-bold">{item.title}</span>
             <span className="w-0 max-w-full shrink grow truncate">{item.description}</span>
             {menuOptions && (
-                <Dropdown align="start" side="left" items={menuOptions}>
+                <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />
                 </Dropdown>
             )}

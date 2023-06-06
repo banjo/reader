@@ -1,4 +1,4 @@
-import { Result } from "@/models/result";
+import { ResultType } from "@/models/result";
 import * as z from "zod";
 
 type Error = {
@@ -25,7 +25,7 @@ const createErrorMessages = (issues: z.ZodIssue[]): Error => {
     };
 };
 
-export const safeParseArray = <T>(array: T[], model: z.ZodSchema<T>): Result<T[]> => {
+export const safeParseArray = <T>(array: T[], model: z.ZodSchema<T>): ResultType<T[]> => {
     try {
         const res = array.map(element => model.parse(element));
         return Result.ok(res);
@@ -37,7 +37,7 @@ export const safeParseArray = <T>(array: T[], model: z.ZodSchema<T>): Result<T[]
     }
 };
 
-export const safeParse = <T>(object: T, model: z.ZodSchema<T>): Result<T> => {
+export const safeParse = <T>(object: T, model: z.ZodSchema<T>): ResultType<T> => {
     try {
         const res = model.parse(object);
         return Result.ok(res);

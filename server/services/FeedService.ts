@@ -1,9 +1,11 @@
 import { CleanFeedWithItems } from "@/models/entities";
-import { Result } from "@/models/result";
+import { Result, ResultType } from "@/models/result";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 
-const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<Result<CleanFeedWithItems>> => {
+const getFeedByPublicUrl = async (
+    feedPublicUrl: string
+): Promise<ResultType<CleanFeedWithItems>> => {
     const feedResponse = await FeedRepository.getFeedByPublicUrl(feedPublicUrl);
 
     if (!feedResponse.success) {
@@ -14,7 +16,7 @@ const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<Result<CleanFe
     return Result.ok(DatabaseMapper.feed(feedResponse.data));
 };
 
-const getAllFeedsByUserId = async (userId: number): Promise<Result<CleanFeedWithItems[]>> => {
+const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeedWithItems[]>> => {
     const feedsResponse = await FeedRepository.getAllFeedsByUserId(userId);
 
     if (!feedsResponse.success) {

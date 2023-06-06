@@ -1,4 +1,4 @@
-import { Result } from "@/models/result";
+import { Result, ResultType } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
 import { Item } from "@prisma/client";
@@ -6,7 +6,7 @@ import "server-only";
 
 const logger = createLogger("ItemRepository");
 
-const getAllItemsByFeed = async (feedId: number): Promise<Result<Item[]>> => {
+const getAllItemsByFeed = async (feedId: number): Promise<ResultType<Item[]>> => {
     let items: Item[];
     try {
         items = await prisma.item.findMany({
@@ -22,7 +22,7 @@ const getAllItemsByFeed = async (feedId: number): Promise<Result<Item[]>> => {
     return Result.ok(items);
 };
 
-const getItemById = async (itemId: number): Promise<Result<Item>> => {
+const getItemById = async (itemId: number): Promise<ResultType<Item>> => {
     let item: Item | null;
     try {
         item = await prisma.item.findUnique({
@@ -43,7 +43,7 @@ const getItemById = async (itemId: number): Promise<Result<Item>> => {
     return Result.ok(item);
 };
 
-const updateItem = async (item: Item): Promise<Result<Item>> => {
+const updateItem = async (item: Item): Promise<ResultType<Item>> => {
     let updatedItem: Item;
     try {
         updatedItem = await prisma.item.update({
@@ -60,7 +60,7 @@ const updateItem = async (item: Item): Promise<Result<Item>> => {
     return Result.ok(updatedItem);
 };
 
-const createItem = async (item: Item): Promise<Result<Item>> => {
+const createItem = async (item: Item): Promise<ResultType<Item>> => {
     try {
         const createdItem = await prisma.item.create({
             data: item,

@@ -6,13 +6,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FC, ReactNode } from "react";
+import { ReactNode } from "react";
 
-export type MenuEntries =
+export type MenuEntries<T> =
     | {
           type: "select";
           content: ReactNode;
-          onSelect: (id: number) => void;
+          onSelect: (item: T) => void;
           disabled?: boolean;
       }
     | {
@@ -23,33 +23,40 @@ export type MenuEntries =
           type: "separator";
       };
 
-type Props = {
+type Props<T> = {
     children: ReactNode;
     side?: "left" | "right" | "top" | "bottom";
     align?: "start" | "center" | "end";
-    items: MenuEntries[];
+    menuEntries: MenuEntries<T>[];
+    item: T;
 };
 
-export const Dropdown: FC<Props> = ({ children, side = "bottom", align = "center", items }) => {
+export const Dropdown = <T,>({
+    children,
+    side = "bottom",
+    align = "center",
+    menuEntries,
+    item,
+}: Props<T>) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
             <DropdownMenuContent side={side} align={align}>
-                {items.map((item, index) => {
-                    switch (item.type) {
+                {menuEntries.map((entry, index) => {
+                    switch (entry.type) {
                         case "select": {
                             return (
                                 <DropdownMenuItem
                                     key={index}
-                                    onSelect={item.onSelect}
-                                    disabled={item.disabled}
+                                    onSelect={() => entry.onSelect(item)}
+                                    disabled={entry.disabled}
                                 >
-                                    {item.content}
+                                    {entry.content}
                                 </DropdownMenuItem>
                             );
                         }
                         case "label": {
-                            return <DropdownMenuLabel key={index}>{item.label}</DropdownMenuLabel>;
+                            return <DropdownMenuLabel key={index}>{entry.label}</DropdownMenuLabel>;
                         }
                         case "separator": {
                             return <DropdownMenuSeparator key={index} />;

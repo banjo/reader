@@ -1,12 +1,12 @@
 import { TableContainer } from "@/components/table/table-container";
-import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 
 export const revalidate = 0;
 
 export default async function AllPage() {
     const userId = await ServerComponentService.getUserId(); // TODO: check if user has access to feed
-    const feedResponse = await FeedRepository.getAllUserFeeds(userId);
+    const feedResponse = await FeedService.getAllFeedsByUserId(userId);
 
     if (!feedResponse.success) {
         console.log("no feed found in db");

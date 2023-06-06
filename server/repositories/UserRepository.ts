@@ -1,11 +1,11 @@
-import { Result } from "@/models/result";
+import { Result, ResultType } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
 import "server-only";
 
 const logger = createLogger("UserRepository");
 
-const getIdByExternalId = async (externalId: string): Promise<Result<number>> => {
+const getIdByExternalId = async (externalId: string): Promise<ResultType<number>> => {
     const user = await prisma.user.findUnique({
         where: {
             externalId,

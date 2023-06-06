@@ -5,14 +5,21 @@ import { getUrl } from "./shared/lib/url";
 export default authMiddleware({
     publicRoutes: ["/"],
     afterAuth: async (auth, req) => {
-        if (req.url?.includes("/api")) {
+        const url = req.url;
+
+        if (url.includes("/api/auth")) {
+            return NextResponse.next();
+        }
+
+        if (url.includes("/api")) {
             const externalId = req.headers.get("X-External-User-Id");
 
             if (!externalId) {
                 return new Response("Unauthorized", { status: 401 });
             }
 
-            const headersList = new Headers(req.headers);
+            const headersList = new Headers();
+            headersList.set("X-External-User-Id", externalId);
 
             const response = await fetch(`${getUrl()}/api/auth`, {
                 headers: headersList,

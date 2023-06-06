@@ -1,11 +1,11 @@
-import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { FeedService } from "@/server/services/FeedService";
 import { RequestService } from "@/server/services/RequestService";
 import { ResponseService } from "@/server/services/ResponseService";
 
 export async function GET(req: Request) {
     const userId = RequestService.getUserId(req);
 
-    const feed = await FeedRepository.getAllUserFeeds(userId);
+    const feed = await FeedService.getAllFeedsByUserId(userId);
 
     if (!feed.success) {
         return ResponseService.error(feed.message, feed.type);

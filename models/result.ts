@@ -20,14 +20,14 @@ export type ErrorResult = {
     status: number;
 };
 
-export type Result<T> = SuccessResult<T> | ErrorResult;
+export type ResultType<T> = SuccessResult<T> | ErrorResult;
 
 export const Result = {
-    ok: <T>(data: T): Result<T> => ({
+    ok: <T>(data: T): ResultType<T> => ({
         success: true,
         data,
     }),
-    error: <T>(message: string, type: ErrorType): Result<T> => ({
+    error: <T>(message: string, type: ErrorType): ResultType<T> => ({
         success: false,
         type,
         message,

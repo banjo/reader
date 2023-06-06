@@ -1,5 +1,5 @@
 import { FeedWithItems } from "@/models/entities";
-import { Result } from "@/models/result";
+import { Result, ResultType } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
 import { Feed } from "@prisma/client";
@@ -7,7 +7,7 @@ import "server-only";
 
 const logger = createLogger("FeedRepository");
 
-const getAllFeedsByUserId = async (userId: number): Promise<Result<FeedWithItems[]>> => {
+const getAllFeedsByUserId = async (userId: number): Promise<ResultType<FeedWithItems[]>> => {
     const feeds = await prisma.feed.findMany({
         where: {
             users: {
@@ -29,7 +29,7 @@ const getAllFeedsByUserId = async (userId: number): Promise<Result<FeedWithItems
     return Result.ok(feeds);
 };
 
-const getFeedById = async (feedId: number): Promise<Result<FeedWithItems>> => {
+const getFeedById = async (feedId: number): Promise<ResultType<FeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
             id: feedId,
@@ -47,7 +47,7 @@ const getFeedById = async (feedId: number): Promise<Result<FeedWithItems>> => {
     return Result.ok(feed);
 };
 
-const getFeedByUrl = async (feedUrl: string): Promise<Result<FeedWithItems>> => {
+const getFeedByUrl = async (feedUrl: string): Promise<ResultType<FeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
             link: feedUrl,
@@ -65,7 +65,7 @@ const getFeedByUrl = async (feedUrl: string): Promise<Result<FeedWithItems>> => 
     return Result.ok(feed);
 };
 
-const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<Result<FeedWithItems>> => {
+const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<ResultType<FeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
             publicUrl: feedPublicUrl,
@@ -83,7 +83,7 @@ const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<Result<FeedWit
     return Result.ok(feed);
 };
 
-const createFeed = async (feed: Feed): Promise<Result<FeedWithItems>> => {
+const createFeed = async (feed: Feed): Promise<ResultType<FeedWithItems>> => {
     const createdFeed = await prisma.feed.create({
         data: feed,
     });
