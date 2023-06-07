@@ -1,5 +1,6 @@
 import { useAuthFetcher } from "@/client/hooks/backend/useAuthFetcher";
 import { Refetch } from "@/shared/models/swr";
+import { isArray } from "@banjoanton/utils";
 import { useMemo } from "react";
 import useSWR from "swr";
 
@@ -29,17 +30,17 @@ export const useGet = <T>({ key, fallbackData }: In<T>): Out<T> => {
         mutate();
     };
 
-    const refetch = async (
-        updatedItem: T,
-        updateFn: () => Promise<undefined>,
-        onError?: () => void
-    ) => {
+    const refetch: Refetch<T> = async (updated, updateFn, onError) => {
         if (!data) {
             mutate();
             return;
         }
 
-        mutate(updatedItem, false);
+        if (isArray(updated)) {
+            throw new Error("useGet: refetch: cannot be an array of items");
+        }
+
+        mutate(updated, false);
         try {
             await updateFn();
         } catch (error) {

@@ -47,6 +47,34 @@ const mutateSidebarItem = (item: CleanItem) => {
     );
 };
 
+const mutateSidebarItems = (items: CleanItem[]) => {
+    mutate<CleanFeedWithItems[]>(
+        KEY,
+        previous => {
+            if (!previous) {
+                return;
+            }
+            // eslint-disable-next-line consistent-return
+            return previous.map(feed => {
+                const updatedFeed = {
+                    ...feed,
+                    items: feed.items.map(i => {
+                        const updatedItem = items.find(ui => ui.id === i.id);
+
+                        if (updatedItem) {
+                            return updatedItem;
+                        }
+
+                        return i;
+                    }),
+                };
+                return updatedFeed;
+            });
+        },
+        false
+    );
+};
+
 const fetchLatestInSidebar = () => {
     mutate(KEY);
 };
@@ -56,5 +84,6 @@ export const useUpdateSidebar = () => {
         mutateSidebarFeed,
         fetchLatestInSidebar,
         mutateSidebarItem,
+        mutateSidebarItems,
     };
 };

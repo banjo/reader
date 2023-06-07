@@ -27,6 +27,10 @@ export const Result = {
         success: true,
         data,
     }),
+    okEmpty: (): ResultType<void> => ({
+        success: true,
+        data: undefined,
+    }),
     error: <T>(message: string, type: ErrorType): ResultType<T> => ({
         success: false,
         type,

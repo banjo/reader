@@ -1,6 +1,7 @@
 import { useGet } from "@/client/hooks/backend/useGet";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { toArray } from "@banjoanton/utils";
 
 type Out = {
     data: CleanFeedWithItems[];
@@ -16,12 +17,16 @@ type In = {
 export const useMultipleFeedsFetcher = ({ key, fallbackData }: In): Out => {
     const { data, refetch: refetchAll, isLoading } = useGet({ key, fallbackData });
 
-    const refetch: Refetch<CleanItem> = (updatedItem, updateFn) => {
+    const refetch: Refetch<CleanItem> = (updated, updateFn) => {
+        const updatedItems = toArray(updated);
+
         const updatedFeeds = data.map(feed => {
             return {
                 ...feed,
                 items: feed.items.map(item => {
-                    if (item.id === updatedItem.id) {
+                    const updatedItem = updatedItems.find(ui => ui.id === item.id);
+
+                    if (updatedItem) {
                         return updatedItem;
                     }
 

@@ -60,6 +60,26 @@ const updateItem = async (item: Item): Promise<ResultType<Item>> => {
     return Result.ok(updatedItem);
 };
 
+const markItemsAsRead = async (itemIds: number[]): Promise<ResultType<void>> => {
+    try {
+        await prisma.item.updateMany({
+            where: {
+                id: {
+                    in: itemIds,
+                },
+            },
+            data: {
+                isRead: true,
+            },
+        });
+    } catch (error: unknown) {
+        logger.error(`Could not mark items as read - ${error}`);
+        return Result.error(`Could not mark items as read`, "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
 const createItem = async (item: Item): Promise<ResultType<Item>> => {
     try {
         const createdItem = await prisma.item.create({
@@ -76,6 +96,7 @@ const createItem = async (item: Item): Promise<ResultType<Item>> => {
 export const ItemRepository = {
     getAllItemsByFeed,
     getItemById,
+    markItemsAsRead,
     createItem,
     updateItem,
 };

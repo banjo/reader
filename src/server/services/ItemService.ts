@@ -54,4 +54,15 @@ const updateItem = async (item: CleanItem) => {
     return Result.ok(updated.data);
 };
 
-export const ItemService = { markAsRead, getItemById, updateItem };
+const markItemsAsRead = async (ids: number[]) => {
+    const res = await ItemRepository.markItemsAsRead(ids);
+
+    if (!res.success) {
+        logger.error(`Could not mark items as read`);
+        return Result.error(`Could not mark items as read`, "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
+export const ItemService = { markAsRead, getItemById, updateItem, markItemsAsRead };

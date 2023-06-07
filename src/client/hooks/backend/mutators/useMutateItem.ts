@@ -65,9 +65,25 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
         });
     };
 
+    const markMultipleAsRead = (items: T[]) => {
+        const updateRequest = api.SWR(`/items/read`, "POST", { ids: items.map(i => i.id) });
+
+        const updatedItems = items
+            .filter(i => !i.isRead)
+            .map(i => ({
+                ...i,
+                isRead: true,
+            }));
+
+        refetch(updatedItems, updateRequest, () => {
+            toast.error("Failed to update items");
+        });
+    };
+
     return {
         toggleReadStatus,
         toggleBookmarkStatus,
         toggleFavoriteStatus,
+        markMultipleAsRead,
     };
 };
