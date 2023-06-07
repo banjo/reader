@@ -1,4 +1,4 @@
-import { CenteredContainer } from "@/components/centered-container";
+import { CenteredContainer } from "@/components/layout/centered-container";
 import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {

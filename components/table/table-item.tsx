@@ -1,5 +1,5 @@
-import { Icons } from "@/components/icons";
 import { Dropdown, MenuEntries } from "@/components/shared/Dropdown";
+import { Icons } from "@/components/shared/icons";
 import { Bookmark } from "@/components/shared/icons/bookmark";
 import { Favorite } from "@/components/shared/icons/favorite";
 import { TableType } from "@/components/table/table.types";

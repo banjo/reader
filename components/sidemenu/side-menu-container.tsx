@@ -1,6 +1,6 @@
 "use client";
 
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/shared/icons";
 import { Category } from "@/components/sidemenu/category";
 import { Divider } from "@/components/sidemenu/divider";
 import { Input } from "@/components/sidemenu/input";

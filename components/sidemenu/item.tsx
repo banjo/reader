@@ -1,4 +1,4 @@
-import { IconType } from "@/components/icons";
+import { IconType } from "@/components/shared/icons";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { FC, ReactNode } from "react";

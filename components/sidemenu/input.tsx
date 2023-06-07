@@ -1,4 +1,4 @@
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/shared/icons";
 import { Input as InputComponent } from "@/components/ui/input";
 import { FC } from "react";
 
