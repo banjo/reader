@@ -1,4 +1,4 @@
-import { CleanFeedWithItems, CleanUser, FeedWithItems } from "@/src/models/entities";
+import { CleanFeedWithItems, CleanUser, FeedWithItems } from "@/models/entities";
 import { Item, User } from "@prisma/client";
 
 function item(item: Item): Omit<Item, "feedId" | "userId"> {

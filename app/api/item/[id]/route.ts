@@ -1,6 +1,6 @@
-import { ItemService } from "@/src/server/services/ItemService";
-import { RequestService } from "@/src/server/services/RequestService";
-import { ResponseService } from "@/src/server/services/ResponseService";
+import { ItemService } from "@/server/services/ItemService";
+import { RequestService } from "@/server/services/RequestService";
+import { ResponseService } from "@/server/services/ResponseService";
 import { z } from "zod";
 
 const itemIdSchema = z.number();

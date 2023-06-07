@@ -1,5 +1,5 @@
-import { FeedService } from "@/src/server/services/FeedService";
-import { ResponseService } from "@/src/server/services/ResponseService";
+import { FeedService } from "@/server/services/FeedService";
+import { ResponseService } from "@/server/services/ResponseService";
 import { z } from "zod";
 
 const fallbackUrlSchema = z.string();

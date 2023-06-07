@@ -5,8 +5,8 @@ import { SiteHeader } from "@/components/nav/site-header";
 import { TailwindIndicator } from "@/components/utils/tailwind-indicator";
 import { ThemeProvider } from "@/components/utils/theme-provider";
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/src/lib/fonts";
-import { cn } from "@/src/lib/utils";
+import { fontSans } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 

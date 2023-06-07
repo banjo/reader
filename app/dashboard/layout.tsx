@@ -1,6 +1,6 @@
 import { SideMenuContainer } from "@/components/sidemenu/side-menu-container";
-import { FeedService } from "@/src/server/services/FeedService";
-import { ServerComponentService } from "@/src/server/services/ServerComponentService";
+import { FeedService } from "@/server/services/FeedService";
+import { ServerComponentService } from "@/server/services/ServerComponentService";
 import { redirect } from "next/navigation";
 
 type Props = {
