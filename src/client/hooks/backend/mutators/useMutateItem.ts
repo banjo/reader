@@ -49,8 +49,25 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
         });
     };
 
+    const toggleFavoriteStatus = (item: T) => {
+        const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
+            ...item,
+            isFavorite: !item.isFavorite,
+        });
+
+        const updatedItem = {
+            ...item,
+            isFavorite: !item.isFavorite,
+        };
+
+        refetch(updatedItem, updateRequest, () => {
+            toast.error("Failed to update item");
+        });
+    };
+
     return {
         toggleReadStatus,
         toggleBookmarkStatus,
+        toggleFavoriteStatus,
     };
 };

@@ -17,7 +17,7 @@ export const AllContainer: FC<Props> = ({ feeds }) => {
     return (
         <div className="flex flex-col gap-4">
             All
-            <TableContainer feeds={data} menuOptions={menuOptions} />
+            <TableContainer feeds={data} menuOptions={menuOptions} refetch={refetch} />
         </div>
     );
 };

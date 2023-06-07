@@ -24,7 +24,7 @@ export const TableItem = <T extends CleanItem>({
     menuOptions,
     refetch,
 }: CardProps<T>) => {
-    const { toggleBookmarkStatus } = useMutateItem<T>({ refetch });
+    const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem<T>({ refetch });
 
     if (type === "card") {
         throw new Error("not implemented");
@@ -32,6 +32,10 @@ export const TableItem = <T extends CleanItem>({
 
     const toggleBookmark = () => {
         toggleBookmarkStatus(item);
+    };
+
+    const toggleFavorite = () => {
+        toggleFavoriteStatus(item);
     };
 
     return (
@@ -45,7 +49,7 @@ export const TableItem = <T extends CleanItem>({
                 <div className="absolute inset-y-0 left-0 w-1 bg-slate-500"></div>
             )}
 
-            <Favorite size="md" active={item.isFavorite} onClick={() => 0} />
+            <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
             <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
             {showFeedName && (
                 <span className="w-32 min-w-max text-sm font-light text-gray-600">{feedName}</span>
