@@ -7,6 +7,7 @@ type Out = {
     data: CleanFeedWithItems[];
     isLoading: boolean;
     refetch: Refetch<CleanItem>;
+    refetchMultiple: Refetch<CleanItem[]>;
     refetchAll: Refetch<CleanFeedWithItems[]>;
 };
 type In = {
@@ -17,7 +18,7 @@ type In = {
 export const useMultipleFeedsFetcher = ({ key, fallbackData }: In): Out => {
     const { data, refetch: refetchAll, isLoading } = useGet({ key, fallbackData });
 
-    const refetch: Refetch<CleanItem> = (updated, updateFn) => {
+    const refetchMultiple: Refetch<CleanItem[]> = (updated, updateFn) => {
         const updatedItems = toArray(updated);
 
         const updatedFeeds = data.map(feed => {
@@ -38,10 +39,28 @@ export const useMultipleFeedsFetcher = ({ key, fallbackData }: In): Out => {
         refetchAll(updatedFeeds, updateFn);
     };
 
+    const refetch: Refetch<CleanItem> = (updated, updateFn) => {
+        const updatedFeeds = data.map(feed => {
+            return {
+                ...feed,
+                items: feed.items.map(item => {
+                    if (item.id === updated.id) {
+                        return updated;
+                    }
+
+                    return item;
+                }),
+            };
+        });
+
+        refetchAll(updatedFeeds, updateFn);
+    };
+
     return {
         data: data,
         isLoading,
-        refetch: refetch,
+        refetch,
         refetchAll,
+        refetchMultiple,
     };
 };

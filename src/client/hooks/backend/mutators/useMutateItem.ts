@@ -6,9 +6,10 @@ import { toast } from "react-hot-toast";
 
 type In<T> = {
     refetch: Refetch<T>;
+    refetchMultiple?: Refetch<T[]>;
 };
 
-export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
+export const useMutateItem = <T extends CleanItem>({ refetch, refetchMultiple }: In<T>) => {
     const { userId } = useAuth();
 
     if (!userId) {
@@ -75,7 +76,11 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
                 isRead: true,
             }));
 
-        refetch(updatedItems, updateRequest, () => {
+        if (!refetchMultiple) {
+            throw new Error("Refetch multiple need to be defined to use markMultipleAsRead");
+        }
+
+        refetchMultiple(updatedItems, updateRequest, () => {
             toast.error("Failed to update items");
         });
     };

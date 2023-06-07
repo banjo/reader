@@ -11,7 +11,10 @@ type Props = {
 };
 
 export const FavoriteContainer: FC<Props> = ({ feeds }) => {
-    const { data, refetch } = useMultipleFeedsFetcher({ key: "/feed", fallbackData: feeds });
+    const { data, refetch, refetchMultiple } = useMultipleFeedsFetcher({
+        key: "/feed",
+        fallbackData: feeds,
+    });
     const { menuOptions } = useTableItemMenu({ refetch });
 
     const filtered = useMemo(
@@ -28,7 +31,12 @@ export const FavoriteContainer: FC<Props> = ({ feeds }) => {
     return (
         <div className="flex flex-col gap-4">
             Favorites
-            <TableContainer feeds={filtered} menuOptions={menuOptions} refetch={refetch} />
+            <TableContainer
+                feeds={filtered}
+                menuOptions={menuOptions}
+                refetch={refetch}
+                refetchMultiple={refetchMultiple}
+            />
         </div>
     );
 };

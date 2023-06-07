@@ -2,7 +2,6 @@ import { useAuthFetcher } from "@/client/hooks/backend/useAuthFetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/useUpdateSidebar";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
-import { toArray } from "@banjoanton/utils";
 import { useMemo } from "react";
 import useSWR from "swr";
 
@@ -10,6 +9,7 @@ type Out = {
     data: CleanFeedWithItems;
     isLoading: boolean;
     refetch: Refetch<CleanItem>;
+    refetchMultiple: Refetch<CleanItem[]>;
 };
 
 type In = {
@@ -19,7 +19,7 @@ type In = {
 
 export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
     const fetcher = useAuthFetcher();
-    const { fetchLatestInSidebar, mutateSidebarItems } = useUpdateSidebar();
+    const { fetchLatestInSidebar, mutateSidebarItem, mutateSidebarItems } = useUpdateSidebar();
 
     const { data: fetchData, mutate } = useSWR<CleanFeedWithItems, Error>(key, fetcher, {
         fallbackData: fallbackData,
@@ -29,9 +29,35 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
         return fetchData ?? fallbackData;
     }, [fallbackData, fetchData]);
 
-    const refetch: Refetch<CleanItem> = async (updated, updateFn, onError) => {
-        const updatedItems = toArray(updated);
+    const refetch: Refetch<CleanItem> = async (updatedItem, updateFn, onError) => {
+        const updatedFeed = data.items.map(i => {
+            if (i.id === updatedItem.id) {
+                return updatedItem;
+            }
 
+            return i;
+        });
+
+        const updatedData = {
+            ...data,
+            items: updatedFeed,
+        };
+
+        mutate(updatedData, false);
+        mutateSidebarItem(updatedItem);
+
+        try {
+            await updateFn();
+        } catch (error) {
+            console.error(error);
+            if (onError) onError();
+        }
+
+        mutate();
+        fetchLatestInSidebar();
+    };
+
+    const refetchMultiple: Refetch<CleanItem[]> = async (updatedItems, updateFn, onError) => {
         const updatedFeed = data.items.map(i => {
             const updatedItem = updatedItems.find(ui => ui.id === i.id);
 
@@ -62,8 +88,9 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
     };
 
     return {
-        data: data,
+        data,
         isLoading: !data,
-        refetch: refetch,
+        refetch,
+        refetchMultiple: refetchMultiple,
     };
 };

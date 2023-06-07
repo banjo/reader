@@ -11,13 +11,21 @@ type Props = {
 };
 
 export const AllContainer: FC<Props> = ({ feeds }) => {
-    const { data, refetch } = useMultipleFeedsFetcher({ key: "/feed", fallbackData: feeds });
+    const { data, refetch, refetchMultiple } = useMultipleFeedsFetcher({
+        key: "/feed",
+        fallbackData: feeds,
+    });
     const { menuOptions } = useTableItemMenu({ refetch });
 
     return (
         <div className="flex flex-col gap-4">
             All
-            <TableContainer feeds={data} menuOptions={menuOptions} refetch={refetch} />
+            <TableContainer
+                feeds={data}
+                menuOptions={menuOptions}
+                refetch={refetch}
+                refetchMultiple={refetchMultiple}
+            />
         </div>
     );
 };
