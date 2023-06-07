@@ -70,15 +70,26 @@ export const fetcher = (userId: string) => {
         },
     });
 
-    const SWR = async <T>(path: string): Promise<T> => {
+    const SWR_AUTH = async <T>(path: string): Promise<T> => {
         try {
             const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
-
             return res.data;
         } catch (error: unknown) {
             console.log(error);
             throw error;
         }
+    };
+
+    const SWR = <T>(
+        path: string,
+        method: "GET" | "POST" | "PUT" | "DELETE",
+        body?: T
+    ): (() => Promise<undefined>) => {
+        return () =>
+            api(updatePath(path), {
+                method,
+                body: JSON.stringify(body),
+            }).json();
     };
 
     const GET = async <T>(path: string): Promise<ResultType<T>> => {
@@ -122,5 +133,5 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    return { GET, POST, PUT, DELETE, SWR };
+    return { GET, POST, PUT, DELETE, SWR, SWR_AUTH };
 };

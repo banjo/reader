@@ -10,5 +10,5 @@ export const useAuthFetcher = () => {
 
     const api = fetcher(userId);
 
-    return api.SWR;
+    return api.SWR_AUTH;
 };

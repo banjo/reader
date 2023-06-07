@@ -1,17 +1,18 @@
 import { MenuEntries } from "@/components/shared/Dropdown";
-import { useUpdateItem } from "@/hooks/backend/mutators/useUpdateItem";
+import { useMutateItem } from "@/hooks/backend/mutators/useMutateItem";
 import { CleanItem } from "@/models/entities";
+import { Refetch } from "@/models/swr";
 
 type Out<T> = {
     menuOptions: MenuEntries<T>[];
 };
 
 type In<T> = {
-    refetch: (item: T) => Promise<void>;
+    refetch: Refetch<T>;
 };
 
 export const useTableItemMenu = <T extends CleanItem>({ refetch }: In<T>): Out<T> => {
-    const { toggleReadStatus } = useUpdateItem<T>({ refetch });
+    const { toggleReadStatus } = useMutateItem<T>({ refetch });
 
     const menuOptions: MenuEntries<T>[] = [
         { label: "Edit", type: "label" },

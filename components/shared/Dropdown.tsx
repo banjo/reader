@@ -38,8 +38,6 @@ export const Dropdown = <T,>({
     menuEntries,
     item,
 }: Props<T>) => {
-    console.log(menuEntries);
-
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>{children}</DropdownMenuTrigger>

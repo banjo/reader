@@ -1,12 +1,14 @@
 import { useAuthFetcher } from "@/hooks/backend/useAuthFetcher";
+import { useUpdateSidebar } from "@/hooks/backend/useUpdateSidebar";
 import { CleanFeedWithItems, CleanItem } from "@/models/entities";
+import { Refetch } from "@/models/swr";
 import { useMemo } from "react";
-import useSWR, { mutate as globalMutate } from "swr";
+import useSWR from "swr";
 
 type Out = {
     data: CleanFeedWithItems;
     isLoading: boolean;
-    refetch: (item: CleanItem) => Promise<void>;
+    refetch: Refetch<CleanItem>;
 };
 
 type In = {
@@ -14,8 +16,10 @@ type In = {
     fallbackData: CleanFeedWithItems;
 };
 
-export const useFeedGet = ({ key, fallbackData }: In): Out => {
+export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
     const fetcher = useAuthFetcher();
+    const { fetchLatestInSidebar, mutateSidebarItem } = useUpdateSidebar();
+
     const { data: fetchData, mutate } = useSWR<CleanFeedWithItems, Error>(key, fetcher, {
         fallbackData: fallbackData,
     });
@@ -24,12 +28,7 @@ export const useFeedGet = ({ key, fallbackData }: In): Out => {
         return fetchData ?? fallbackData;
     }, [fallbackData, fetchData]);
 
-    const refetch = async (updatedItem: CleanItem) => {
-        if (!data) {
-            await mutate();
-            return;
-        }
-
+    const refetch = async (updatedItem: CleanItem, updateFn: () => Promise<undefined>) => {
         const updatedFeed = data.items.map(i => {
             if (i.id === updatedItem.id) {
                 return updatedItem;
@@ -41,8 +40,14 @@ export const useFeedGet = ({ key, fallbackData }: In): Out => {
             ...data,
             items: updatedFeed,
         };
-        await globalMutate("/feed");
-        await mutate(updatedData);
+
+        mutate(updatedData, false);
+        mutateSidebarItem(updatedItem);
+
+        await updateFn();
+
+        mutate();
+        fetchLatestInSidebar();
     };
 
     return {

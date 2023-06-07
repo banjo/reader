@@ -1,7 +1,7 @@
 "use client";
 
+import { useMultipleFeedsFetcher } from "@/components/features/feed/hooks/useMultipleFeedsFetcher";
 import { TableContainer } from "@/components/table/table-container";
-import { useGet } from "@/hooks/backend/useGet";
 import { useTableItemMenu } from "@/hooks/shared/useTableItemMenu";
 import { CleanFeedWithItems } from "@/models/entities";
 import { FC, useMemo } from "react";
@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const FavoriteContainer: FC<Props> = ({ feeds }) => {
-    const { data, refetch } = useGet({ key: `/feed`, fallbackData: feeds });
+    const { data, refetch } = useMultipleFeedsFetcher({ key: "/feed", fallbackData: feeds });
     const { menuOptions } = useTableItemMenu({ refetch });
 
     const filtered = useMemo(

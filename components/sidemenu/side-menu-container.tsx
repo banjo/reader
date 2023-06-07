@@ -19,13 +19,8 @@ type Props = {
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
-    const { data: fetchData } = useGet({ key: "/feed", fallbackData: feeds });
-
+    const { data } = useGet({ key: "/feed", fallbackData: feeds });
     const pathname = usePathname();
-
-    const data = useMemo(() => {
-        return fetchData ?? feeds;
-    }, [feeds, fetchData]);
 
     const prefixUrl = (url: string) => {
         return prefix ? `${prefix}${url}` : url;
@@ -114,7 +109,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
                 />
-                {feeds.map(feed => {
+                {data.map(feed => {
                     const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
 
                     return (

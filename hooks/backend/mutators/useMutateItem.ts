@@ -1,13 +1,13 @@
 import { fetcher } from "@/lib/fetcher";
 import { CleanItem } from "@/models/entities";
+import { Refetch } from "@/models/swr";
 import { useAuth } from "@clerk/nextjs";
-import { toast } from "react-hot-toast";
 
 type In<T> = {
-    refetch: (item: T) => Promise<void>;
+    refetch: Refetch<T>;
 };
 
-export const useUpdateItem = <T extends CleanItem>({ refetch }: In<T>) => {
+export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
     const { userId } = useAuth();
 
     if (!userId) {
@@ -16,22 +16,17 @@ export const useUpdateItem = <T extends CleanItem>({ refetch }: In<T>) => {
 
     const api = fetcher(userId);
 
-    const toggleReadStatus = async (item: T) => {
-        const res = await api.PUT(`/item/${item.id}/read`, {
+    const toggleReadStatus = (item: T) => {
+        const updateRequest = api.SWR(`/item/${item.id}/read`, "PUT", {
             markAsRead: !item.isRead,
         });
-
-        if (!res.success) {
-            toast.error(res.message);
-            return;
-        }
 
         const updatedItem = {
             ...item,
             isRead: !item.isRead,
         };
 
-        await refetch(updatedItem);
+        refetch(updatedItem, updateRequest);
     };
 
     return {
