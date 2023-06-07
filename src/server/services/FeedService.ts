@@ -1,7 +1,7 @@
-import { CleanFeedWithItems } from "@/models/entities";
-import { Result, ResultType } from "@/models/result";
-import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
-import { FeedRepository } from "@/server/repositories/FeedRepository";
+import { CleanFeedWithItems } from "@/src/models/entities";
+import { Result, ResultType } from "@/src/models/result";
+import { DatabaseMapper } from "@/src/server/mappers/DatabaseMapper";
+import { FeedRepository } from "@/src/server/repositories/FeedRepository";
 
 const getFeedByPublicUrl = async (
     feedPublicUrl: string

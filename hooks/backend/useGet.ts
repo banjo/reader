@@ -1,5 +1,5 @@
 import { useAuthFetcher } from "@/hooks/backend/useAuthFetcher";
-import { Refetch } from "@/models/swr";
+import { Refetch } from "@/src/models/swr";
 import { useMemo } from "react";
 import useSWR from "swr";
 

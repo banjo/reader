@@ -1,4 +1,4 @@
-import { Result, ResultType } from "@/models/result";
+import { Result, ResultType } from "@/src/models/result";
 import * as z from "zod";
 
 type Error = {

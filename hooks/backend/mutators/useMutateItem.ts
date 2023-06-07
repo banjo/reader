@@ -1,6 +1,6 @@
-import { fetcher } from "@/lib/fetcher";
-import { CleanItem } from "@/models/entities";
-import { Refetch } from "@/models/swr";
+import { fetcher } from "@/src/lib/fetcher";
+import { CleanItem } from "@/src/models/entities";
+import { Refetch } from "@/src/models/swr";
 import { useAuth } from "@clerk/nextjs";
 
 type In<T> = {

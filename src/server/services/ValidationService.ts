@@ -1,4 +1,4 @@
-import { Result } from "@/models/result";
+import { Result } from "@/src/models/result";
 import { KeySchema, ZodIssue } from "zod";
 
 const createErrorMessage = (issues: ZodIssue[], value: string, name: string): string => {

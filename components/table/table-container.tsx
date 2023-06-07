@@ -3,7 +3,7 @@
 import { MenuEntries } from "@/components/shared/Dropdown";
 import { Table } from "@/components/table/table";
 import { TableItem } from "@/components/table/table-item";
-import { CleanFeedWithItems, CleanItem } from "@/models/entities";
+import { CleanFeedWithItems, CleanItem } from "@/src/models/entities";
 import { FC, useMemo } from "react";
 
 type TableContainerProps = {

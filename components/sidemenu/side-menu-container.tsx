@@ -8,8 +8,8 @@ import { Item } from "@/components/sidemenu/item";
 import { Sidemenu } from "@/components/sidemenu/menu";
 import { SubMenu } from "@/components/sidemenu/sub-menu";
 import { useGet } from "@/hooks/backend/useGet";
-import { avatarUrl } from "@/lib/utils";
-import { CleanFeedWithItems } from "@/models/entities";
+import { avatarUrl } from "@/src/lib/utils";
+import { CleanFeedWithItems } from "@/src/models/entities";
 import { usePathname } from "next/navigation";
 import { FC, useMemo } from "react";
 

@@ -1,4 +1,4 @@
-import { BadRequestError, RequestError, SuccessRequest } from "@/models/request";
+import { BadRequestError, RequestError, SuccessRequest } from "@/src/models/request";
 import { NextResponse } from "next/server";
 import { ZodIssue } from "zod";
 import { ErrorStatus, ErrorType } from "../../models/result";

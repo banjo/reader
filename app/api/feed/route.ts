@@ -1,6 +1,6 @@
-import { FeedService } from "@/server/services/FeedService";
-import { RequestService } from "@/server/services/RequestService";
-import { ResponseService } from "@/server/services/ResponseService";
+import { FeedService } from "@/src/server/services/FeedService";
+import { RequestService } from "@/src/server/services/RequestService";
+import { ResponseService } from "@/src/server/services/ResponseService";
 
 export async function GET(req: Request) {
     const userId = RequestService.getUserId(req);

@@ -1,5 +1,5 @@
-import { ItemService } from "@/server/services/ItemService";
-import { ResponseService } from "@/server/services/ResponseService";
+import { ItemService } from "@/src/server/services/ItemService";
+import { ResponseService } from "@/src/server/services/ResponseService";
 import { z } from "zod";
 
 const putBodySchema = z.object({

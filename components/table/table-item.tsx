@@ -3,7 +3,7 @@ import { Icons } from "@/components/shared/icons";
 import { Bookmark } from "@/components/shared/icons/bookmark";
 import { Favorite } from "@/components/shared/icons/favorite";
 import { TableType } from "@/components/table/table.types";
-import { CleanItem } from "@/models/entities";
+import { CleanItem } from "@/src/models/entities";
 
 type CardProps<T> = {
     item: T;

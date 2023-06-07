@@ -1,4 +1,4 @@
-import { UserRepository } from "@/server/repositories/UserRepository";
+import { UserRepository } from "@/src/server/repositories/UserRepository";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 

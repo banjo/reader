@@ -1,7 +1,7 @@
 import { useAuthFetcher } from "@/hooks/backend/useAuthFetcher";
 import { useUpdateSidebar } from "@/hooks/backend/useUpdateSidebar";
-import { CleanFeedWithItems, CleanItem } from "@/models/entities";
-import { Refetch } from "@/models/swr";
+import { CleanFeedWithItems, CleanItem } from "@/src/models/entities";
+import { Refetch } from "@/src/models/swr";
 import { useMemo } from "react";
 import useSWR from "swr";
 

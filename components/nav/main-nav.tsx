@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { Icons } from "@/components/shared/icons";
 import { siteConfig } from "@/config/site";
-import { cn } from "@/lib/utils";
-import { NavItem } from "@/types/nav";
+import { cn } from "@/src/lib/utils";
+import { NavItem } from "@/src/types/nav";
 import { auth } from "@clerk/nextjs";
 import { useMemo } from "react";
 

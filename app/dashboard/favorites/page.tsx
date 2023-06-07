@@ -1,6 +1,6 @@
 import { FavoriteContainer } from "@/components/features/feed/containers/favorite-container";
-import { FeedService } from "@/server/services/FeedService";
-import { ServerComponentService } from "@/server/services/ServerComponentService";
+import { FeedService } from "@/src/server/services/FeedService";
+import { ServerComponentService } from "@/src/server/services/ServerComponentService";
 
 export const revalidate = 0;
 

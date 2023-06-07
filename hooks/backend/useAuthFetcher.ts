@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/fetcher";
+import { fetcher } from "@/src/lib/fetcher";
 import { useAuth } from "@clerk/nextjs";
 
 export const useAuthFetcher = () => {
