@@ -1,4 +1,4 @@
-import { AllContainer } from "@/client/components/features/feed/containers/all-container";
+import { AllContainer } from "@/client/features/feed/containers/all-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 

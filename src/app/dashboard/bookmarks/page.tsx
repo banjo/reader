@@ -1,4 +1,4 @@
-import { BookmarkContainer } from "@/client/components/features/feed/containers/bookmark-container";
+import { BookmarkContainer } from "@/client/features/feed/containers/bookmark-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useMultipleFeedsFetcher } from "@/client/components/features/feed/hooks/useMultipleFeedsFetcher";
 import { TableContainer } from "@/client/components/table/table-container";
+import { useMultipleFeedsFetcher } from "@/client/features/feed/hooks/useMultipleFeedsFetcher";
 import { useTableItemMenu } from "@/client/hooks/shared/useTableItemMenu";
 import { CleanFeedWithItems } from "@/shared/models/entities";
 import { FC, useMemo } from "react";
@@ -10,7 +10,7 @@ type Props = {
     feeds: CleanFeedWithItems[];
 };
 
-export const FavoriteContainer: FC<Props> = ({ feeds }) => {
+export const BookmarkContainer: FC<Props> = ({ feeds }) => {
     const { data, refetch } = useMultipleFeedsFetcher({ key: "/feed", fallbackData: feeds });
     const { menuOptions } = useTableItemMenu({ refetch });
 
@@ -19,7 +19,7 @@ export const FavoriteContainer: FC<Props> = ({ feeds }) => {
             data.map(feed => {
                 return {
                     ...feed,
-                    items: feed.items.filter(item => item.isFavorite),
+                    items: feed.items.filter(item => item.isBookmarked),
                 };
             }),
         [data]
