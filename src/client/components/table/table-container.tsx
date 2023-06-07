@@ -4,11 +4,13 @@ import { MenuEntries } from "@/client/components/shared/Dropdown";
 import { Table } from "@/client/components/table/table";
 import { TableItem } from "@/client/components/table/table-item";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
+import { Refetch } from "@/shared/models/swr";
 import { FC, useMemo } from "react";
 
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
     menuOptions?: MenuEntries<CleanItem>[];
+    refetch: Refetch<CleanItem>;
 };
 
 type FormattedFeed = {
@@ -17,7 +19,7 @@ type FormattedFeed = {
     items: CleanItem[];
 };
 
-export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions }) => {
+export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, refetch }) => {
     const multipleFeeds = useMemo(() => feeds.length > 1, [feeds]);
 
     const data: FormattedFeed[] = useMemo(
@@ -44,6 +46,7 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions }) 
                             feedName={formattedFeed.name}
                             showFeedName={multipleFeeds}
                             menuOptions={menuOptions}
+                            refetch={refetch}
                         />
                     );
                 });

@@ -17,8 +17,10 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
     const api = fetcher(userId);
 
     const toggleReadStatus = (item: T) => {
-        const updateRequest = api.SWR(`/item/${item.id}/read`, "PUT", {
-            markAsRead: !item.isRead,
+        console.log(item); // todo: fix datetime
+        const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
+            ...item,
+            isRead: !item.isRead,
         });
 
         const updatedItem = {
@@ -29,7 +31,22 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
         refetch(updatedItem, updateRequest);
     };
 
+    const toggleBookmarkStatus = (item: T) => {
+        const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
+            ...item,
+            isBookmarked: !item.isBookmarked,
+        });
+
+        const updatedItem = {
+            ...item,
+            isBookmarked: !item.isBookmarked,
+        };
+
+        refetch(updatedItem, updateRequest);
+    };
+
     return {
         toggleReadStatus,
+        toggleBookmarkStatus,
     };
 };

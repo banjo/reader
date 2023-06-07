@@ -1,0 +1,32 @@
+// Update auto generated models to be correct, making the date type work.
+import { globby } from "globby";
+import fs from "node:fs";
+
+const readFile = (path: string) => {
+    return fs.promises.readFile(path, "utf8");
+};
+
+const writeFile = async (path: string, content: string) => {
+    await fs.promises.writeFile(path, content, "utf8");
+};
+
+const replaceMap = {
+    "z.date()": "z.coerce.date()",
+};
+
+const main = async () => {
+    const files = await globby(`**/prisma/zod/*.ts`);
+
+    for (const file of files) {
+        const content = await readFile(file);
+
+        let newContent = content;
+        for (const [oldValue, newValue] of Object.entries(replaceMap)) {
+            newContent = content.replaceAll(oldValue, newValue);
+        }
+
+        await writeFile(file, newContent);
+    }
+};
+
+main();

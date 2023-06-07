@@ -1,17 +1,31 @@
-import { Feed, Item, User } from "@prisma/client";
+import { FeedModel, ItemModel, UserModel } from "prisma/zod";
+import { z } from "zod";
 
-type StrictOmitKeys<T, K extends keyof T> = {
-    [P in keyof T]: P extends K ? never : P;
-}[keyof T];
+// create schema from generated prisma models and replace date with better option
+export const CleanItemSchema = ItemModel.omit({
+    feedId: true,
+    userId: true,
+});
 
-type StrictOmit<T, K extends keyof T> = {
-    [P in StrictOmitKeys<T, K>]: T[P];
-};
+export const CleanFeedSchema = FeedModel.omit({
+    ttl: true,
+});
 
-// FOR FRONTEND
-export type CleanFeed = StrictOmit<Feed, "ttl">;
-export type CleanUser = StrictOmit<User, "externalId">;
-export type CleanItem = StrictOmit<Item, "feedId" | "userId">;
+export const CleanUserSchema = UserModel.omit({
+    externalId: true,
+});
 
-export type FeedWithItems = Feed & { items?: Item[] };
-export type CleanFeedWithItems = CleanFeed & { items: CleanItem[] };
+export type CleanItem = z.TypeOf<typeof CleanItemSchema>;
+export type CleanFeed = z.TypeOf<typeof CleanFeedSchema>;
+export type CleanUser = z.TypeOf<typeof CleanUserSchema>;
+
+export const FeedWithItemsSchema = FeedModel.extend({
+    items: ItemModel.array(),
+});
+
+export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
+    items: CleanItemSchema.array(),
+});
+
+export type FeedWithItems = z.TypeOf<typeof FeedWithItemsSchema>;
+export type CleanFeedWithItems = z.TypeOf<typeof CleanFeedWithItemsSchema>;

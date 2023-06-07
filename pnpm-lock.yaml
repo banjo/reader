@@ -123,6 +123,9 @@ devDependencies:
   esno:
     specifier: ^0.16.3
     version: 0.16.3
+  globby:
+    specifier: ^13.1.4
+    version: 13.1.4
   postcss:
     specifier: ^8.4.24
     version: 8.4.24

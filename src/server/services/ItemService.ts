@@ -1,5 +1,6 @@
 import createLogger from "@/server/lib/logger";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
+import { CleanItem } from "@/shared/models/entities";
 import { Result } from "@/shared/models/result";
 
 const logger = createLogger("ItemService");
@@ -33,4 +34,24 @@ const getItemById = async (id: number) => {
     return Result.ok(item.data);
 };
 
-export const ItemService = { markAsRead, getItemById };
+const updateItem = async (item: CleanItem) => {
+    const existingItem = await ItemRepository.getItemById(item.id);
+
+    if (!existingItem.success) {
+        logger.error(`Could not find item with id ${item.id}`);
+        return Result.error(`Could not find item with id ${item.id}`, "NotFound");
+    }
+
+    const updatedItem = { ...existingItem.data, ...item };
+
+    const updated = await ItemRepository.updateItem(updatedItem);
+
+    if (!updated.success) {
+        logger.error(`Could not update item with id ${item.id}`);
+        return Result.error(`Could not update item with id ${item.id}`, "InternalError");
+    }
+
+    return Result.ok(updated.data);
+};
+
+export const ItemService = { markAsRead, getItemById, updateItem };

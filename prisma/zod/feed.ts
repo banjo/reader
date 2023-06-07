@@ -1,10 +1,10 @@
 import * as z from "zod";
-import { CompleteItem, CompleteUser, RelatedItemModel, RelatedUserModel } from "./index";
+import { CompleteItem, RelatedItemModel, CompleteUser, RelatedUserModel } from "./index";
 
 export const FeedModel = z.object({
     id: z.number().int(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
     name: z.string(),
     link: z.string(),
     imageUrl: z.string().nullish(),

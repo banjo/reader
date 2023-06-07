@@ -1,17 +1,17 @@
 import * as z from "zod";
 import {
     CompleteFeed,
-    CompleteTag,
-    CompleteUser,
     RelatedFeedModel,
-    RelatedTagModel,
+    CompleteUser,
     RelatedUserModel,
+    CompleteTag,
+    RelatedTagModel,
 } from "./index";
 
 export const ItemModel = z.object({
     id: z.number().int(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
     feedId: z.number().int(),
     userId: z.number().int(),
     isRead: z.boolean(),
@@ -23,8 +23,8 @@ export const ItemModel = z.object({
     link: z.string(),
     content: z.string(),
     html: z.string(),
-    lastFetch: z.date(),
-    pubDate: z.date(),
+    lastFetch: z.coerce.date(),
+    pubDate: z.coerce.date(),
 });
 
 export interface CompleteItem extends z.infer<typeof ItemModel> {

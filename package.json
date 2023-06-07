@@ -13,7 +13,8 @@
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
     "add": "npx shadcn-ui add",
-    "db:update": "npx prisma migrate reset --skip-seed --skip-generate --force && npx prisma db push && npx prisma generate && nr format:write && npx prisma db seed"
+    "db:generate": "npx prisma generate && esno scripts/updateZodModels.ts && nr format:write",
+    "db:update": "npx prisma migrate reset --skip-seed --skip-generate --force && npx prisma db push && nr db:generate && npx prisma db seed"
   },
   "prisma": {
     "seed": "esno prisma/seed.ts"
@@ -61,6 +62,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-tailwindcss": "^3.12.0",
     "esno": "^0.16.3",
+    "globby": "^13.1.4",
     "postcss": "^8.4.24",
     "prettier": "^2.8.8",
     "prisma": "^4.15.0",

@@ -3,7 +3,9 @@ import { Icons } from "@/client/components/shared/icons";
 import { Bookmark } from "@/client/components/shared/icons/bookmark";
 import { Favorite } from "@/client/components/shared/icons/favorite";
 import { TableType } from "@/client/components/table/table.types";
+import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
 import { CleanItem } from "@/shared/models/entities";
+import { Refetch } from "@/shared/models/swr";
 
 type CardProps<T> = {
     item: T;
@@ -11,6 +13,7 @@ type CardProps<T> = {
     showFeedName?: boolean;
     feedName?: string;
     menuOptions?: MenuEntries<T>[];
+    refetch: Refetch<T>;
 };
 
 export const TableItem = <T extends CleanItem>({
@@ -19,10 +22,17 @@ export const TableItem = <T extends CleanItem>({
     showFeedName = false,
     feedName,
     menuOptions,
+    refetch,
 }: CardProps<T>) => {
+    const { toggleBookmarkStatus } = useMutateItem<T>({ refetch });
+
     if (type === "card") {
         throw new Error("not implemented");
     }
+
+    const toggleBookmark = () => {
+        toggleBookmarkStatus(item);
+    };
 
     return (
         <div
@@ -36,7 +46,7 @@ export const TableItem = <T extends CleanItem>({
             )}
 
             <Favorite size="md" active={item.isFavorite} onClick={() => 0} />
-            <Bookmark size="md" active={item.isBookmarked} onClick={() => 0} />
+            <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
             {showFeedName && (
                 <span className="w-32 min-w-max text-sm font-light text-gray-600">{feedName}</span>
             )}
