@@ -1,12 +1,11 @@
 import * as z from "zod";
-import * as imports from "../null";
 import {
     CompleteFeed,
-    RelatedFeedModel,
-    CompleteUser,
-    RelatedUserModel,
     CompleteTag,
+    CompleteUser,
+    RelatedFeedModel,
     RelatedTagModel,
+    RelatedUserModel,
 } from "./index";
 
 export const ItemModel = z.object({

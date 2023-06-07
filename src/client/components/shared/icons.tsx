@@ -3,6 +3,7 @@ import {
     Bookmark,
     Home,
     LayoutList,
+    type Icon as LucideIcon,
     LucideProps,
     Moon,
     MoreHorizontal,
@@ -10,7 +11,6 @@ import {
     Star,
     SunMedium,
     Twitter,
-    type Icon as LucideIcon,
 } from "lucide-react";
 
 export type IconType = LucideIcon;

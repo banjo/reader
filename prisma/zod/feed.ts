@@ -1,6 +1,5 @@
 import * as z from "zod";
-import * as imports from "../null";
-import { CompleteItem, RelatedItemModel, CompleteUser, RelatedUserModel } from "./index";
+import { CompleteItem, CompleteUser, RelatedItemModel, RelatedUserModel } from "./index";
 
 export const FeedModel = z.object({
     id: z.number().int(),
