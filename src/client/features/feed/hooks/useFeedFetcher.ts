@@ -28,7 +28,11 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
         return fetchData ?? fallbackData;
     }, [fallbackData, fetchData]);
 
-    const refetch = async (updatedItem: CleanItem, updateFn: () => Promise<undefined>) => {
+    const refetch: Refetch<CleanItem> = async (
+        updatedItem: CleanItem,
+        updateFn: () => Promise<undefined>,
+        onError?: () => void
+    ) => {
         const updatedFeed = data.items.map(i => {
             if (i.id === updatedItem.id) {
                 return updatedItem;
@@ -44,7 +48,12 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
         mutate(updatedData, false);
         mutateSidebarItem(updatedItem);
 
-        await updateFn();
+        try {
+            await updateFn();
+        } catch (error) {
+            console.error(error);
+            if (onError) onError();
+        }
 
         mutate();
         fetchLatestInSidebar();

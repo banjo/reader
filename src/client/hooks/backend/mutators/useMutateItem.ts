@@ -2,6 +2,7 @@ import { fetcher } from "@/client/lib/fetcher";
 import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "react-hot-toast";
 
 type In<T> = {
     refetch: Refetch<T>;
@@ -17,7 +18,6 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
     const api = fetcher(userId);
 
     const toggleReadStatus = (item: T) => {
-        console.log(item); // todo: fix datetime
         const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
             ...item,
             isRead: !item.isRead,
@@ -28,7 +28,9 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
             isRead: !item.isRead,
         };
 
-        refetch(updatedItem, updateRequest);
+        refetch(updatedItem, updateRequest, () => {
+            toast.error("Failed to update item");
+        });
     };
 
     const toggleBookmarkStatus = (item: T) => {
@@ -42,7 +44,9 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
             isBookmarked: !item.isBookmarked,
         };
 
-        refetch(updatedItem, updateRequest);
+        refetch(updatedItem, updateRequest, () => {
+            toast.error("Failed to update item");
+        });
     };
 
     return {

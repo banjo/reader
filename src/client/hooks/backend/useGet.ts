@@ -29,14 +29,23 @@ export const useGet = <T>({ key, fallbackData }: In<T>): Out<T> => {
         mutate();
     };
 
-    const refetch = async (updatedItem: T, updateFn: () => Promise<undefined>) => {
+    const refetch = async (
+        updatedItem: T,
+        updateFn: () => Promise<undefined>,
+        onError?: () => void
+    ) => {
         if (!data) {
             mutate();
             return;
         }
 
         mutate(updatedItem, false);
-        await updateFn();
+        try {
+            await updateFn();
+        } catch (error) {
+            console.error(error);
+            if (onError) onError();
+        }
         mutate();
     };
 
