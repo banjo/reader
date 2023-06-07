@@ -1,3 +1,4 @@
+import { Tooltip } from "@/client/components/shared/Tooltip";
 import { IconType } from "@/client/components/shared/icons";
 import { Badge } from "@/client/components/ui/badge";
 import Link from "next/link";
@@ -11,12 +12,14 @@ type ItemProps = {
     selected: boolean;
     highlight?: boolean;
     notification?: ReactNode;
+    notificationTooltip: string;
 };
 
 export const Item: FC<ItemProps> = ({
     title,
     Icon,
     notification,
+    notificationTooltip,
     url,
     image,
     selected = false,
@@ -42,7 +45,14 @@ export const Item: FC<ItemProps> = ({
                 {image && <img src={image} className="h-5 w-5 rounded-full" />}
                 <span className="text-md">{title}</span>
             </div>
-            {notification && <Badge>{notification}</Badge>}
+
+            {notification && (
+                <Tooltip tooltip={notificationTooltip}>
+                    <div>
+                        <Badge>{notification}</Badge>
+                    </div>
+                </Tooltip>
+            )}
         </Link>
     );
 };

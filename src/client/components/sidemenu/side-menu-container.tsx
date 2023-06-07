@@ -79,6 +79,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     selected={isSelected("")}
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
+                    notificationTooltip="Unread items"
                 />
                 <Item
                     title="Read later"
@@ -87,6 +88,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     selected={isSelected("/bookmarks")}
                     highlight={Boolean(bookmarksUnread)}
                     notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
+                    notificationTooltip="Unread items"
                 />
                 <Item
                     title="Favorites"
@@ -95,6 +97,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     selected={isSelected("/favorites")}
                     highlight={Boolean(favoritesUnread)}
                     notification={favoritesUnread > 0 ? favoritesUnread : undefined}
+                    notificationTooltip="Unread items"
                 />
             </SubMenu>
 
@@ -108,6 +111,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     selected={isSelected("/all")}
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
+                    notificationTooltip="Unread items"
                 />
                 {data.map(feed => {
                     const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
@@ -121,6 +125,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                             selected={isSelected(`/feed/${feed.publicUrl}`)}
                             notification={unread > 0 ? unread : undefined}
                             highlight={Boolean(unread)}
+                            notificationTooltip="Unread items"
                         />
                     );
                 })}
