@@ -1,4 +1,4 @@
-import { CleanFeedWithItems, CleanItem } from "@/models/entities";
+import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { mutate } from "swr";
 
 const KEY = "/feed";

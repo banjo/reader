@@ -1,6 +1,6 @@
 import { useGet } from "@/client/hooks/backend/useGet";
-import { CleanFeedWithItems, CleanItem } from "@/models/entities";
-import { Refetch } from "@/models/swr";
+import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
+import { Refetch } from "@/shared/models/swr";
 
 type Out = {
     data: CleanFeedWithItems[];

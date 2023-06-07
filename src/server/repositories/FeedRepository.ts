@@ -1,7 +1,7 @@
-import { FeedWithItems } from "@/models/entities";
-import { Result, ResultType } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
+import { FeedWithItems } from "@/shared/models/entities";
+import { Result, ResultType } from "@/shared/models/result";
 import { Feed } from "@prisma/client";
 import "server-only";
 

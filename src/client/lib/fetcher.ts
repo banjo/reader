@@ -1,6 +1,6 @@
-import { BadRequestError, RequestError, SuccessRequest } from "@/models/request";
-import { ErrorType, Result, ResultType } from "@/models/result";
 import { getUrl } from "@/shared/lib/url";
+import { BadRequestError, RequestError, SuccessRequest } from "@/shared/models/request";
+import { ErrorType, Result, ResultType } from "@/shared/models/result";
 import ky, { HTTPError } from "ky-universal";
 
 /**

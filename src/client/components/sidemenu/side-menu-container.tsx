@@ -9,7 +9,7 @@ import { Sidemenu } from "@/client/components/sidemenu/menu";
 import { SubMenu } from "@/client/components/sidemenu/sub-menu";
 import { useGet } from "@/client/hooks/backend/useGet";
 import { avatarUrl } from "@/client/lib/utils";
-import { CleanFeedWithItems } from "@/models/entities";
+import { CleanFeedWithItems } from "@/shared/models/entities";
 import { usePathname } from "next/navigation";
 import { FC, useMemo } from "react";
 

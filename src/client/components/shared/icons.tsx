@@ -1,4 +1,4 @@
-import { Size } from "@/models/size";
+import { Size } from "@/shared/models/size";
 import {
     Bookmark,
     Home,

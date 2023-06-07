@@ -1,6 +1,6 @@
 import { Icons, iconSizeMapper } from "@/client/components/shared/icons";
 import { IconBase } from "@/client/components/shared/icons/icon-base";
-import { Size } from "@/models/size";
+import { Size } from "@/shared/models/size";
 import { FC } from "react";
 
 type Props = {

@@ -15,5 +15,3 @@ export type CleanItem = StrictOmit<Item, "feedId" | "userId">;
 
 export type FeedWithItems = Feed & { items?: Item[] };
 export type CleanFeedWithItems = CleanFeed & { items: CleanItem[] };
-
-// FOR DATABASE PARAMETERS

@@ -1,7 +1,7 @@
-import { BadRequestError, RequestError, SuccessRequest } from "@/models/request";
+import { BadRequestError, RequestError, SuccessRequest } from "@/shared/models/request";
 import { NextResponse } from "next/server";
 import { ZodIssue } from "zod";
-import { ErrorStatus, ErrorType } from "../../models/result";
+import { ErrorStatus, ErrorType } from "../../shared/models/result";
 
 const success = <T>(data: T): NextResponse<SuccessRequest<T>> => {
     return NextResponse.json({ data, success: true });

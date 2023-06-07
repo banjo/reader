@@ -3,7 +3,7 @@
 import { useFeedFetcher } from "@/client/components/features/feed/hooks/useFeedFetcher";
 import { TableContainer } from "@/client/components/table/table-container";
 import { useTableItemMenu } from "@/client/hooks/shared/useTableItemMenu";
-import { CleanFeedWithItems } from "@/models/entities";
+import { CleanFeedWithItems } from "@/shared/models/entities";
 import { FC } from "react";
 
 type Props = {

@@ -1,7 +1,7 @@
 import { MenuEntries } from "@/client/components/shared/Dropdown";
 import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
-import { CleanItem } from "@/models/entities";
-import { Refetch } from "@/models/swr";
+import { CleanItem } from "@/shared/models/entities";
+import { Refetch } from "@/shared/models/swr";
 
 type Out<T> = {
     menuOptions: MenuEntries<T>[];

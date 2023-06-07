@@ -1,5 +1,5 @@
-import { Result, type ResultType } from "@/models/result";
 import createLogger from "@/server/lib/logger";
+import { Result, type ResultType } from "@/shared/models/result";
 import { KeySchema } from "zod";
 
 const logger = createLogger("RequestService");

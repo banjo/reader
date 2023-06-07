@@ -1,6 +1,6 @@
-import { Result } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
+import { Result } from "@/shared/models/result";
 
 const logger = createLogger("ItemService");
 

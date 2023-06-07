@@ -1,6 +1,6 @@
-import { Result, ResultType } from "@/models/result";
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
+import { Result, ResultType } from "@/shared/models/result";
 import { Item } from "@prisma/client";
 import "server-only";
 
