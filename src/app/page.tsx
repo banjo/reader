@@ -1,4 +1,4 @@
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/client/components/ui/button";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 

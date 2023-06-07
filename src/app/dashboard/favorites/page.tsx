@@ -1,4 +1,4 @@
-import { FavoriteContainer } from "@/components/features/feed/containers/favorite-container";
+import { FavoriteContainer } from "@/client/components/features/feed/containers/favorite-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 

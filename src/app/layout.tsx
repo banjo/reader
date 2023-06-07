@@ -1,12 +1,12 @@
-import "@/styles/globals.css";
+import "@/client/styles/globals.css";
 import { Metadata } from "next";
 
-import { SiteHeader } from "@/components/nav/site-header";
-import { TailwindIndicator } from "@/components/utils/tailwind-indicator";
-import { ThemeProvider } from "@/components/utils/theme-provider";
-import { siteConfig } from "@/config/site";
-import { fontSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
+import { SiteHeader } from "@/client/components/nav/site-header";
+import { TailwindIndicator } from "@/client/components/utils/tailwind-indicator";
+import { ThemeProvider } from "@/client/components/utils/theme-provider";
+import { siteConfig } from "@/client/config/site";
+import { fontSans } from "@/client/lib/fonts";
+import { cn } from "@/client/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 

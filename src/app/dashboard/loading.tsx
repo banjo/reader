@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/client/components/ui/skeleton";
 import { range } from "@banjoanton/utils";
 
 export default function Loading() {

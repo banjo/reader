@@ -1,4 +1,4 @@
-import { FeedContainer } from "@/components/features/feed/containers/feed-container";
+import { FeedContainer } from "@/client/components/features/feed/containers/feed-container";
 import { FeedService } from "@/server/services/FeedService";
 
 type Props = {
