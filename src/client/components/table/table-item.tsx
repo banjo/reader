@@ -42,17 +42,20 @@ export const TableItem = <T extends CleanItem>({
         <div
             className="relative flex h-8 w-full cursor-pointer
                 items-center justify-start gap-3 overflow-hidden  rounded-md
-                bg-slate-100
-                px-2 text-sm transition-colors hover:bg-slate-200"
+                bg-slate-100 px-2 text-sm
+                transition-colors hover:bg-slate-200
+                dark:border dark:bg-background dark:hover:bg-slate-900"
         >
             {item.isRead ? null : (
-                <div className="absolute inset-y-0 left-0 w-1 bg-slate-500"></div>
+                <div className="absolute inset-y-0 left-0 w-1 bg-slate-500 dark:bg-foreground"></div>
             )}
 
             <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
             <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
             {showFeedName && (
-                <span className="w-32 min-w-max text-sm font-light text-gray-600">{feedName}</span>
+                <span className="w-32 min-w-max text-sm font-light text-gray-600 dark:text-gray-300">
+                    {feedName}
+                </span>
             )}
             <span className="min-w-max font-bold">{item.title}</span>
             <span className="w-0 max-w-full shrink grow truncate">{item.description}</span>
