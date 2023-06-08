@@ -5,11 +5,10 @@ import { useAuth } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
 
 type In<T> = {
-    refetch: Refetch<T>;
-    refetchMultiple?: Refetch<T[]>;
+    refetch: Refetch<T[]>;
 };
 
-export const useMutateItem = <T extends CleanItem>({ refetch, refetchMultiple }: In<T>) => {
+export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
     const { userId } = useAuth();
 
     if (!userId) {
@@ -29,7 +28,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch, refetchMultiple }:
             isRead: !item.isRead,
         };
 
-        refetch(updatedItem, updateRequest, () => {
+        refetch([updatedItem], updateRequest, () => {
             toast.error("Failed to update item");
         });
     };
@@ -45,7 +44,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch, refetchMultiple }:
             isBookmarked: !item.isBookmarked,
         };
 
-        refetch(updatedItem, updateRequest, () => {
+        refetch([updatedItem], updateRequest, () => {
             toast.error("Failed to update item");
         });
     };
@@ -61,7 +60,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch, refetchMultiple }:
             isFavorite: !item.isFavorite,
         };
 
-        refetch(updatedItem, updateRequest, () => {
+        refetch([updatedItem], updateRequest, () => {
             toast.error("Failed to update item");
         });
     };
@@ -76,11 +75,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch, refetchMultiple }:
                 isRead: true,
             }));
 
-        if (!refetchMultiple) {
-            throw new Error("Refetch multiple need to be defined to use markMultipleAsRead");
-        }
-
-        refetchMultiple(updatedItems, updateRequest, () => {
+        refetch(updatedItems, updateRequest, () => {
             toast.error("Failed to update items");
         });
     };

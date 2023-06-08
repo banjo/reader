@@ -8,7 +8,7 @@ type Out<T> = {
 };
 
 type In<T> = {
-    refetch: Refetch<T>;
+    refetch: Refetch<T[]>;
 };
 
 export const useTableItemMenu = <T extends CleanItem>({ refetch }: In<T>): Out<T> => {

@@ -14,8 +14,7 @@ import { FC, useMemo, useState } from "react";
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
     menuOptions?: MenuEntries<CleanItem>[];
-    refetch: Refetch<CleanItem>;
-    refetchMultiple?: Refetch<CleanItem[]>;
+    refetch: Refetch<CleanItem[]>;
 };
 
 type TableCard = CleanItem & {
@@ -37,15 +36,11 @@ type TableFiltersOut = {
     actions: TableActions;
 };
 
-const useTableFilters = (
-    data: TableCard[],
-    refetch: Refetch<CleanItem>,
-    refetchMultiple?: Refetch<CleanItem[]>
-): TableFiltersOut => {
+const useTableFilters = (data: TableCard[], refetch: Refetch<CleanItem[]>): TableFiltersOut => {
     const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(() => {
         return data.some(item => item.isRead === false);
     });
-    const { markMultipleAsRead } = useMutateItem({ refetch, refetchMultiple });
+    const { markMultipleAsRead } = useMutateItem({ refetch });
 
     // FILTERED DATA
     const filteredData = useMemo(() => {
@@ -99,12 +94,7 @@ export const FilterBar: FC<FilterBarProps> = ({ filters, actions }) => {
     );
 };
 
-export const TableContainer: FC<TableContainerProps> = ({
-    feeds,
-    menuOptions,
-    refetch,
-    refetchMultiple,
-}) => {
+export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, refetch }) => {
     const multipleFeeds = useMemo(() => feeds.length > 1, [feeds]);
 
     const formattedData: TableCard[] = useMemo(() => {
@@ -117,7 +107,7 @@ export const TableContainer: FC<TableContainerProps> = ({
         return tableCards;
     }, [feeds]);
 
-    const { data, filters, actions } = useTableFilters(formattedData, refetch, refetchMultiple);
+    const { data, filters, actions } = useTableFilters(formattedData, refetch);
 
     return (
         <>

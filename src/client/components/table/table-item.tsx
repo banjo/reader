@@ -14,7 +14,7 @@ type CardProps<T> = {
     showFeedName?: boolean;
     feedName?: string;
     menuOptions?: MenuEntries<T>[];
-    refetch: Refetch<T>;
+    refetch: Refetch<T[]>;
 };
 
 export const TableItem = <T extends CleanItem>({
