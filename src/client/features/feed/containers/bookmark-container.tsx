@@ -30,8 +30,12 @@ export const BookmarkContainer: FC<Props> = ({ feeds }) => {
 
     return (
         <div className="flex flex-col gap-4">
-            Favorites
-            <TableContainer feeds={filtered} menuOptions={menuOptions} refetch={refetchMultiple} />
+            <TableContainer
+                feeds={filtered}
+                menuOptions={menuOptions}
+                refetch={refetchMultiple}
+                title="Bookmarks"
+            />
         </div>
     );
 };

@@ -15,6 +15,7 @@ type TableContainerProps = {
     feeds: CleanFeedWithItems[];
     menuOptions?: MenuEntries<CleanItem>[];
     refetch: Refetch<CleanItem[]>;
+    title: string;
 };
 
 type TableCard = CleanItem & {
@@ -70,14 +71,17 @@ const useTableFilters = (data: TableCard[], refetch: Refetch<CleanItem[]>): Tabl
 type FilterBarProps = {
     filters: TableFilters;
     actions: TableActions;
+    title: string;
 };
 
-export const FilterBar: FC<FilterBarProps> = ({ filters, actions }) => {
+export const FilterBar: FC<FilterBarProps> = ({ filters, actions, title }) => {
     const { showUnreadOnly, toggleShowUnreadOnly } = filters;
     const { markAllAsRead } = actions;
 
     return (
-        <div className="flex h-16 w-full items-center justify-end gap-8 rounded-md bg-slate-100 p-4">
+        <div className="flex h-16 w-full items-center justify-end gap-8 rounded-md border border-border p-4">
+            <span className="mr-auto text-lg font-medium">{title}</span>
+
             <Button onClick={markAllAsRead}>Mark all as read</Button>
 
             <div className="flex items-center">
@@ -94,7 +98,7 @@ export const FilterBar: FC<FilterBarProps> = ({ filters, actions }) => {
     );
 };
 
-export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, refetch }) => {
+export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, refetch, title }) => {
     const multipleFeeds = useMemo(() => feeds.length > 1, [feeds]);
 
     const formattedData: TableCard[] = useMemo(() => {
@@ -111,7 +115,7 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, re
 
     return (
         <>
-            <FilterBar filters={filters} actions={actions} />
+            <FilterBar filters={filters} actions={actions} title={title} />
             <Table type="list">
                 <AnimatePresence initial={false}>
                     {data.map(item => {
