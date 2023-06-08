@@ -1,4 +1,4 @@
-import { Tooltip } from "@/client/components/shared/Tooltip";
+import { Tooltip } from "@/client/components/shared/tooltip";
 import { useBoop } from "@/client/hooks/animation/useBoop";
 import { motion } from "framer-motion";
 import { FC, ReactNode } from "react";

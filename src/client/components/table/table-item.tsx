@@ -1,4 +1,4 @@
-import { Dropdown, MenuEntries } from "@/client/components/shared/Dropdown";
+import { Dropdown, MenuEntries } from "@/client/components/shared/dropdown";
 import { Icons } from "@/client/components/shared/icons";
 import { Bookmark } from "@/client/components/shared/icons/bookmark";
 import { Favorite } from "@/client/components/shared/icons/favorite";

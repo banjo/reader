@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuEntries } from "@/client/components/shared/Dropdown";
+import { MenuEntries } from "@/client/components/shared/dropdown";
 import { Table } from "@/client/components/table/table";
 import { TableItem } from "@/client/components/table/table-item";
 import { Button } from "@/client/components/ui/button";

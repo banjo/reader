@@ -1,6 +1,6 @@
-import { Tooltip } from "@/client/components/shared/Tooltip";
-import { Animated } from "@/client/components/shared/Animated";
+import { Animated } from "@/client/components/shared/animated";
 import { IconType } from "@/client/components/shared/icons";
+import { Tooltip } from "@/client/components/shared/tooltip";
 import { Badge } from "@/client/components/ui/badge";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
