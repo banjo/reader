@@ -9,7 +9,7 @@ import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { AnimatePresence } from "framer-motion";
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
@@ -24,6 +24,7 @@ type TableCard = CleanItem & {
 
 type TableFilters = {
     showUnreadOnly: boolean;
+    hasReadAll: boolean;
     toggleShowUnreadOnly: () => void;
 };
 
@@ -52,9 +53,21 @@ const useTableFilters = (data: TableCard[], refetch: Refetch<CleanItem[]>): Tabl
     }, [data, showUnreadOnly]);
 
     // FILTERS
+    const hasReadAll = useMemo(() => {
+        return filteredData.every(item => item.isRead === true);
+    }, [filteredData]);
+
     const toggleShowUnreadOnly = () => {
         setShowUnreadOnly(prev => !prev);
     };
+
+    useEffect(() => {
+        if (hasReadAll) {
+            setTimeout(() => {
+                setShowUnreadOnly(false);
+            }, 200);
+        }
+    }, [hasReadAll]);
 
     // ACTIONS
     const markAllAsRead = () => {
@@ -62,7 +75,7 @@ const useTableFilters = (data: TableCard[], refetch: Refetch<CleanItem[]>): Tabl
     };
 
     return {
-        filters: { showUnreadOnly, toggleShowUnreadOnly },
+        filters: { showUnreadOnly, toggleShowUnreadOnly, hasReadAll },
         data: filteredData,
         actions: { markAllAsRead },
     };
@@ -75,14 +88,16 @@ type FilterBarProps = {
 };
 
 export const FilterBar: FC<FilterBarProps> = ({ filters, actions, title }) => {
-    const { showUnreadOnly, toggleShowUnreadOnly } = filters;
+    const { showUnreadOnly, toggleShowUnreadOnly, hasReadAll } = filters;
     const { markAllAsRead } = actions;
 
     return (
         <div className="flex h-32 w-full items-center justify-end gap-8 rounded-md border border-border p-4">
             <span className="mr-auto text-lg font-medium">{title}</span>
 
-            <Button onClick={markAllAsRead}>Mark all as read</Button>
+            <Button onClick={markAllAsRead} disabled={hasReadAll}>
+                Mark all as read
+            </Button>
 
             <div className="flex items-center">
                 <Switch
