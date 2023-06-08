@@ -1,4 +1,5 @@
 import { Tooltip } from "@/client/components/shared/Tooltip";
+import { Animated } from "@/client/components/shared/Animated";
 import { IconType } from "@/client/components/shared/icons";
 import { Badge } from "@/client/components/ui/badge";
 import Link from "next/link";
@@ -35,10 +36,10 @@ export const Item: FC<ItemProps> = ({
         <Link
             href={url}
             className={`flex h-10 w-72 cursor-pointer items-center justify-between gap-4 rounded
-         px-4 text-foreground
-         ${selectedClasses}
-         ${highlightClasses}
-         `}
+            px-4 text-foreground
+            ${selectedClasses}
+            ${highlightClasses}
+            `}
         >
             <div className="flex items-center gap-4">
                 {Icon && <Icon className="h-5 w-5" />}
@@ -46,13 +47,11 @@ export const Item: FC<ItemProps> = ({
                 <span className="text-md">{title}</span>
             </div>
 
-            {notification && (
+            <Animated show={Boolean(notification)}>
                 <Tooltip tooltip={notificationTooltip}>
-                    <div>
-                        <Badge>{notification}</Badge>
-                    </div>
+                    <Badge>{notification}</Badge>
                 </Tooltip>
-            )}
+            </Animated>
         </Link>
     );
 };
