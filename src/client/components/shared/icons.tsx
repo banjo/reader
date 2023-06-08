@@ -2,8 +2,8 @@ import { Size } from "@/shared/models/size";
 import {
     Bookmark,
     Home,
+    Info,
     LayoutList,
-    type Icon as LucideIcon,
     LucideProps,
     Moon,
     MoreHorizontal,
@@ -11,6 +11,7 @@ import {
     Star,
     SunMedium,
     Twitter,
+    type Icon as LucideIcon,
 } from "lucide-react";
 
 export type IconType = LucideIcon;
@@ -30,6 +31,7 @@ export const Icons = {
     layout: LayoutList,
     add: PlusCircle,
     star: Star,
+    info: Info,
     horizontalMenu: MoreHorizontal,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>

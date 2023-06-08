@@ -3,6 +3,7 @@
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { Table } from "@/client/components/table/table";
 import { TableItem } from "@/client/components/table/table-item";
+import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
 import { Button } from "@/client/components/ui/button";
 import { Switch } from "@/client/components/ui/switch";
 import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
@@ -132,20 +133,28 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, re
         <>
             <FilterBar filters={filters} actions={actions} title={title} />
             <Table type="list">
-                <AnimatePresence initial={false}>
-                    {data.map(item => {
-                        return (
-                            <TableItem
-                                key={item.id}
-                                item={item}
-                                type="list"
-                                feedName={item.feedName}
-                                showFeedName={multipleFeeds}
-                                menuOptions={menuOptions}
-                                refetch={refetch}
-                            />
-                        );
-                    })}
+                <AnimatePresence mode={"wait"} initial={false}>
+                    {data.length > 0 &&
+                        data.map(item => {
+                            return (
+                                <TableItem
+                                    key={item.id}
+                                    item={item}
+                                    type="list"
+                                    feedName={item.feedName}
+                                    showFeedName={multipleFeeds}
+                                    menuOptions={menuOptions}
+                                    refetch={refetch}
+                                />
+                            );
+                        })}
+
+                    {data.length === 0 && (
+                        <Alert className="">
+                            <AlertTitle>Ops!</AlertTitle>
+                            <AlertDescription>No items found</AlertDescription>
+                        </Alert>
+                    )}
                 </AnimatePresence>
             </Table>
         </>
