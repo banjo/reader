@@ -11,11 +11,11 @@ type Props = {
 };
 
 export const BookmarkContainer: FC<Props> = ({ feeds }) => {
-    const { data, refetch, refetchMultiple } = useMultipleFeedsFetcher({
+    const { data, refetchMultiple } = useMultipleFeedsFetcher({
         key: "/feed",
         fallbackData: feeds,
     });
-    const { menuOptions } = useTableItemMenu({ refetch });
+    const { menuOptions } = useTableItemMenu({ refetch: refetchMultiple });
 
     const filtered = useMemo(
         () =>
