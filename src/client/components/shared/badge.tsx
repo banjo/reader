@@ -8,7 +8,7 @@ type Props = {
     children: ReactNode;
     tooltip: string;
     show: boolean;
-    animate: HTMLMotionProps<"div">;
+    animate?: HTMLMotionProps<"div">;
 } & BadgeProps;
 
 export const Badge: FC<Props> = ({ children, tooltip, show, animate, ...props }) => {
