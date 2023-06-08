@@ -1,6 +1,19 @@
 import { Variants } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 
+export type UseBoopProps = {
+    x?: number;
+    y?: number;
+    rotation?: number;
+    scale?: number;
+    timing?: number;
+    transitionConfig?: {
+        type: "spring" | "tween";
+        stiffness?: number;
+        damping?: number;
+    };
+};
+
 export const useBoop = ({
     x = 0,
     y = 0,
@@ -12,7 +25,7 @@ export const useBoop = ({
         stiffness: 300,
         damping: 10,
     },
-}): [boolean, Variants, () => void] => {
+}: UseBoopProps): [boolean, Variants, () => void] => {
     const [isBooped, setIsBooped] = useState(false);
     const variants = {
         boop: {

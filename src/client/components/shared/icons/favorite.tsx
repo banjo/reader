@@ -18,7 +18,17 @@ export const Favorite: FC<Props> = ({ active, onClick, size = "md" }) => {
     };
 
     return (
-        <IconBase tooltip={tooltip}>
+        <IconBase
+            boopOnClick={true}
+            boopProps={{
+                rotation: 40,
+                transitionConfig: {
+                    type: "spring",
+                    stiffness: 250,
+                },
+            }}
+            tooltip={tooltip}
+        >
             <Icons.star className={`${iconSizeMapper[size]} ${color}`} onClick={handleClick} />
         </IconBase>
     );
