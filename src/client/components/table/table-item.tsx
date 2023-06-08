@@ -49,12 +49,12 @@ export const TableItem = <T extends CleanItem>({
             exit={{ opacity: 0, height: 0, transition: { duration: 0.3 } }}
             className="relative flex w-full cursor-pointer
                 items-center justify-start gap-3 overflow-hidden rounded-md
-                bg-slate-100 px-2 text-sm
-                transition-colors hover:bg-slate-200
+                border border-border px-2 text-sm
+                transition-colors hover:bg-slate-100
                 dark:border dark:bg-background dark:hover:bg-slate-900"
         >
             {item.isRead ? null : (
-                <div className="absolute inset-y-0 left-0 w-1 bg-slate-500 dark:bg-foreground"></div>
+                <div className="absolute inset-y-0 left-0 w-1 bg-primary dark:bg-foreground"></div>
             )}
 
             <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
