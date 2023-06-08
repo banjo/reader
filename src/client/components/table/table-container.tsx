@@ -133,7 +133,7 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, re
         <>
             <FilterBar filters={filters} actions={actions} title={title} />
             <Table type="list">
-                <AnimatePresence mode={"wait"} initial={false}>
+                <AnimatePresence initial={false}>
                     {data.length > 0 &&
                         data.map(item => {
                             return (
