@@ -1,7 +1,5 @@
-import { Animated } from "@/client/components/shared/animated";
+import { Badge } from "@/client/components/shared/badge";
 import { IconType } from "@/client/components/shared/icons";
-import { Tooltip } from "@/client/components/shared/tooltip";
-import { Badge } from "@/client/components/ui/badge";
 import Link from "next/link";
 import { FC, ReactNode } from "react";
 
@@ -47,11 +45,9 @@ export const Item: FC<ItemProps> = ({
                 <span className="text-md">{title}</span>
             </div>
 
-            <Animated show={Boolean(notification)}>
-                <Tooltip tooltip={notificationTooltip}>
-                    <Badge>{notification}</Badge>
-                </Tooltip>
-            </Animated>
+            <Badge show={Boolean(notification)} tooltip={notificationTooltip}>
+                {notification}
+            </Badge>
         </Link>
     );
 };
