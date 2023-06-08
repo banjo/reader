@@ -1,4 +1,4 @@
-import { SideMenuContainer } from "@/client/components/sidemenu/side-menu-container";
+import { SideMenuContainer } from "@/client/components/nav/sidemenu/side-menu-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 import { redirect } from "next/navigation";

@@ -1,12 +1,12 @@
 "use client";
 
+import { Category } from "@/client/components/nav/sidemenu/category";
+import { Divider } from "@/client/components/nav/sidemenu/divider";
+import { Input } from "@/client/components/nav/sidemenu/input";
+import { Item } from "@/client/components/nav/sidemenu/item";
+import { Sidemenu } from "@/client/components/nav/sidemenu/menu";
+import { SubMenu } from "@/client/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/client/components/shared/icons";
-import { Category } from "@/client/components/sidemenu/category";
-import { Divider } from "@/client/components/sidemenu/divider";
-import { Input } from "@/client/components/sidemenu/input";
-import { Item } from "@/client/components/sidemenu/item";
-import { Sidemenu } from "@/client/components/sidemenu/menu";
-import { SubMenu } from "@/client/components/sidemenu/sub-menu";
 import { useGet } from "@/client/hooks/backend/useGet";
 import { avatarUrl } from "@/client/lib/utils";
 import { CleanFeedWithItems } from "@/shared/models/entities";
