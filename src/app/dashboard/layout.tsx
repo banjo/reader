@@ -1,4 +1,4 @@
-import { SideMenuContainer } from "@/client/components/nav/sidemenu/side-menu-container";
+import { SideMenuClientContainer } from "@/client/components/nav/sidemenu/side-menu-client-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 import { redirect } from "next/navigation";
@@ -20,7 +20,7 @@ export default async function DashboardLayout({ children }: Props) {
 
     return (
         <section className="flex">
-            <SideMenuContainer prefix="/dashboard" feeds={feeds.data} />
+            <SideMenuClientContainer prefix="/dashboard" feeds={feeds.data} />
             <main className="flex-1 p-6">{children}</main>
         </section>
     );

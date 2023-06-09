@@ -5,7 +5,7 @@ export const useAuthFetcher = () => {
     const { userId } = useAuth();
 
     if (!userId) {
-        throw new Error("User is not logged in");
+        throw new Error("User is not authenticated");
     }
 
     const api = fetcher(userId);

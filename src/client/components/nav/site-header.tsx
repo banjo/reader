@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { MainNav } from "@/client/components/nav/main-nav";
@@ -38,7 +40,7 @@ export function SiteHeader() {
                         </Link>
                         <ThemeToggle />
 
-                        <div className="pl-4">
+                        <div className="h-8 w-8 pl-4">
                             <UserButton afterSignOutUrl="/" />
                         </div>
                     </nav>

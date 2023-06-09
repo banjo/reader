@@ -4,7 +4,7 @@ import { Icons } from "@/client/components/shared/icons";
 import { siteConfig } from "@/client/config/site";
 import { cn } from "@/client/lib/utils";
 import { NavItem } from "@/client/types/nav";
-import { auth } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { useMemo } from "react";
 
 interface MainNavProps {
@@ -12,7 +12,7 @@ interface MainNavProps {
 }
 
 export function MainNav({ items }: MainNavProps) {
-    const { userId } = auth();
+    const { userId } = useAuth();
 
     const linksToRender = useMemo(() => {
         return items?.filter(item => {

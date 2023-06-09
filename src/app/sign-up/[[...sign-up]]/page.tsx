@@ -4,7 +4,7 @@ import { SignUp } from "@clerk/nextjs";
 export default function Page() {
     return (
         <CenteredContainer withNav={true}>
-            <SignUp />;
+            <SignUp afterSignInUrl={"/dashboard"} afterSignUpUrl={"/dashboard"} />;
         </CenteredContainer>
     );
 }
