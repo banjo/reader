@@ -35,7 +35,7 @@ function feed(feed: FeedWithItems): CleanFeedWithItems {
         url: feed.url,
         description: feed.description,
         updatedAt: feed.updatedAt,
-        items: feed.items ? items(feed.items) : [], // TODO: fix types
+        items: feed.items ? items(feed.items) : [],
     };
 }
 

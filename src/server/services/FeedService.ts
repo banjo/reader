@@ -1,9 +1,11 @@
 import createLogger from "@/server/lib/logger";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
+import { FeedMapper } from "@/server/mappers/FeedMapper";
+import { ItemsMapper } from "@/server/mappers/ItemsMapper";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { ParseService } from "@/server/services/ParseService";
-import { CleanFeedWithItems, CreateFeed, CreateItem } from "@/shared/models/entities";
+import { CleanFeedWithItems, CreateItem } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 
 const logger = createLogger("FeedService");
@@ -108,30 +110,10 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
         return Result.error("Failed to parse feed", "InternalError");
     }
 
-    // TODO: create a mapper for creations like this
-    const itemsToCreate: CreateItem[] = parseResult.data.items.map(item => {
-        return {
-            description: item.description,
-            imageUrl: null,
-            link: item.link,
-            isBookmarked: false,
-            isFavorite: false,
-            isRead: false,
-            lastFetch: new Date(),
-            pubDate: new Date(item.pubDate ?? new Date()),
-            userId: userId,
-            title: item.title,
-            content: item.contentSnippet ?? item.content,
-        };
-    });
-
-    const feedToCreate: CreateFeed = {
-        description: parseResult.data.description,
-        rssUrl: rssUrl,
-        imageUrl: null,
-        name: parseResult.data.title,
-        url: parseResult.data.link,
-    };
+    const itemsToCreate = parseResult.data.items.map(item =>
+        ItemsMapper.parseItemToCreateItem(item, userId)
+    );
+    const feedToCreate = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl);
 
     const createFeedResult = await FeedRepository.createFeed(feedToCreate, itemsToCreate, userId);
 

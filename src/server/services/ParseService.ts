@@ -8,27 +8,28 @@ const rssParser = new RssParser();
 
 const logger = createLogger("ParseService");
 
-const baseItemSchema = z.object({
+export const ParseItemSchema = z.object({
     title: z.string(),
     link: z.string().url(),
-    pubDate: z.string().optional(),
-    description: z.string().optional(),
-    content: z.string().optional(),
-    guid: z.string().optional(),
+    pubDate: z.union([z.string(), z.null()]),
+    description: z.union([z.string(), z.null()]),
+    content: z.union([z.string(), z.null()]),
+    guid: z.union([z.string(), z.null()]),
     categories: z.string().array().optional(),
-    contentSnippet: z.string().optional(),
+    contentSnippet: z.union([z.string(), z.null()]),
 });
 
-const baseFeedSchema = z.object({
+export const ParseFeedSchema = z.object({
     title: z.string(),
-    description: z.string().optional(),
+    description: z.union([z.string(), z.null()]),
     link: z.string().url(),
-    items: baseItemSchema.array(),
+    items: ParseItemSchema.array(),
 });
 
-type BaseFeed = z.infer<typeof baseFeedSchema>;
+export type ParseItem = z.infer<typeof ParseItemSchema>;
+export type ParseFeed = z.infer<typeof ParseFeedSchema>;
 
-const parseRssFeed = async (url: string): Promise<ResultType<BaseFeed>> => {
+const parseRssFeed = async (url: string): Promise<ResultType<ParseFeed>> => {
     let parsedResult;
     try {
         parsedResult = await rssParser.parseURL(url);
@@ -41,7 +42,7 @@ const parseRssFeed = async (url: string): Promise<ResultType<BaseFeed>> => {
         return Result.error("Failed to parse feed", "InternalError");
     }
 
-    const baseFeed = baseFeedSchema.safeParse(parsedResult);
+    const baseFeed = ParseFeedSchema.safeParse(parsedResult);
 
     if (!baseFeed.success) {
         logger.error(`Failed to parse feed with url: ${url}`, baseFeed.error);
