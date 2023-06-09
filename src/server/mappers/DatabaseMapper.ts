@@ -7,12 +7,12 @@ function item(item: Item): Omit<Item, "feedId" | "userId"> {
         isRead: item.isRead,
         isBookmarked: item.isBookmarked,
         isFavorite: item.isFavorite,
-        image: item.image,
+        imageUrl: item.imageUrl,
         title: item.title,
         link: item.link,
         content: item.content,
         description: item.description,
-        html: item.html,
+        htmlContent: item.htmlContent,
         lastFetch: item.lastFetch,
         pubDate: item.pubDate,
         createdAt: item.createdAt,
@@ -28,12 +28,14 @@ function feed(feed: FeedWithItems): CleanFeedWithItems {
     return {
         id: feed.id,
         name: feed.name,
-        link: feed.link,
         imageUrl: feed.imageUrl,
-        publicUrl: feed.publicUrl,
+        internalIdentifier: feed.internalIdentifier,
         createdAt: feed.createdAt,
+        rssUrl: feed.rssUrl,
+        url: feed.url,
+        description: feed.description,
         updatedAt: feed.updatedAt,
-        items: feed.items ? items(feed.items) : [],
+        items: feed.items ? items(feed.items) : [], // TODO: fix types
     };
 }
 

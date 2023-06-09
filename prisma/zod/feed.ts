@@ -6,9 +6,11 @@ export const FeedModel = z.object({
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
     name: z.string(),
-    link: z.string(),
+    url: z.string(),
+    rssUrl: z.string(),
+    description: z.string().nullish(),
     imageUrl: z.string().nullish(),
-    publicUrl: z.string(),
+    internalIdentifier: z.string(),
     ttl: z.number().int().nullish(),
 });
 

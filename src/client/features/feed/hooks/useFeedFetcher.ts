@@ -18,7 +18,7 @@ type In = {
 };
 
 export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
-    const fetcher = useAuthFetcher();
+    const { SWR_AUTH: fetcher } = useAuthFetcher();
     const { fetchLatestInSidebar, mutateSidebarItem, mutateSidebarItems } = useUpdateSidebar();
 
     const { data: fetchData, mutate } = useSWR<CleanFeedWithItems, Error>(key, fetcher, {

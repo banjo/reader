@@ -32,6 +32,7 @@ npx prisma studio
 -   [ ] Fetch client side for dynamic data instead (or combo?)
 -   [ ] fix dark and white mode for table
 -   [ ] Add delay for "no items found" box
+-   [ ] Add transactions to database
 
 
 

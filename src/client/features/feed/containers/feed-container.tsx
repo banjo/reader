@@ -8,12 +8,12 @@ import { FC } from "react";
 
 type Props = {
     feed: CleanFeedWithItems;
-    publicUrl: string;
+    internalIdentifier: string;
 };
 
-export const FeedContainer: FC<Props> = ({ feed, publicUrl }) => {
+export const FeedContainer: FC<Props> = ({ feed, internalIdentifier }) => {
     const { data, refetchMultiple } = useFeedFetcher({
-        key: `/feed/${publicUrl}`,
+        key: `/feed/${internalIdentifier}`,
         fallbackData: feed,
     });
     const { menuOptions } = useTableItemMenu({ refetch: refetchMultiple });

@@ -65,7 +65,9 @@ export const TableItem = <T extends CleanItem>({
                 </span>
             )}
             <span className="min-w-max font-bold">{item.title}</span>
-            <span className="w-0 max-w-full shrink grow truncate">{item.description}</span>
+            <span className="w-0 max-w-full shrink grow truncate">
+                {item.description ?? item.content}
+            </span>
             {menuOptions && (
                 <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />

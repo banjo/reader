@@ -10,7 +10,7 @@ import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { AnimatePresence } from "framer-motion";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
@@ -61,14 +61,6 @@ const useTableFilters = (data: TableCard[], refetch: Refetch<CleanItem[]>): Tabl
     const toggleShowUnreadOnly = () => {
         setShowUnreadOnly(prev => !prev);
     };
-
-    useEffect(() => {
-        if (hasReadAll) {
-            setTimeout(() => {
-                setShowUnreadOnly(false);
-            }, 200);
-        }
-    }, [hasReadAll]);
 
     // ACTIONS
     const markAllAsRead = () => {
@@ -150,7 +142,7 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, re
                         })}
 
                     {data.length === 0 && (
-                        <Alert className="">
+                        <Alert>
                             <AlertTitle>Ops!</AlertTitle>
                             <AlertDescription>No items found</AlertDescription>
                         </Alert>

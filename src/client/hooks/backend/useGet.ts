@@ -16,7 +16,7 @@ type In<T> = {
 };
 
 export const useGet = <T>({ key, fallbackData }: In<T>): Out<T> => {
-    const fetcher = useAuthFetcher();
+    const { SWR_AUTH: fetcher } = useAuthFetcher();
     const { data: fetchData, mutate } = useSWR<T, Error>(key, fetcher, {
         fallbackData: fallbackData,
     });

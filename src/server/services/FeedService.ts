@@ -1,15 +1,24 @@
+import createLogger from "@/server/lib/logger";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
-import { CleanFeedWithItems } from "@/shared/models/entities";
+import { ItemRepository } from "@/server/repositories/ItemRespository";
+import { ParseService } from "@/server/services/ParseService";
+import { CleanFeedWithItems, CreateFeed, CreateItem } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 
-const getFeedByPublicUrl = async (
-    feedPublicUrl: string
+const logger = createLogger("FeedService");
+
+const getFeedByInternalIdentifier = async (
+    feedInternalIdentifier: string,
+    userId: number
 ): Promise<ResultType<CleanFeedWithItems>> => {
-    const feedResponse = await FeedRepository.getFeedByPublicUrl(feedPublicUrl);
+    const feedResponse = await FeedRepository.getFeedByInternalIdentifier(
+        feedInternalIdentifier,
+        userId
+    );
 
     if (!feedResponse.success) {
-        console.log("no feed found in db");
+        logger.error(`no feed found in db with public url ${feedInternalIdentifier}`);
         return Result.error("Feed not found", "NotFound");
     }
 
@@ -20,14 +29,122 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeed
     const feedsResponse = await FeedRepository.getAllFeedsByUserId(userId);
 
     if (!feedsResponse.success) {
-        console.log("no feeds found in db");
+        logger.error("no feeds found in db");
         return Result.error("No feeds found", "NotFound");
     }
 
     return Result.ok(feedsResponse.data.map(feed => DatabaseMapper.feed(feed)));
 };
 
+const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
+    const itemsResponse = await ItemRepository.getItemsByFeedId(feedId);
+
+    if (!itemsResponse.success) {
+        logger.error(`no items found in db for feed with id ${feedId}`);
+        return Result.error("Items not found", "NotFound");
+    }
+
+    const items = itemsResponse.data;
+
+    const newItems: CreateItem[] = items.map(item => {
+        return {
+            description: item.description,
+            imageUrl: item.imageUrl,
+            link: item.link,
+            isBookmarked: false,
+            isFavorite: false,
+            isRead: false,
+            lastFetch: item.lastFetch,
+            pubDate: item.pubDate,
+            userId: userId,
+            title: item.title,
+            content: item.content,
+            feedId: feedId,
+        };
+    });
+
+    const addItemsResult = await ItemRepository.createItems(newItems, feedId, userId);
+
+    if (!addItemsResult.success) {
+        logger.error(`failed to add items to user with id ${userId}`);
+        return Result.error("Failed to add items to user", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
+type AddFeedResponse = {
+    feedId: number;
+};
+
+const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFeedResponse>> => {
+    // TODO: add transactions in db
+    const existingFeed = await FeedRepository.getFeedByRssUrl(rssUrl);
+
+    if (existingFeed.success) {
+        logger.info("feed already exists in db, adding to user's feeds");
+        const id = existingFeed.data.id;
+        const addFeedToUserResult = await FeedRepository.addFeedToUser(id, userId);
+
+        if (!addFeedToUserResult.success) {
+            logger.error("failed to add feed to user");
+            return Result.error("Failed to add feed to user", "InternalError");
+        }
+
+        const assignFeedItemsToUserResult = await assignFeedItemsToUser(id, userId);
+
+        if (!assignFeedItemsToUserResult.success) {
+            logger.error("failed to add items to feed");
+            return Result.error("Failed to add items to feed", "InternalError");
+        }
+
+        return Result.ok({ feedId: id });
+    }
+
+    const parseResult = await ParseService.parseRssFeed(rssUrl);
+
+    if (!parseResult.success) {
+        logger.error("failed to parse feed");
+        return Result.error("Failed to parse feed", "InternalError");
+    }
+
+    // TODO: create a mapper for creations like this
+    const itemsToCreate: CreateItem[] = parseResult.data.items.map(item => {
+        return {
+            description: item.description,
+            imageUrl: null,
+            link: item.link,
+            isBookmarked: false,
+            isFavorite: false,
+            isRead: false,
+            lastFetch: new Date(),
+            pubDate: new Date(item.pubDate ?? new Date()),
+            userId: userId,
+            title: item.title,
+            content: item.contentSnippet ?? item.content,
+        };
+    });
+
+    const feedToCreate: CreateFeed = {
+        description: parseResult.data.description,
+        rssUrl: rssUrl,
+        imageUrl: null,
+        name: parseResult.data.title,
+        url: parseResult.data.link,
+    };
+
+    const createFeedResult = await FeedRepository.createFeed(feedToCreate, itemsToCreate, userId);
+
+    if (!createFeedResult.success) {
+        logger.error(`failed to create feed with url ${rssUrl}`);
+        return Result.error("Failed to create feed", "InternalError");
+    }
+
+    return Result.ok({ feedId: createFeedResult.data.id });
+};
+
 export const FeedService = {
-    getFeedByPublicUrl,
+    addFeed,
+    getFeedByInternalIdentifier,
     getAllFeedsByUserId,
 };

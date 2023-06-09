@@ -120,9 +120,9 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                         <Item
                             key={feed.id}
                             title={feed.name}
-                            url={prefixUrl(`/feed/${feed.publicUrl}`)}
-                            image={feed.imageUrl ?? avatarUrl(feed.publicUrl)}
-                            selected={isSelected(`/feed/${feed.publicUrl}`)}
+                            url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
+                            image={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
+                            selected={isSelected(`/feed/${feed.internalIdentifier}`)}
                             notification={unread > 0 ? unread : undefined}
                             highlight={Boolean(unread)}
                             notificationTooltip="Unread items"

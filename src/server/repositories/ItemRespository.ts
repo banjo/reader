@@ -1,5 +1,6 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
+import { CreateItem } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 import { Item } from "@prisma/client";
 import "server-only";
@@ -80,10 +81,14 @@ const markItemsAsRead = async (itemIds: number[]): Promise<ResultType<void>> => 
     return Result.okEmpty();
 };
 
-const createItem = async (item: Item): Promise<ResultType<Item>> => {
+const createItem = async (
+    item: CreateItem,
+    feedId: number,
+    userId: number
+): Promise<ResultType<Item>> => {
     try {
         const createdItem = await prisma.item.create({
-            data: item,
+            data: { ...item, feedId, userId },
         });
 
         return Result.ok(createdItem);
@@ -93,10 +98,51 @@ const createItem = async (item: Item): Promise<ResultType<Item>> => {
     }
 };
 
+const createItems = async (
+    items: CreateItem[],
+    feedId: number,
+    userId: number
+): Promise<ResultType<void>> => {
+    try {
+        const createdItems = await prisma.item.createMany({
+            data: items.map(item => ({ ...item, feedId, userId })),
+        });
+
+        if (createdItems.count !== items.length) {
+            logger.error(`Could not create all items`);
+            return Result.error(`Could not create all items`, "InternalError");
+        }
+
+        return Result.okEmpty();
+    } catch (error: unknown) {
+        logger.error(`Could not create items - ${error}`);
+        return Result.error(`Could not create items`, "InternalError");
+    }
+};
+
+const getItemsByFeedId = async (feedId: number): Promise<ResultType<Item[]>> => {
+    let items: Item[];
+    try {
+        items = await prisma.item.findMany({
+            distinct: ["link"],
+            where: {
+                feedId: feedId,
+            },
+        });
+
+        return Result.ok(items);
+    } catch (error: unknown) {
+        logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
+        return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
+    }
+};
+
 export const ItemRepository = {
     getAllItemsByFeed,
     getItemById,
     markItemsAsRead,
     createItem,
+    createItems,
     updateItem,
+    getItemsByFeedId,
 };

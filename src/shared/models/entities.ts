@@ -29,3 +29,22 @@ export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
 
 export type FeedWithItems = z.TypeOf<typeof FeedWithItemsSchema>;
 export type CleanFeedWithItems = z.TypeOf<typeof CleanFeedWithItemsSchema>;
+
+export const CreateFeedSchema = FeedModel.omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    users: true,
+    internalIdentifier: true,
+});
+
+export type CreateFeed = z.TypeOf<typeof CreateFeedSchema>;
+
+export const CreateItemSchema = ItemModel.omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    feedId: true,
+});
+
+export type CreateItem = z.TypeOf<typeof CreateItemSchema>;

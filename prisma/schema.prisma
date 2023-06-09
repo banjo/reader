@@ -32,16 +32,18 @@ generator zod {
 }
 
 model Feed {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String
-  link      String   @unique
-  imageUrl  String?
-  publicUrl String   @unique @default(uuid())
-  ttl       Int?
-  items     Item[]
-  users     User[]
+  id                 Int      @id @default(autoincrement())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  name               String
+  url                String   @unique
+  rssUrl             String   @unique
+  description        String?    @db.Text
+  imageUrl           String?
+  internalIdentifier String   @unique @default(uuid())
+  ttl                Int?
+  items              Item[]
+  users              User[]
 }
 
 model Item {
@@ -55,12 +57,12 @@ model Item {
   isRead       Boolean  @default(false)
   isBookmarked Boolean  @default(false)
   isFavorite   Boolean  @default(false)
-  image        String?
+  imageUrl        String?
   title        String
-  description  String
+  description  String? @db.Text
   link         String
-  content      String
-  html         String
+  content      String? @db.Text
+  htmlContent  String? @db.Text
   lastFetch    DateTime
   pubDate      DateTime
   tags         Tag[]

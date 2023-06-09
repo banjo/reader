@@ -1,6 +1,6 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { FeedWithItems } from "@/shared/models/entities";
+import { CreateFeed, CreateItem, FeedWithItems } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 import { Feed } from "@prisma/client";
 import "server-only";
@@ -17,7 +17,11 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<FeedWithI
             },
         },
         include: {
-            items: true,
+            items: {
+                where: {
+                    userId: userId,
+                },
+            },
         },
     });
 
@@ -40,17 +44,17 @@ const getFeedById = async (feedId: number): Promise<ResultType<FeedWithItems>> =
     });
 
     if (!feed) {
-        logger.error("Feed not found");
+        logger.error(`Feed not found with id: ${feedId}`);
         return Result.error("Feed not found", "NotFound");
     }
 
     return Result.ok(feed);
 };
 
-const getFeedByUrl = async (feedUrl: string): Promise<ResultType<FeedWithItems>> => {
+const getFeedByRssUrl = async (rssUrl: string): Promise<ResultType<FeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
-            link: feedUrl,
+            rssUrl: rssUrl,
         },
         include: {
             items: true,
@@ -58,34 +62,53 @@ const getFeedByUrl = async (feedUrl: string): Promise<ResultType<FeedWithItems>>
     });
 
     if (!feed) {
-        logger.error("Feed not found");
+        logger.error(`Feed not found with id: ${rssUrl}`);
         return Result.error("Feed not found", "NotFound");
     }
 
     return Result.ok(feed);
 };
 
-const getFeedByPublicUrl = async (feedPublicUrl: string): Promise<ResultType<FeedWithItems>> => {
+const getFeedByInternalIdentifier = async (
+    feedInternalIdentifier: string,
+    userId: number
+): Promise<ResultType<FeedWithItems>> => {
     const feed = await prisma.feed.findUnique({
         where: {
-            publicUrl: feedPublicUrl,
+            internalIdentifier: feedInternalIdentifier,
         },
         include: {
-            items: true,
+            items: {
+                where: {
+                    userId: userId,
+                },
+            },
         },
     });
 
     if (!feed) {
-        logger.error("Feed not found");
+        logger.error(`Feed not found with internalIdentifier: ${feedInternalIdentifier}`);
         return Result.error("Feed not found", "NotFound");
     }
 
     return Result.ok(feed);
 };
 
-const createFeed = async (feed: Feed): Promise<ResultType<FeedWithItems>> => {
+const createFeed = async (
+    feed: CreateFeed,
+    items: CreateItem[],
+    userId: number
+): Promise<ResultType<Feed>> => {
     const createdFeed = await prisma.feed.create({
-        data: feed,
+        data: {
+            ...feed,
+            items: { createMany: { data: items } },
+            users: {
+                connect: {
+                    id: userId,
+                },
+            },
+        },
     });
 
     if (!createdFeed) {
@@ -96,10 +119,39 @@ const createFeed = async (feed: Feed): Promise<ResultType<FeedWithItems>> => {
     return Result.ok(createdFeed);
 };
 
+const addFeedToUser = async (
+    feedId: number,
+    userId: number
+): Promise<ResultType<FeedWithItems>> => {
+    const feed = await prisma.feed.update({
+        where: {
+            id: feedId,
+        },
+        data: {
+            users: {
+                connect: {
+                    id: userId,
+                },
+            },
+        },
+        include: {
+            items: true,
+        },
+    });
+
+    if (!feed) {
+        logger.error("Could not add feed to user");
+        return Result.error("Could not add feed to user", "InternalError");
+    }
+
+    return Result.ok(feed);
+};
+
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
-    getFeedByUrl,
-    getFeedByPublicUrl,
+    getFeedByRssUrl,
+    getFeedByInternalIdentifier,
     createFeed,
+    addFeedToUser,
 };
