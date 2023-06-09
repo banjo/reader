@@ -1,5 +1,5 @@
 import { TableCard } from "@/client/components/table/table-container";
-import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
+import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { useMemo, useState } from "react";

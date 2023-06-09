@@ -4,7 +4,7 @@ import { MenuEntries } from "@/client/components/shared/dropdown";
 import { Table } from "@/client/components/table/table";
 import { FilterBar } from "@/client/components/table/table-filter-bar";
 import { TableItem } from "@/client/components/table/table-item";
-import { useTableFilters } from "@/client/components/table/useTableFilters";
+import { useTableFilters } from "@/client/components/table/use-table-filters";
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";

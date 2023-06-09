@@ -1,5 +1,5 @@
 import { Tooltip } from "@/client/components/shared/tooltip";
-import { useBoop, UseBoopProps } from "@/client/hooks/animation/useBoop";
+import { useBoop, UseBoopProps } from "@/client/hooks/animation/use-boop";
 import { motion } from "framer-motion";
 import { FC, ReactNode, useMemo } from "react";
 

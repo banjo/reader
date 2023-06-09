@@ -1,8 +1,8 @@
 "use client";
 
 import { TableContainer } from "@/client/components/table/table-container";
-import { useFeedFetcher } from "@/client/features/feed/hooks/useFeedFetcher";
-import { useTableItemMenu } from "@/client/hooks/shared/useTableItemMenu";
+import { useFeedFetcher } from "@/client/features/feed/hooks/use-feed-fetcher";
+import { useTableItemMenu } from "@/client/hooks/shared/use-table-item-menu";
 import { CleanFeedWithItems } from "@/shared/models/entities";
 import { FC } from "react";
 

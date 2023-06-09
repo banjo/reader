@@ -7,7 +7,7 @@ import { Item } from "@/client/components/nav/sidemenu/item";
 import { Sidemenu } from "@/client/components/nav/sidemenu/menu";
 import { SubMenu } from "@/client/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/client/components/shared/icons";
-import { useGet } from "@/client/hooks/backend/useGet";
+import { useGet } from "@/client/hooks/backend/use-get";
 import { avatarUrl } from "@/client/lib/utils";
 import { CleanFeedWithItems } from "@/shared/models/entities";
 import { usePathname } from "next/navigation";

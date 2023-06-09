@@ -3,7 +3,7 @@ import { Icons } from "@/client/components/shared/icons";
 import { Bookmark } from "@/client/components/shared/icons/bookmark";
 import { Favorite } from "@/client/components/shared/icons/favorite";
 import { TableType } from "@/client/components/table/table.types";
-import { useMutateItem } from "@/client/hooks/backend/mutators/useMutateItem";
+import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { motion } from "framer-motion";

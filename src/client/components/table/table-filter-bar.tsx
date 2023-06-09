@@ -1,4 +1,4 @@
-import { TableActions, TableFilters } from "@/client/components/table/useTableFilters";
+import { TableActions, TableFilters } from "@/client/components/table/use-table-filters";
 import { Button } from "@/client/components/ui/button";
 import { Switch } from "@/client/components/ui/switch";
 import { FC } from "react";

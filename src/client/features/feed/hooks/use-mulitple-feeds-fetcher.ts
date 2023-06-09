@@ -1,4 +1,4 @@
-import { useGet } from "@/client/hooks/backend/useGet";
+import { useGet } from "@/client/hooks/backend/use-get";
 import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { toArray } from "@banjoanton/utils";

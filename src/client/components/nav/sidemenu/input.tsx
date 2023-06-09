@@ -1,7 +1,7 @@
 import { Icons } from "@/client/components/shared/icons";
 import { Input as InputComponent } from "@/client/components/ui/input";
-import { useAuthFetcher } from "@/client/hooks/backend/useAuthFetcher";
-import { useUpdateSidebar } from "@/client/hooks/backend/useUpdateSidebar";
+import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
+import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
 import { FC } from "react";
 import { toast } from "react-hot-toast";
 
