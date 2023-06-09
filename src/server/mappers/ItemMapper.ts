@@ -1,5 +1,6 @@
 import { ParseItem } from "@/server/services/ParseService";
 import { CreateItem } from "@/shared/models/entities";
+import { Item } from "@prisma/client";
 
 const parseItemToCreateItem = (item: ParseItem, userId: number): CreateItem => {
     return {
@@ -18,6 +19,24 @@ const parseItemToCreateItem = (item: ParseItem, userId: number): CreateItem => {
     };
 };
 
-export const ItemsMapper = {
+const itemToCreateItem = (item: Item, userId: number): CreateItem => {
+    return {
+        description: item.description,
+        imageUrl: item.imageUrl,
+        link: item.link,
+        isBookmarked: false,
+        htmlContent: item.htmlContent,
+        isFavorite: false,
+        isRead: false,
+        lastFetch: item.lastFetch,
+        pubDate: item.pubDate,
+        userId: userId,
+        title: item.title,
+        content: item.content,
+    };
+};
+
+export const ItemMapper = {
     parseItemToCreateItem,
+    itemToCreateItem,
 };

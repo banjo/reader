@@ -1,7 +1,7 @@
 import createLogger from "@/server/lib/logger";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
 import { FeedMapper } from "@/server/mappers/FeedMapper";
-import { ItemsMapper } from "@/server/mappers/ItemsMapper";
+import { ItemMapper } from "@/server/mappers/ItemMapper";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { ParseService } from "@/server/services/ParseService";
@@ -46,24 +46,9 @@ const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<Re
         return Result.error("Items not found", "NotFound");
     }
 
-    const items = itemsResponse.data;
-
-    const newItems: CreateItem[] = items.map(item => {
-        return {
-            description: item.description,
-            imageUrl: item.imageUrl,
-            link: item.link,
-            isBookmarked: false,
-            isFavorite: false,
-            isRead: false,
-            lastFetch: item.lastFetch,
-            pubDate: item.pubDate,
-            userId: userId,
-            title: item.title,
-            content: item.content,
-            feedId: feedId,
-        };
-    });
+    const newItems: CreateItem[] = itemsResponse.data.map(item =>
+        ItemMapper.itemToCreateItem(item, userId)
+    );
 
     const addItemsResult = await ItemRepository.createItems(newItems, feedId, userId);
 
@@ -111,7 +96,7 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
     }
 
     const itemsToCreate = parseResult.data.items.map(item =>
-        ItemsMapper.parseItemToCreateItem(item, userId)
+        ItemMapper.parseItemToCreateItem(item, userId)
     );
     const feedToCreate = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl);
 
