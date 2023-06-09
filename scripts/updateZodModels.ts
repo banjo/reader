@@ -11,7 +11,8 @@ const writeFile = async (path: string, content: string) => {
 };
 
 const replaceMap = {
-    "z.date()": "z.coerce.date()",
+    "z.date()": "z.coerce.date()", // make date parsing work
+    "z.string().nullish()": "z.union([z.string(), z.null()])", // make type be only null or value, not undefined as well.
 };
 
 const main = async () => {

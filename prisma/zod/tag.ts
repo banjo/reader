@@ -3,8 +3,8 @@ import { CompleteUser, RelatedUserModel, CompleteItem, RelatedItemModel } from "
 
 export const TagModel = z.object({
     id: z.number().int(),
-    createdAt: z.coerce.date(),
-    updatedAt: z.coerce.date(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     name: z.string(),
     userId: z.number().int(),
 });

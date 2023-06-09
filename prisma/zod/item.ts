@@ -10,21 +10,21 @@ import {
 
 export const ItemModel = z.object({
     id: z.number().int(),
-    createdAt: z.coerce.date(),
-    updatedAt: z.coerce.date(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     feedId: z.number().int(),
     userId: z.number().int(),
     isRead: z.boolean(),
     isBookmarked: z.boolean(),
     isFavorite: z.boolean(),
-    imageUrl: z.string().nullish(),
+    imageUrl: z.union([z.string(), z.null()]),
     title: z.string(),
-    description: z.string().nullish(),
+    description: z.union([z.string(), z.null()]),
     link: z.string(),
-    content: z.string().nullish(),
-    htmlContent: z.string().nullish(),
-    lastFetch: z.coerce.date(),
-    pubDate: z.coerce.date(),
+    content: z.union([z.string(), z.null()]),
+    htmlContent: z.union([z.string(), z.null()]),
+    lastFetch: z.date(),
+    pubDate: z.date(),
 });
 
 export interface CompleteItem extends z.infer<typeof ItemModel> {

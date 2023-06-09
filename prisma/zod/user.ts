@@ -10,10 +10,10 @@ import {
 
 export const UserModel = z.object({
     id: z.number().int(),
-    createdAt: z.coerce.date(),
-    updatedAt: z.coerce.date(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     email: z.string(),
-    name: z.string().nullish(),
+    name: z.union([z.string(), z.null()]),
     externalId: z.string(),
 });
 

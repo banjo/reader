@@ -3,13 +3,13 @@ import { CompleteItem, RelatedItemModel, CompleteUser, RelatedUserModel } from "
 
 export const FeedModel = z.object({
     id: z.number().int(),
-    createdAt: z.coerce.date(),
-    updatedAt: z.coerce.date(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
     name: z.string(),
     url: z.string(),
     rssUrl: z.string(),
-    description: z.string().nullish(),
-    imageUrl: z.string().nullish(),
+    description: z.union([z.string(), z.null()]),
+    imageUrl: z.union([z.string(), z.null()]),
     internalIdentifier: z.string(),
     ttl: z.number().int().nullish(),
 });
