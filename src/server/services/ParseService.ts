@@ -12,7 +12,7 @@ export const ParseItemSchema = z.object({
     title: z.string(),
     link: z.string().url(),
     pubDate: z.union([z.string(), z.null()]),
-    description: z.union([z.string(), z.null()]),
+    description: z.union([z.string(), z.null(), z.undefined()]),
     content: z.union([z.string(), z.null()]),
     guid: z.union([z.string(), z.null()]),
     categories: z.string().array().optional(),

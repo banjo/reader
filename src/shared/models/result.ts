@@ -1,3 +1,5 @@
+import { ZodIssue } from "zod";
+
 export type ErrorType = "NotFound" | "BadRequest" | "Unauthorized" | "Forbidden" | "InternalError";
 
 export const ErrorStatus: Record<ErrorType, number> = {
@@ -20,7 +22,12 @@ export type ErrorResult = {
     status: number;
 };
 
-export type ResultType<T> = SuccessResult<T> | ErrorResult;
+export type BadRequestResult = Omit<ErrorResult, "type"> & {
+    type: "BadRequest";
+    errors: ZodIssue[];
+};
+
+export type ResultType<T> = SuccessResult<T> | ErrorResult | BadRequestResult;
 
 export const Result = {
     ok: <T>(data: T): ResultType<T> => ({

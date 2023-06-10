@@ -6,7 +6,7 @@ A simple RSS reader built with Next.js.
 
 ```bash
 # connect locally
-pscale connect banjo-rss initial-setup --port 3309
+pscale connect banjo-rss initial-setup --port 3309 # intial-setup is the branch name in planetscale
 
 # add changes to database
 npx prisma db push

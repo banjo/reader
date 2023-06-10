@@ -6,6 +6,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 generator zod {
@@ -44,6 +45,10 @@ model Feed {
   ttl                Int?
   items              Item[]
   users              User[]
+
+
+@@fulltext([name, url, rssUrl, description])
+
 }
 
 model Item {
@@ -66,6 +71,8 @@ model Item {
   lastFetch    DateTime
   pubDate      DateTime
   tags         Tag[]
+
+  @@fulltext([title, description, content, htmlContent])
 }
 
 model User {

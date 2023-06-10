@@ -1,7 +1,7 @@
 import { FeedModel, ItemModel, UserModel } from "prisma/zod";
 import { z } from "zod";
 
-// create schema from generated prisma models and replace date with better option
+// CLEAN OBJECTS (for frontend)
 export const CleanItemSchema = ItemModel.omit({
     feedId: true,
     userId: true,
@@ -19,6 +19,12 @@ export type CleanItem = z.TypeOf<typeof CleanItemSchema>;
 export type CleanFeed = z.TypeOf<typeof CleanFeedSchema>;
 export type CleanUser = z.TypeOf<typeof CleanUserSchema>;
 
+// FEED WITH ITEMS INCLUDED
+
+export const feedWithUserSchema = FeedModel.extend({
+    users: UserModel.array(),
+});
+
 export const FeedWithItemsSchema = FeedModel.extend({
     items: ItemModel.array(),
 });
@@ -27,9 +33,11 @@ export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
     items: CleanItemSchema.array(),
 });
 
+export type FeedWithUser = z.TypeOf<typeof feedWithUserSchema>;
 export type FeedWithItems = z.TypeOf<typeof FeedWithItemsSchema>;
 export type CleanFeedWithItems = z.TypeOf<typeof CleanFeedWithItemsSchema>;
 
+// CREATE OBJECTS (when creating new objects)
 export const CreateFeedSchema = FeedModel.omit({
     id: true,
     createdAt: true,
@@ -48,3 +56,16 @@ export const CreateItemSchema = ItemModel.omit({
 });
 
 export type CreateItem = z.TypeOf<typeof CreateItemSchema>;
+
+// SEARCH OBJECTS (returned when searching)
+
+export const SearchFeedSchema = FeedModel.pick({
+    name: true,
+    rssUrl: true,
+    description: true,
+    imageUrl: true,
+    url: true,
+    internalIdentifier: true,
+});
+
+export type SearchFeed = z.TypeOf<typeof SearchFeedSchema>;

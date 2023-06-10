@@ -13,6 +13,8 @@
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
     "add": "npx shadcn-ui add",
+    "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
+    "db:local:run": "docker compose -f ./docker/docker-compose.yml up -d --remove-orphans",
     "db:generate": "npx prisma generate && esno scripts/updateZodModels.ts && nr format:write",
     "db:update": "npx prisma migrate reset --skip-seed --skip-generate --force && npx prisma db push && nr db:generate && npx prisma db seed"
   },
@@ -37,6 +39,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
+    "react-select": "^5.7.3",
+    "react-select-async-paginate": "^0.7.2",
     "rss-parser": "^3.13.0",
     "server-only": "^0.0.1",
     "sharp": "^0.31.3",

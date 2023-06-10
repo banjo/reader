@@ -1,6 +1,6 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { CreateFeed, CreateItem, FeedWithItems } from "@/shared/models/entities";
+import { CreateFeed, CreateItem, FeedWithItems, FeedWithUser } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 import { Feed } from "@prisma/client";
 import "server-only";
@@ -147,6 +147,73 @@ const addFeedToUser = async (
     return Result.ok(feed);
 };
 
+const searchFeeds = async (searchTerm: string): Promise<ResultType<FeedWithUser[]>> => {
+    // TODO: change to search instead of contains when it works with prisma
+    // TODO2: Exclude feeds that have connection to user by id here instead of in service
+
+    const feeds: FeedWithUser[] = await prisma.feed.findMany({
+        where: {
+            OR: [
+                {
+                    name: {
+                        contains: searchTerm,
+                    },
+                },
+                {
+                    url: {
+                        contains: searchTerm,
+                    },
+                },
+                {
+                    rssUrl: {
+                        contains: searchTerm,
+                    },
+                },
+                {
+                    description: {
+                        contains: searchTerm,
+                    },
+                },
+            ],
+        },
+        include: {
+            users: true,
+        },
+    });
+
+    if (!feeds) {
+        logger.error(`No feeds found with query ${searchTerm}`);
+        return Result.error("No feeds found", "NotFound");
+    }
+
+    return Result.ok(feeds);
+};
+
+const checkIfFeedIsAssignedToUser = async (
+    feedId: number,
+    userId: number
+): Promise<ResultType<boolean>> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            id: feedId,
+        },
+        include: {
+            users: {
+                where: {
+                    id: userId,
+                },
+            },
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Feed not found with id: ${feedId}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    return Result.ok(feed.users.length > 0);
+};
+
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
@@ -154,4 +221,6 @@ export const FeedRepository = {
     getFeedByInternalIdentifier,
     createFeed,
     addFeedToUser,
+    searchFeeds,
+    checkIfFeedIsAssignedToUser,
 };

@@ -1,0 +1,23 @@
+version: "3.8"
+
+name: prisma-prisma
+
+# For connection urls to the following instances, see
+# https://github.com/prisma/prisma/blob/main/TESTING.md#environment-variables
+services:
+    mysql:
+        container_name: prisma-mysql
+        image: mysql:8.0
+        command: --default-authentication-plugin=mysql_native_password --lower_case_table_names=1
+        restart: unless-stopped
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=banjo-rss
+            - MYSQL_USER=prisma
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql-data:/var/lib/mysql
+
+volumes:
+    mysql-data:

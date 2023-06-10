@@ -5,7 +5,7 @@ import { ItemMapper } from "@/server/mappers/ItemMapper";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { ParseService } from "@/server/services/ParseService";
-import { CleanFeedWithItems, CreateItem } from "@/shared/models/entities";
+import { CleanFeedWithItems, CreateItem, SearchFeed } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 
 const logger = createLogger("FeedService");
@@ -71,6 +71,24 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
     if (existingFeed.success) {
         logger.info("feed already exists in db, adding to user's feeds");
         const id = existingFeed.data.id;
+
+        const feedAssignedToUserResult = await FeedRepository.checkIfFeedIsAssignedToUser(
+            id,
+            userId
+        );
+
+        if (!feedAssignedToUserResult.success) {
+            logger.info(
+                `Something went wrong with checking if feed ${id} was assigned to user ${userId}`
+            );
+            return Result.error("Failed to add feed to user", "InternalError");
+        }
+
+        if (feedAssignedToUserResult.data) {
+            logger.info(`feed ${id} already assigned to user ${userId}`);
+            return Result.ok({ feedId: id });
+        }
+
         const addFeedToUserResult = await FeedRepository.addFeedToUser(id, userId);
 
         if (!addFeedToUserResult.success) {
@@ -110,8 +128,24 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
     return Result.ok({ feedId: createFeedResult.data.id });
 };
 
+const searchFeeds = async (query: string, userId?: number): Promise<ResultType<SearchFeed[]>> => {
+    const feedsResponse = await FeedRepository.searchFeeds(query);
+
+    if (!feedsResponse.success) {
+        logger.error(`no feeds found in db for query ${query}`);
+        return Result.error("No feeds found", "NotFound");
+    }
+
+    const feedsNotConnectedToUser = feedsResponse.data.filter(feed => {
+        return feed.users.every(user => user.id !== userId);
+    });
+
+    return Result.ok(feedsNotConnectedToUser.map(feed => FeedMapper.feedToSearchFeed(feed)));
+};
+
 export const FeedService = {
     addFeed,
     getFeedByInternalIdentifier,
     getAllFeedsByUserId,
+    searchFeeds,
 };
