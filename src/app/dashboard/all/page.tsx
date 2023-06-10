@@ -1,3 +1,4 @@
+import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
 import { AllContainer } from "@/client/features/feed/containers/all-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
@@ -14,5 +15,9 @@ export default async function AllPage() {
 
     const feeds = feedResponse.data;
 
-    return <AllContainer feeds={feeds} />;
+    return (
+        <ClientAuthContainer>
+            <AllContainer feeds={feeds} />
+        </ClientAuthContainer>
+    );
 }

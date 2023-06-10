@@ -1,3 +1,4 @@
+import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
 import { FavoriteContainer } from "@/client/features/feed/containers/favorite-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
@@ -12,5 +13,9 @@ export default async function FavoritePage() {
         throw new Error(feedResponse.message);
     }
 
-    return <FavoriteContainer feeds={feedResponse.data} />;
+    return (
+        <ClientAuthContainer>
+            <FavoriteContainer feeds={feedResponse.data} />
+        </ClientAuthContainer>
+    );
 }

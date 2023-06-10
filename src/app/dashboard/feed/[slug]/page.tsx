@@ -1,3 +1,4 @@
+import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
 import { FeedContainer } from "@/client/features/feed/containers/feed-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
@@ -37,5 +38,9 @@ export default async function FeedPage({ params }: Props) {
         return <div>invalid feed id</div>; // TODO: create error page
     }
 
-    return <FeedContainer feed={feedResponse.data} internalIdentifier={slug} />;
+    return (
+        <ClientAuthContainer>
+            <FeedContainer feed={feedResponse.data} internalIdentifier={slug} />
+        </ClientAuthContainer>
+    );
 }

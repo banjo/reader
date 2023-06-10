@@ -1,3 +1,4 @@
+import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
 import { BookmarkContainer } from "@/client/features/feed/containers/bookmark-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
@@ -12,5 +13,9 @@ export default async function BookmarksPage() {
         throw new Error(feedResponse.message);
     }
 
-    return <BookmarkContainer feeds={feedResponse.data} />;
+    return (
+        <ClientAuthContainer>
+            <BookmarkContainer feeds={feedResponse.data} />
+        </ClientAuthContainer>
+    );
 }
