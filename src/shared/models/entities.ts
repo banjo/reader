@@ -1,6 +1,8 @@
 import { FeedModel, ItemModel, UserModel } from "prisma/zod";
 import { z } from "zod";
 
+// TODO: refactor to own files
+
 // CLEAN OBJECTS (for frontend)
 export const CleanItemSchema = ItemModel.omit({
     feedId: true,

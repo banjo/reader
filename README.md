@@ -5,14 +5,17 @@ A simple RSS reader built with Next.js.
 ## Database
 
 ```bash
-# connect locally
+# connect to planetscale
 pscale connect banjo-rss initial-setup --port 3309 # intial-setup is the branch name in planetscale
 
-# add changes to database
-npx prisma db push
+# use local docker instance (change .env)
+nr db:local:run
 
-# generate prisma client
-npx prisma generate # this will also generate the types for zod
+# see logs
+nr db:local:logs
+
+# reset database (remove all data)
+nr db:update
 
 # open prisma studio
 npx prisma studio
@@ -28,9 +31,9 @@ npx prisma studio
 -   [x] Make own model separate from database model
 -   [x] Add feed image to feed model
 -   [x] Add public id for feed model (for url)
--   [ ] Do not return result from repository, return result from service?
--   [ ] Fetch client side for dynamic data instead (or combo?)
--   [ ] fix dark and white mode for table
+-   [x] Do not return result from repository, return result from service?
+-   [x] Fetch client side for dynamic data instead (or combo?)
+-   [x] fix dark and white mode for table
 -   [ ] Add delay for "no items found" box
 -   [ ] Add transactions to database
 

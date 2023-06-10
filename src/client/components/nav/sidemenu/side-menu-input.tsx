@@ -92,6 +92,9 @@ export const SideMenuInput: FC = () => {
         return options;
     };
 
+    // TODO: add debounce
+    // TODO: fix dark mode
+
     return (
         <div className="flex items-center gap-2">
             <Select
