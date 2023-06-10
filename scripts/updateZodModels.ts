@@ -10,6 +10,7 @@ const writeFile = async (path: string, content: string) => {
     await fs.promises.writeFile(path, content, "utf8");
 };
 
+// TODO: fix so that everything gets replaced
 const replaceMap = {
     "z.date()": "z.coerce.date()", // make date parsing work
     "z.string().nullish()": "z.union([z.string(), z.null()])", // make type be only null or value, not undefined as well.
@@ -23,7 +24,7 @@ const main = async () => {
 
         let newContent = content;
         for (const [oldValue, newValue] of Object.entries(replaceMap)) {
-            newContent = content.replaceAll(oldValue, newValue);
+            newContent = newContent.replaceAll(oldValue, newValue);
         }
 
         await writeFile(file, newContent);

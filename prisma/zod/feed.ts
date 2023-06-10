@@ -3,8 +3,8 @@ import { CompleteItem, RelatedItemModel, CompleteUser, RelatedUserModel } from "
 
 export const FeedModel = z.object({
     id: z.number().int(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
     name: z.string(),
     url: z.string(),
     rssUrl: z.string(),
