@@ -15,6 +15,7 @@
     "add": "npx shadcn-ui add",
     "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
     "db:local:run": "docker compose -f ./docker/docker-compose.yml up -d --remove-orphans",
+    "db:local:stop": "docker compose -f ./docker/docker-compose.yml down",
     "db:generate:types": "npx prisma generate && esno scripts/updateZodModels.ts && nr format:write",
     "db:update": "npx prisma migrate reset --skip-seed --skip-generate --force && npx prisma db push && nr db:generate:types && npx prisma db seed"
   },
