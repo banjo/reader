@@ -42,6 +42,17 @@ export type FeedWithUser = z.TypeOf<typeof FeedWithUsersSchema>;
 export type FeedWithItems = z.TypeOf<typeof FeedWithItemsSchema>;
 export type CleanFeedWithItems = z.TypeOf<typeof CleanFeedWithItemsSchema>;
 
+// UPDATE OBJECTS (when updating existing objects)
+export const UpdateItemSchema = ItemModel.omit({
+    createdAt: true,
+    updatedAt: true,
+    feedId: true,
+    contentId: true,
+    userId: true,
+});
+
+export type UpdateItem = z.TypeOf<typeof UpdateItemSchema>;
+
 // CREATE OBJECTS (when creating new objects)
 export const CreateFeedSchema = FeedModel.omit({
     id: true,

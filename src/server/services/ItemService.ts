@@ -1,4 +1,5 @@
 import createLogger from "@/server/lib/logger";
+import { ItemMapper } from "@/server/mappers/ItemMapper";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { CleanItem } from "@/shared/models/entities";
 import { Result } from "@/shared/models/result";
@@ -42,9 +43,9 @@ const updateItem = async (item: CleanItem) => {
         return Result.error(`Could not find item with id ${item.id}`, "NotFound");
     }
 
-    const updatedItem = { ...existingItem.data, ...item };
+    const updatedItem: CleanItem = { ...existingItem.data, ...item };
 
-    const updated = await ItemRepository.updateItem(updatedItem);
+    const updated = await ItemRepository.updateItem(ItemMapper.cleanItemToUpdateItem(updatedItem));
 
     if (!updated.success) {
         logger.error(`Could not update item with id ${item.id}`);

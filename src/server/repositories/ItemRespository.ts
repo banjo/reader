@@ -1,6 +1,6 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { CreateItem } from "@/shared/models/entities";
+import { CreateItem, UpdateItem } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 import { Item } from "@prisma/client";
 import "server-only";
@@ -50,7 +50,7 @@ const getItemById = async (itemId: number): Promise<ResultType<Item>> => {
     return Result.ok(item);
 };
 
-const updateItem = async (item: Item): Promise<ResultType<Item>> => {
+const updateItem = async (item: UpdateItem): Promise<ResultType<Item>> => {
     let updatedItem: Item;
     try {
         updatedItem = await prisma.item.update({

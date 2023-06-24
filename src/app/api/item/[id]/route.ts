@@ -20,8 +20,8 @@ export async function PUT(req: Request, { params }: PutProps) {
         const { errors } = idResult.error;
         return ResponseService.badRequest("id", errors);
     }
-    const res = await req.json();
-    const bodyResult = CleanItemSchema.safeParse(res);
+    const body = await req.json();
+    const bodyResult = CleanItemSchema.safeParse(body);
 
     if (!bodyResult.success) {
         const { errors } = bodyResult.error;

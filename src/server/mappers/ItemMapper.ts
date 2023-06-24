@@ -1,5 +1,5 @@
 import { ParseItem } from "@/server/services/ParseService";
-import { CreateItem } from "@/shared/models/entities";
+import { CleanItem, CreateItem, UpdateItem } from "@/shared/models/entities";
 import { Item } from "@prisma/client";
 
 const parseItemToCreateItem = (item: ParseItem, userId: number): CreateItem => {
@@ -36,7 +36,17 @@ const itemToCreateItem = (item: Item, userId: number): CreateItem => {
     };
 };
 
+export const cleanItemToUpdateItem = (item: CleanItem): UpdateItem => {
+    return {
+        id: item.id,
+        isRead: item.isRead,
+        isBookmarked: item.isBookmarked,
+        isFavorite: item.isFavorite,
+    };
+};
+
 export const ItemMapper = {
     parseItemToCreateItem,
     itemToCreateItem,
+    cleanItemToUpdateItem,
 };
