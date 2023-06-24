@@ -18,6 +18,9 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<FeedWithI
         },
         include: {
             items: {
+                include: {
+                    content: true,
+                },
                 where: {
                     userId: userId,
                 },
@@ -39,7 +42,11 @@ const getFeedById = async (feedId: number): Promise<ResultType<FeedWithItems>> =
             id: feedId,
         },
         include: {
-            items: true,
+            items: {
+                include: {
+                    content: true,
+                },
+            },
         },
     });
 
@@ -57,7 +64,11 @@ const getFeedByRssUrl = async (rssUrl: string): Promise<ResultType<FeedWithItems
             rssUrl: rssUrl,
         },
         include: {
-            items: true,
+            items: {
+                include: {
+                    content: true,
+                },
+            },
         },
     });
 
@@ -79,6 +90,9 @@ const getFeedByInternalIdentifier = async (
         },
         include: {
             items: {
+                include: {
+                    content: true,
+                },
                 where: {
                     userId: userId,
                 },
@@ -135,7 +149,11 @@ const addFeedToUser = async (
             },
         },
         include: {
-            items: true,
+            items: {
+                include: {
+                    content: true,
+                },
+            },
         },
     });
 

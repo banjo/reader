@@ -1,4 +1,4 @@
-import { FeedModel, ItemModel, UserModel } from "prisma/zod";
+import { FeedModel, ItemContentModel, ItemModel, UserModel } from "prisma/zod";
 import { z } from "zod";
 
 // TODO: refactor to own files
@@ -7,6 +7,9 @@ import { z } from "zod";
 export const CleanItemSchema = ItemModel.omit({
     feedId: true,
     userId: true,
+    contentId: true,
+}).extend({
+    content: ItemContentModel,
 });
 
 export const CleanFeedSchema = FeedModel.omit({
@@ -23,7 +26,7 @@ export type CleanUser = z.TypeOf<typeof CleanUserSchema>;
 
 // FEED WITH ITEMS INCLUDED
 
-export const feedWithUserSchema = FeedModel.extend({
+export const FeedWithUsersSchema = FeedModel.extend({
     users: UserModel.array(),
 });
 
@@ -35,7 +38,7 @@ export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
     items: CleanItemSchema.array(),
 });
 
-export type FeedWithUser = z.TypeOf<typeof feedWithUserSchema>;
+export type FeedWithUser = z.TypeOf<typeof FeedWithUsersSchema>;
 export type FeedWithItems = z.TypeOf<typeof FeedWithItemsSchema>;
 export type CleanFeedWithItems = z.TypeOf<typeof CleanFeedWithItemsSchema>;
 

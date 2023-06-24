@@ -39,7 +39,8 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeed
 };
 
 const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
-    const itemsResponse = await ItemRepository.getItemsByFeedId(feedId);
+    // TODO: make this work after new models
+    const itemsResponse = await ItemRepository.getItemsByFeedId();
 
     if (!itemsResponse.success) {
         logger.error(`no items found in db for feed with id ${feedId}`);

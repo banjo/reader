@@ -1,5 +1,12 @@
 import * as z from "zod";
-import { CompleteItem, RelatedItemModel, CompleteUser, RelatedUserModel } from "./index";
+import {
+    CompleteItem,
+    RelatedItemModel,
+    CompleteUser,
+    RelatedUserModel,
+    CompleteItemContent,
+    RelatedItemContentModel,
+} from "./index";
 
 export const FeedModel = z.object({
     id: z.number().int(),
@@ -17,6 +24,7 @@ export const FeedModel = z.object({
 export interface CompleteFeed extends z.infer<typeof FeedModel> {
     items: CompleteItem[];
     users: CompleteUser[];
+    contentItems: CompleteItemContent[];
 }
 
 /**
@@ -28,5 +36,6 @@ export const RelatedFeedModel: z.ZodSchema<CompleteFeed> = z.lazy(() =>
     FeedModel.extend({
         items: RelatedItemModel.array(),
         users: RelatedUserModel.array(),
+        contentItems: RelatedItemContentModel.array(),
     })
 );

@@ -14,6 +14,9 @@ const getAllItemsByFeed = async (feedId: number): Promise<ResultType<Item[]>> =>
             where: {
                 feedId: feedId,
             },
+            include: {
+                content: true,
+            },
         });
     } catch (error: unknown) {
         logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
@@ -29,6 +32,9 @@ const getItemById = async (itemId: number): Promise<ResultType<Item>> => {
         item = await prisma.item.findUnique({
             where: {
                 id: itemId,
+            },
+            include: {
+                content: true,
             },
         });
     } catch (error: unknown) {
@@ -120,21 +126,22 @@ const createItems = async (
     }
 };
 
-const getItemsByFeedId = async (feedId: number): Promise<ResultType<Item[]>> => {
-    let items: Item[];
-    try {
-        items = await prisma.item.findMany({
-            distinct: ["link"],
-            where: {
-                feedId: feedId,
-            },
-        });
+// TODO: Move to ItemContentRepository and make it work
+const getItemsByFeedId = (): Promise<ResultType<Item[]>> => {
+    throw new Error("Not implemented");
+    // let items: ItemContent[];
+    // try {
+    //     items = await prisma.itemContent.findMany({
+    //         where: {
+    //             feedId: feedId,
+    //         },
+    //     });
 
-        return Result.ok(items);
-    } catch (error: unknown) {
-        logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
-        return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
-    }
+    //     return Result.ok(items);
+    // } catch (error: unknown) {
+    //     logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
+    //     return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
+    // }
 };
 
 const removeFeedItemsForUser = async (

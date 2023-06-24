@@ -1,4 +1,4 @@
-import { Feed, Item, PrismaClient, User } from "@prisma/client";
+import { Feed, Item, ItemContent, PrismaClient, User } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 const prisma = new PrismaClient();
 
@@ -48,22 +48,18 @@ const feeds: Feed[] = [
     },
 ];
 
-const items: Item[] = [
+const itemContents: ItemContent[] = [
     {
         id: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 1,
-        userId: 1,
-        isRead: false,
-        isBookmarked: true,
         imageUrl: "https://picsum.photos/1080/720",
         title: "Nesting Rounded Corners in CSS",
         description: "This is the description",
         link: "https://www.banjocode.com/post/css/nesting-rounded-corners",
         content: "This is the content",
         htmlContent: "This is the htmlContent",
-        isFavorite: true,
         lastFetch: new Date(),
         pubDate: new Date(),
     },
@@ -72,10 +68,6 @@ const items: Item[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 1,
-        userId: 1,
-        isRead: false,
-        isBookmarked: true,
-        isFavorite: true,
         imageUrl: null,
         title: "Some other title",
         description: "This is another slighly longer description",
@@ -90,10 +82,6 @@ const items: Item[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 1,
-        userId: 1,
-        isFavorite: true,
-        isRead: false,
-        isBookmarked: false,
         title: "Exploring CSS Grids",
         description: "Another intriguing post about CSS",
         imageUrl: null,
@@ -108,10 +96,6 @@ const items: Item[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 1,
-        userId: 1,
-        isRead: false,
-        isBookmarked: true,
-        isFavorite: true,
         title: "JavaScript Asynchronous Patterns",
         imageUrl: "https://picsum.photos/1080/720",
         description: "A deep dive into async patterns in JS",
@@ -126,10 +110,6 @@ const items: Item[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 1,
-        userId: 1,
-        isFavorite: false,
-        isRead: true,
-        isBookmarked: false,
         title: "React Component Best Practices",
         imageUrl: "https://picsum.photos/1080/720",
         description: "Tips and tricks for React components",
@@ -145,10 +125,6 @@ const items: Item[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 1,
-        userId: 1,
-        isRead: false,
-        isBookmarked: true,
-        isFavorite: false,
         title: "Intro to Vue.js",
         description: "A beginner's guide to Vue.js",
         link: "https://www.example.com/post/vue/beginners-guide",
@@ -163,10 +139,6 @@ const items: Item[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         feedId: 2,
-        userId: 1,
-        isRead: false,
-        isBookmarked: true,
-        isFavorite: false,
         imageUrl: "https://picsum.photos/1080/720",
         title: "Intro to Vue.js",
         description: "A beginner's guide to Vue.js",
@@ -175,6 +147,86 @@ const items: Item[] = [
         htmlContent: "<p><strong>Vue.js</strong> can make your life easier!</p>",
         lastFetch: new Date(),
         pubDate: new Date(),
+    },
+];
+
+const items: Item[] = [
+    {
+        id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 1,
+        userId: 1,
+        isRead: false,
+        isBookmarked: true,
+        isFavorite: true,
+        contentId: 1,
+    },
+    {
+        id: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 1,
+        userId: 1,
+        isRead: false,
+        isBookmarked: true,
+        isFavorite: true,
+        contentId: 2,
+    },
+    {
+        id: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 1,
+        userId: 1,
+        isFavorite: true,
+        isRead: false,
+        isBookmarked: false,
+        contentId: 3,
+    },
+    {
+        id: 4,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 1,
+        userId: 1,
+        isRead: false,
+        isBookmarked: true,
+        isFavorite: true,
+        contentId: 4,
+    },
+    {
+        id: 5,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 1,
+        userId: 1,
+        isFavorite: false,
+        isRead: true,
+        isBookmarked: false,
+        contentId: 5,
+    },
+    {
+        id: 6,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 1,
+        userId: 1,
+        isRead: false,
+        isBookmarked: true,
+        isFavorite: false,
+        contentId: 6,
+    },
+    {
+        id: 7,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        feedId: 2,
+        userId: 1,
+        isRead: false,
+        isBookmarked: true,
+        isFavorite: false,
+        contentId: 7,
     },
 ];
 
@@ -197,6 +249,14 @@ async function main() {
                     connect: feeds.map(feed => ({ id: feed.id })),
                 },
             },
+        });
+    }
+
+    for (const content of itemContents) {
+        await prisma.itemContent.upsert({
+            where: { id: content.id },
+            update: {},
+            create: content,
         });
     }
 

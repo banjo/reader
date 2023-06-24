@@ -4,6 +4,8 @@ import {
     RelatedFeedModel,
     CompleteUser,
     RelatedUserModel,
+    CompleteItemContent,
+    RelatedItemContentModel,
     CompleteTag,
     RelatedTagModel,
 } from "./index";
@@ -14,22 +16,16 @@ export const ItemModel = z.object({
     updatedAt: z.coerce.date(),
     feedId: z.number().int(),
     userId: z.number().int(),
+    contentId: z.number().int(),
     isRead: z.boolean(),
     isBookmarked: z.boolean(),
     isFavorite: z.boolean(),
-    imageUrl: z.union([z.string(), z.null()]),
-    title: z.string(),
-    description: z.union([z.string(), z.null()]),
-    link: z.string(),
-    content: z.union([z.string(), z.null()]),
-    htmlContent: z.union([z.string(), z.null()]),
-    lastFetch: z.coerce.date(),
-    pubDate: z.coerce.date(),
 });
 
 export interface CompleteItem extends z.infer<typeof ItemModel> {
     feed: CompleteFeed;
     user: CompleteUser;
+    content: CompleteItemContent;
     tags: CompleteTag[];
 }
 
@@ -42,6 +38,7 @@ export const RelatedItemModel: z.ZodSchema<CompleteItem> = z.lazy(() =>
     ItemModel.extend({
         feed: RelatedFeedModel,
         user: RelatedUserModel,
+        content: RelatedItemContentModel,
         tags: RelatedTagModel.array(),
     })
 );

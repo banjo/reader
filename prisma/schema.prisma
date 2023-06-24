@@ -5,7 +5,7 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
@@ -33,44 +33,54 @@ generator zod {
 }
 
 model Feed {
-  id                 Int      @id @default(autoincrement())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                 Int           @id @default(autoincrement())
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
   name               String
-  url                String   @unique
-  rssUrl             String   @unique
-  description        String?    @db.Text
+  url                String        @unique
+  rssUrl             String        @unique
+  description        String?       @db.Text
   imageUrl           String?
-  internalIdentifier String   @unique @default(uuid())
+  internalIdentifier String        @unique @default(uuid())
   ttl                Int?
   items              Item[]
   users              User[]
+  contentItems       ItemContent[]
 
-
-@@fulltext([name, url, rssUrl, description])
-
+  @@fulltext([name, url, rssUrl, description])
 }
 
 model Item {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  feed         Feed     @relation(fields: [feedId], references: [id])
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  feed         Feed        @relation(fields: [feedId], references: [id])
   feedId       Int
-  user         User     @relation(fields: [userId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
   userId       Int
-  isRead       Boolean  @default(false)
-  isBookmarked Boolean  @default(false)
-  isFavorite   Boolean  @default(false)
-  imageUrl        String?
-  title        String
-  description  String? @db.Text
-  link         String
-  content      String? @db.Text
-  htmlContent  String? @db.Text
-  lastFetch    DateTime
-  pubDate      DateTime
+  content      ItemContent @relation(fields: [contentId], references: [id])
+  contentId    Int
+  isRead       Boolean     @default(false)
+  isBookmarked Boolean     @default(false)
+  isFavorite   Boolean     @default(false)
   tags         Tag[]
+}
+
+model ItemContent {
+  id          Int      @id @default(autoincrement())
+  items       Item[]
+  feed        Feed     @relation(fields: [feedId], references: [id])
+  feedId      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  imageUrl    String?
+  title       String
+  description String?  @db.Text
+  link        String
+  content     String?  @db.Text
+  htmlContent String?  @db.Text
+  lastFetch   DateTime
+  pubDate     DateTime
 
   @@fulltext([title, description, content, htmlContent])
 }
