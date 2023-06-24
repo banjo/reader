@@ -29,6 +29,7 @@ type Props<T> = {
     align?: "start" | "center" | "end";
     menuEntries: MenuEntries<T>[];
     item: T;
+    buttonClasses?: string;
 };
 
 export const Dropdown = <T,>({
@@ -37,10 +38,11 @@ export const Dropdown = <T,>({
     align = "center",
     menuEntries,
     item,
+    buttonClasses,
 }: Props<T>) => {
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+            <DropdownMenuTrigger className={buttonClasses}>{children}</DropdownMenuTrigger>
             <DropdownMenuContent side={side} align={align}>
                 {menuEntries.map((entry, index) => {
                     switch (entry.type) {

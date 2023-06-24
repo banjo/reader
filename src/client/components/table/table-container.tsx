@@ -11,9 +11,14 @@ import { Refetch } from "@/shared/models/swr";
 import { AnimatePresence } from "framer-motion";
 import { FC, useMemo } from "react";
 
+export type TitleMenu = {
+    title: string;
+};
+
 type TableContainerProps = {
     feeds: CleanFeedWithItems[];
     menuOptions?: MenuEntries<CleanItem>[];
+    titleMenuOptions?: MenuEntries<TitleMenu>[];
     refetch: Refetch<CleanItem[]>;
     title: string;
 };
@@ -22,7 +27,13 @@ export type TableCard = CleanItem & {
     feedName: string;
 };
 
-export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, refetch, title }) => {
+export const TableContainer: FC<TableContainerProps> = ({
+    feeds,
+    menuOptions,
+    refetch,
+    title,
+    titleMenuOptions,
+}) => {
     const multipleFeeds = useMemo(() => feeds.length > 1, [feeds]);
 
     const formattedData: TableCard[] = useMemo(() => {
@@ -39,7 +50,12 @@ export const TableContainer: FC<TableContainerProps> = ({ feeds, menuOptions, re
 
     return (
         <>
-            <FilterBar filters={filters} actions={actions} title={title} />
+            <FilterBar
+                filters={filters}
+                actions={actions}
+                title={title}
+                titleMenuOptions={titleMenuOptions}
+            />
             <Table type="list">
                 <AnimatePresence initial={false}>
                     {data.length > 0 &&

@@ -147,6 +147,34 @@ const addFeedToUser = async (
     return Result.ok(feed);
 };
 
+const removeFeedFromUser = async (
+    feedId: number,
+    userId: number
+): Promise<ResultType<FeedWithItems>> => {
+    const feed = await prisma.feed.update({
+        where: {
+            id: feedId,
+        },
+        data: {
+            users: {
+                disconnect: {
+                    id: userId,
+                },
+            },
+        },
+        include: {
+            items: true,
+        },
+    });
+
+    if (!feed) {
+        logger.error("Could not remove feed from user");
+        return Result.error("Could not remove feed from user", "InternalError");
+    }
+
+    return Result.ok(feed);
+};
+
 const searchFeeds = async (searchTerm: string): Promise<ResultType<FeedWithUser[]>> => {
     // TODO: change to search instead of contains when it works with prisma
     // TODO2: Exclude feeds that have connection to user by id here instead of in service
@@ -223,4 +251,5 @@ export const FeedRepository = {
     addFeedToUser,
     searchFeeds,
     checkIfFeedIsAssignedToUser,
+    removeFeedFromUser,
 };

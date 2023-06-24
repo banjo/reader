@@ -10,12 +10,19 @@ type Out = {
     isLoading: boolean;
     refetch: Refetch<CleanItem>;
     refetchMultiple: Refetch<CleanItem[]>;
+    refetchFeed: Refetch<CleanFeedWithItems>;
+    unsubscribe: (updateFn: () => Promise<undefined>, onError: () => void) => Promise<void>;
 };
 
 type In = {
     key: string;
     fallbackData: CleanFeedWithItems;
 };
+
+export type UnsubscribeFn = (
+    updateFn: () => Promise<undefined>,
+    onError: () => void
+) => Promise<void>;
 
 export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
     const { SWR_AUTH: fetcher } = useAuthFetcher();
@@ -28,6 +35,41 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
     const data = useMemo(() => {
         return fetchData ?? fallbackData;
     }, [fallbackData, fetchData]);
+
+    const unsubscribe: UnsubscribeFn = async (updateFn, onError) => {
+        mutate(undefined, false);
+        mutateSidebarItems([]);
+
+        try {
+            await updateFn();
+        } catch (error) {
+            console.error(error);
+            if (onError) onError();
+        }
+
+        mutate();
+        fetchLatestInSidebar();
+    };
+
+    const refetchFeed: Refetch<CleanFeedWithItems> = async (updatedFeed, updateFn, onError) => {
+        const updatedData = {
+            ...data,
+            ...updatedFeed,
+        };
+
+        mutate(updatedData, false);
+        mutateSidebarItems(updatedFeed.items);
+
+        try {
+            await updateFn();
+        } catch (error) {
+            console.error(error);
+            if (onError) onError();
+        }
+
+        mutate();
+        fetchLatestInSidebar();
+    };
 
     const refetch: Refetch<CleanItem> = async (updatedItem, updateFn, onError) => {
         const updatedFeed = data.items.map(i => {
@@ -92,5 +134,7 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
         isLoading: !data,
         refetch,
         refetchMultiple: refetchMultiple,
+        refetchFeed,
+        unsubscribe,
     };
 };

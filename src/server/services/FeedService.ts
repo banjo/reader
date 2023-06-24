@@ -143,9 +143,41 @@ const searchFeeds = async (query: string, userId?: number): Promise<ResultType<S
     return Result.ok(feedsNotConnectedToUser.map(feed => FeedMapper.feedToSearchFeed(feed)));
 };
 
+const unsubscribeFromFeed = async (
+    internalIdentifier: string,
+    userId: number
+): Promise<ResultType<void>> => {
+    const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier, userId);
+
+    if (!feedResult.success) {
+        if (feedResult.type === "NotFound") {
+            logger.error(`no feed found in db with public url ${internalIdentifier}`);
+            return Result.error("Feed not found", "NotFound");
+        }
+
+        logger.error(`failed to get feed with public url ${internalIdentifier}`);
+
+        return Result.error("Failed to get feed", "InternalError");
+    }
+
+    const removeResult = await FeedRepository.removeFeedFromUser(feedResult.data.id, userId);
+
+    if (!removeResult.success) {
+        logger.error(`failed to remove feed with id ${feedResult.data.id} from user ${userId}`);
+        return Result.error("Failed to remove feed from user", "InternalError");
+    }
+
+    // do not remove items from user,
+    // the current approach is to keep them in the db as they are needed for
+    // fetching items for new users
+
+    return Result.okEmpty();
+};
+
 export const FeedService = {
     addFeed,
     getFeedByInternalIdentifier,
     getAllFeedsByUserId,
     searchFeeds,
+    unsubscribeFromFeed,
 };

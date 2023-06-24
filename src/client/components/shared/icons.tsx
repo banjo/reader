@@ -1,6 +1,7 @@
 import { Size } from "@/shared/models/size";
 import {
     Bookmark,
+    ChevronDown,
     Home,
     Info,
     LayoutList,
@@ -32,6 +33,7 @@ export const Icons = {
     add: PlusCircle,
     star: Star,
     info: Info,
+    chevronDown: ChevronDown,
     horizontalMenu: MoreHorizontal,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>

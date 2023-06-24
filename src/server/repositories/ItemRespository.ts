@@ -137,6 +137,25 @@ const getItemsByFeedId = async (feedId: number): Promise<ResultType<Item[]>> => 
     }
 };
 
+const removeFeedItemsForUser = async (
+    feedId: number,
+    userId: number
+): Promise<ResultType<void>> => {
+    try {
+        await prisma.item.deleteMany({
+            where: {
+                feedId,
+                userId,
+            },
+        });
+
+        return Result.okEmpty();
+    } catch (error: unknown) {
+        logger.error(`Could not remove items for feed with id ${feedId} - ${error}`);
+        return Result.error(`Could not remove items for feed with id ${feedId}`, "InternalError");
+    }
+};
+
 export const ItemRepository = {
     getAllItemsByFeed,
     getItemById,
@@ -145,4 +164,5 @@ export const ItemRepository = {
     createItems,
     updateItem,
     getItemsByFeedId,
+    removeFeedItemsForUser,
 };
