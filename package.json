@@ -14,6 +14,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
     "add": "npx shadcn-ui add",
     "db:migrate:dev": "npx prisma migrate dev && nr db:generate:types",
+    "db:migrate:prod": "npx prisma migrate deploy",
     "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
     "db:local:run": "docker compose -f ./docker/docker-compose.yml up -d --remove-orphans",
     "db:local:stop": "docker compose -f ./docker/docker-compose.yml down",
