@@ -1,6 +1,11 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { CreateItem, UpdateItem } from "@/shared/models/entities";
+import {
+    CreateItem,
+    CreateItemContent,
+    CreateItemWithContentId,
+    UpdateItem,
+} from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 import { Item } from "@prisma/client";
 import "server-only";
@@ -87,14 +92,22 @@ const markItemsAsRead = async (itemIds: number[]): Promise<ResultType<void>> => 
     return Result.okEmpty();
 };
 
-const createItem = async (
-    item: CreateItem,
-    feedId: number,
-    userId: number
-): Promise<ResultType<Item>> => {
+type CreateItemProps = {
+    item: CreateItem;
+    contentId: number;
+    feedId: number;
+    userId: number;
+};
+
+const createItem = async ({
+    item,
+    contentId,
+    feedId,
+    userId,
+}: CreateItemProps): Promise<ResultType<Item>> => {
     try {
         const createdItem = await prisma.item.create({
-            data: { ...item, feedId, userId },
+            data: { ...item, feedId, userId, contentId },
         });
 
         return Result.ok(createdItem);
@@ -105,16 +118,20 @@ const createItem = async (
 };
 
 const createItems = async (
-    items: CreateItem[],
+    itemsWithContentId: CreateItemWithContentId[],
     feedId: number,
     userId: number
-): Promise<ResultType<void>> => {
+) => {
     try {
         const createdItems = await prisma.item.createMany({
-            data: items.map(item => ({ ...item, feedId, userId })),
+            data: itemsWithContentId.map(item => ({
+                ...item,
+                feedId,
+                userId,
+            })),
         });
 
-        if (createdItems.count !== items.length) {
+        if (createdItems.count !== itemsWithContentId.length) {
             logger.error(`Could not create all items`);
             return Result.error(`Could not create all items`, "InternalError");
         }
@@ -126,22 +143,48 @@ const createItems = async (
     }
 };
 
-// TODO: Move to ItemContentRepository and make it work
-const getItemsByFeedId = (): Promise<ResultType<Item[]>> => {
-    throw new Error("Not implemented");
-    // let items: ItemContent[];
-    // try {
-    //     items = await prisma.itemContent.findMany({
-    //         where: {
-    //             feedId: feedId,
-    //         },
-    //     });
+const createItemsWithContentFromContent = async (
+    content: CreateItemContent[],
+    feedId: number,
+    userId: number
+): Promise<ResultType<void>> => {
+    try {
+        const createdContentResult = await prisma.itemContent.createMany({
+            data: content,
+        });
 
-    //     return Result.ok(items);
-    // } catch (error: unknown) {
-    //     logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
-    //     return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
-    // }
+        if (createdContentResult.count !== content.length) {
+            logger.error(`Could not create all content`);
+            return Result.error(`Could not create all content`, "InternalError");
+        }
+
+        const createdContent = await prisma.itemContent.findMany({
+            where: {
+                feedId,
+            },
+        });
+
+        const createdItems = await prisma.item.createMany({
+            data: createdContent.map(itemContent => ({
+                contentId: itemContent.id,
+                feedId,
+                userId,
+                isBookmarked: false,
+                isRead: false,
+                isFavorite: false,
+            })),
+        });
+
+        if (createdItems.count !== content.length) {
+            logger.error(`Could not create all items`);
+            return Result.error(`Could not create all items`, "InternalError");
+        }
+
+        return Result.okEmpty();
+    } catch (error: unknown) {
+        logger.error(`Could not create items - ${error}`);
+        return Result.error(`Could not create items`, "InternalError");
+    }
 };
 
 const removeFeedItemsForUser = async (
@@ -167,9 +210,9 @@ export const ItemRepository = {
     getAllItemsByFeed,
     getItemById,
     markItemsAsRead,
-    createItem,
     createItems,
+    createItem,
+    createItemsWithContentFromContent,
     updateItem,
-    getItemsByFeedId,
     removeFeedItemsForUser,
 };

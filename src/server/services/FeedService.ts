@@ -1,11 +1,13 @@
 import createLogger from "@/server/lib/logger";
+import { ContentMapper } from "@/server/mappers/ContentMapper";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
 import { FeedMapper } from "@/server/mappers/FeedMapper";
 import { ItemMapper } from "@/server/mappers/ItemMapper";
+import { ContentRepository } from "@/server/repositories/ContentRepository";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { ParseService } from "@/server/services/ParseService";
-import { CleanFeedWithItems, CreateItem, SearchFeed } from "@/shared/models/entities";
+import { CleanFeedWithItems, CreateItemWithContentId, SearchFeed } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 
 const logger = createLogger("FeedService");
@@ -39,17 +41,17 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeed
 };
 
 const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
-    // TODO: make this work after new models
-    const itemsResponse = await ItemRepository.getItemsByFeedId();
+    const contentResponse = await ContentRepository.getAllContentById(feedId);
 
-    if (!itemsResponse.success) {
-        logger.error(`no items found in db for feed with id ${feedId}`);
-        return Result.error("Items not found", "NotFound");
+    if (!contentResponse.success) {
+        logger.error(`no content items found in db for feed with id ${feedId}`);
+        return Result.error("Content not found", "NotFound");
     }
 
-    const newItems: CreateItem[] = itemsResponse.data.map(item =>
-        ItemMapper.itemToCreateItem(item, userId)
-    );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const newItems: CreateItemWithContentId[] = contentResponse.data.map(content => {
+        return { ...ItemMapper.defaultItem(), userId: userId, contentId: content.id };
+    });
 
     const addItemsResult = await ItemRepository.createItems(newItems, feedId, userId);
 
@@ -86,6 +88,7 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
         }
 
         if (feedAssignedToUserResult.data) {
+            // TODO: update feed items
             logger.info(`feed ${id} already assigned to user ${userId}`);
             return Result.ok({ feedId: id });
         }
@@ -97,6 +100,7 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
             return Result.error("Failed to add feed to user", "InternalError");
         }
 
+        // TODO: update feed items with new scan
         const assignFeedItemsToUserResult = await assignFeedItemsToUser(id, userId);
 
         if (!assignFeedItemsToUserResult.success) {
@@ -114,16 +118,28 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
         return Result.error("Failed to parse feed", "InternalError");
     }
 
-    const itemsToCreate = parseResult.data.items.map(item =>
-        ItemMapper.parseItemToCreateItem(item, userId)
-    );
     const feedToCreate = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl);
 
-    const createFeedResult = await FeedRepository.createFeed(feedToCreate, itemsToCreate, userId);
+    const createFeedResult = await FeedRepository.createFeed(feedToCreate, userId);
 
     if (!createFeedResult.success) {
         logger.error(`failed to create feed with url ${rssUrl}`);
         return Result.error("Failed to create feed", "InternalError");
+    }
+
+    const contentToCreate = parseResult.data.items.map(parsedItem => {
+        return ContentMapper.parseItemToCreateContent(parsedItem, createFeedResult.data.id);
+    });
+
+    const createContentResult = await ItemRepository.createItemsWithContentFromContent(
+        contentToCreate,
+        createFeedResult.data.id,
+        userId
+    );
+
+    if (!createContentResult.success) {
+        logger.error(`failed to create content for feed with url ${rssUrl}`);
+        return Result.error("Failed to create content", "InternalError");
     }
 
     return Result.ok({ feedId: createFeedResult.data.id });
@@ -168,9 +184,15 @@ const unsubscribeFromFeed = async (
         return Result.error("Failed to remove feed from user", "InternalError");
     }
 
-    // do not remove items from user,
-    // the current approach is to keep them in the db as they are needed for
-    // fetching items for new users
+    const removeItemsResult = await ItemRepository.removeFeedItemsForUser(
+        feedResult.data.id,
+        userId
+    );
+
+    if (!removeItemsResult.success) {
+        logger.error(`failed to remove items for feed with id ${feedResult.data.id}`);
+        return Result.error("Failed to remove items for feed", "InternalError");
+    }
 
     return Result.okEmpty();
 };

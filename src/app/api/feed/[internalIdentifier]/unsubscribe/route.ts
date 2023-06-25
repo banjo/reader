@@ -6,8 +6,6 @@ export async function POST(req: Request, context: { params: { internalIdentifier
     const userId = RequestService.getUserId(req);
     const internalIdentifier = context.params.internalIdentifier;
 
-    console.log("🪕%c Banjo | route.ts:9 |", "color: #E91E63", internalIdentifier);
-
     const item = await FeedService.unsubscribeFromFeed(internalIdentifier, userId);
 
     if (!item.success) {

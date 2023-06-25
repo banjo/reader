@@ -1,6 +1,6 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { CreateFeed, CreateItem, FeedWithItems, FeedWithUser } from "@/shared/models/entities";
+import { CreateFeed, FeedWithItems, FeedWithUser } from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 import { Feed } from "@prisma/client";
 import "server-only";
@@ -108,15 +108,10 @@ const getFeedByInternalIdentifier = async (
     return Result.ok(feed);
 };
 
-const createFeed = async (
-    feed: CreateFeed,
-    items: CreateItem[],
-    userId: number
-): Promise<ResultType<Feed>> => {
+const createFeed = async (feed: CreateFeed, userId: number): Promise<ResultType<Feed>> => {
     const createdFeed = await prisma.feed.create({
         data: {
             ...feed,
-            items: { createMany: { data: items } },
             users: {
                 connect: {
                     id: userId,

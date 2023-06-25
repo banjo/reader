@@ -69,9 +69,24 @@ export const CreateItemSchema = ItemModel.omit({
     createdAt: true,
     updatedAt: true,
     feedId: true,
+    contentId: true,
 });
 
 export type CreateItem = z.TypeOf<typeof CreateItemSchema>;
+
+export const CreateItemWithContentIdSchema = CreateItemSchema.extend({
+    contentId: z.number(),
+});
+
+export type CreateItemWithContentId = z.TypeOf<typeof CreateItemWithContentIdSchema>;
+
+export const CreateItemContentSchema = ItemContentModel.omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+});
+
+export type CreateItemContent = z.TypeOf<typeof CreateItemContentSchema>;
 
 // SEARCH OBJECTS (returned when searching)
 

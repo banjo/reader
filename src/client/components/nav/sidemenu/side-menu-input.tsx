@@ -118,7 +118,13 @@ export const SideMenuInput: FC = () => {
                 noOptionsMessage={() => "No feeds found, submit an RSS URL to add a new feed"}
             />
 
-            <button type="button" className="ml-2 hover:text-slate-400" onClick={addFeed}>
+            <button
+                type="button"
+                className="ml-2 hover:text-slate-400"
+                onClick={async () => {
+                    await addFeed();
+                }}
+            >
                 <Icons.add className="h-6 w-6" />
             </button>
         </div>
