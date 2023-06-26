@@ -1,15 +1,17 @@
-import { FeedModel, ItemContentModel, ItemModel, UserModel } from "prisma/zod";
+import { FeedModel, ItemContentModel, ItemModel, TagModel, UserModel } from "prisma/zod";
 import { z } from "zod";
 
 // TODO: refactor to own files
 
 // COMPLETE OBJECTS
-
-const CompleteItemSchema = ItemModel.extend({
+export const CompleteItemSchema = ItemModel.extend({
     content: ItemContentModel,
+    user: UserModel.optional(),
+    feed: FeedModel.optional(),
+    tag: TagModel.optional(),
 });
 
-const CompleteFeedSchema = FeedModel.extend({
+export const CompleteFeedSchema = FeedModel.extend({
     items: ItemModel.array(),
 });
 
@@ -43,7 +45,6 @@ export type CleanUser = z.TypeOf<typeof CleanUserSchema>;
 export type CleanContent = z.TypeOf<typeof CleanContentSchema>;
 
 // FEED WITH ITEMS INCLUDED
-
 export const FeedWithUsersSchema = FeedModel.extend({
     users: UserModel.array(),
 });
@@ -107,7 +108,6 @@ export const CreateItemContentSchema = ItemContentModel.omit({
 export type CreateItemContent = z.TypeOf<typeof CreateItemContentSchema>;
 
 // SEARCH OBJECTS (returned when searching)
-
 export const SearchFeedSchema = FeedModel.pick({
     name: true,
     rssUrl: true,
