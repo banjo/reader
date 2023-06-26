@@ -1,26 +1,25 @@
-import { CleanFeedWithItems, CleanUser, FeedWithItems } from "@/shared/models/entities";
-import { Item, User } from "@prisma/client";
+import {
+    CleanFeedWithItems,
+    CleanItem,
+    CleanUser,
+    CompleteItem,
+    FeedWithItems,
+} from "@/shared/models/entities";
+import { User } from "@prisma/client";
 
-function item(item: Item): Omit<Item, "feedId" | "userId"> {
+function item(item: CompleteItem): CleanItem {
     return {
         id: item.id,
         isRead: item.isRead,
         isBookmarked: item.isBookmarked,
         isFavorite: item.isFavorite,
-        imageUrl: item.imageUrl,
-        title: item.title,
-        link: item.link,
-        content: item.content,
-        description: item.description,
-        htmlContent: item.htmlContent,
-        lastFetch: item.lastFetch,
-        pubDate: item.pubDate,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
+        content: item.content,
     };
 }
 
-function items(items: Item[]): Omit<Item, "feedId" | "userId">[] {
+function items(items: CompleteItem[]): CleanItem[] {
     return items.map(element => item(element));
 }
 
@@ -35,7 +34,7 @@ function feed(feed: FeedWithItems): CleanFeedWithItems {
         url: feed.url,
         description: feed.description,
         updatedAt: feed.updatedAt,
-        items: feed.items ? items(feed.items) : [],
+        items: feed.items.length > 0 ? items(feed.items) : [],
     };
 }
 

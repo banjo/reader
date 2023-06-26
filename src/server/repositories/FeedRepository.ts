@@ -160,10 +160,7 @@ const addFeedToUser = async (
     return Result.ok(feed);
 };
 
-const removeFeedFromUser = async (
-    feedId: number,
-    userId: number
-): Promise<ResultType<FeedWithItems>> => {
+const removeFeedFromUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
     const feed = await prisma.feed.update({
         where: {
             id: feedId,
@@ -175,9 +172,6 @@ const removeFeedFromUser = async (
                 },
             },
         },
-        include: {
-            items: true,
-        },
     });
 
     if (!feed) {
@@ -185,7 +179,7 @@ const removeFeedFromUser = async (
         return Result.error("Could not remove feed from user", "InternalError");
     }
 
-    return Result.ok(feed);
+    return Result.okEmpty();
 };
 
 const searchFeeds = async (searchTerm: string): Promise<ResultType<FeedWithUser[]>> => {

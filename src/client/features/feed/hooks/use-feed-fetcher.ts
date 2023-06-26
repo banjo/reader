@@ -72,7 +72,7 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
     };
 
     const refetch: Refetch<CleanItem> = async (updatedItem, updateFn, onError) => {
-        const updatedFeed = data.items.map(i => {
+        const updatedItems = data.items.map(i => {
             if (i.id === updatedItem.id) {
                 return updatedItem;
             }
@@ -82,7 +82,7 @@ export const useFeedFetcher = ({ key, fallbackData }: In): Out => {
 
         const updatedData = {
             ...data,
-            items: updatedFeed,
+            items: updatedItems,
         };
 
         mutate(updatedData, false);

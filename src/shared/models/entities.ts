@@ -3,6 +3,19 @@ import { z } from "zod";
 
 // TODO: refactor to own files
 
+// COMPLETE OBJECTS
+
+const CompleteItemSchema = ItemModel.extend({
+    content: ItemContentModel,
+});
+
+const CompleteFeedSchema = FeedModel.extend({
+    items: ItemModel.array(),
+});
+
+export type CompleteItem = z.TypeOf<typeof CompleteItemSchema>;
+export type CompleteFeed = z.TypeOf<typeof CompleteFeedSchema>;
+
 // CLEAN OBJECTS (for frontend)
 export const CleanItemSchema = ItemModel.omit({
     feedId: true,
@@ -20,9 +33,14 @@ export const CleanUserSchema = UserModel.omit({
     externalId: true,
 });
 
+export const CleanContentSchema = ItemContentModel.omit({
+    feedId: true,
+});
+
 export type CleanItem = z.TypeOf<typeof CleanItemSchema>;
 export type CleanFeed = z.TypeOf<typeof CleanFeedSchema>;
 export type CleanUser = z.TypeOf<typeof CleanUserSchema>;
+export type CleanContent = z.TypeOf<typeof CleanContentSchema>;
 
 // FEED WITH ITEMS INCLUDED
 
@@ -31,7 +49,7 @@ export const FeedWithUsersSchema = FeedModel.extend({
 });
 
 export const FeedWithItemsSchema = FeedModel.extend({
-    items: ItemModel.array(),
+    items: CompleteItemSchema.array(),
 });
 
 export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
