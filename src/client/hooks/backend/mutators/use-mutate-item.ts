@@ -1,7 +1,7 @@
+import { useAuth } from "@/client/hooks/backend/use-auth";
 import { fetcher } from "@/client/lib/fetcher";
 import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
-import { useAuth } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
 
 type In<T> = {

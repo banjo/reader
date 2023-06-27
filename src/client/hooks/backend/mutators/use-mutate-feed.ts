@@ -1,8 +1,8 @@
 import { UnsubscribeFn } from "@/client/features/feed/hooks/use-feed-fetcher";
+import { useAuth } from "@/client/hooks/backend/use-auth";
 import { fetcher } from "@/client/lib/fetcher";
 import { CleanFeedWithItems } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
-import { useAuth } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
 
 type In<T> = {

@@ -1,5 +1,5 @@
+import { useAuth } from "@/client/hooks/backend/use-auth";
 import { fetcher } from "@/client/lib/fetcher";
-import { useAuth } from "@clerk/nextjs";
 
 export const useAuthFetcher = () => {
     const { userId } = useAuth();

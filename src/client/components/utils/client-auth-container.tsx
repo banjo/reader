@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/client/hooks/backend/use-auth";
 import { FC, ReactNode } from "react";
 
 type Props = {

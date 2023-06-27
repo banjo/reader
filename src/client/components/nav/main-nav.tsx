@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import { Icons } from "@/client/components/shared/icons";
 import { siteConfig } from "@/client/config/site";
+import { useAuth } from "@/client/hooks/backend/use-auth";
 import { cn } from "@/client/lib/utils";
 import { NavItem } from "@/client/types/nav";
-import { useAuth } from "@clerk/nextjs";
 import { useMemo } from "react";
 
 interface MainNavProps {

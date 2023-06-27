@@ -1,8 +1,8 @@
 "use client";
 
 import { SideMenuContainer } from "@/client/components/nav/sidemenu/side-menu-container";
+import { useAuth } from "@/client/hooks/backend/use-auth";
 import { CleanFeedWithItems } from "@/shared/models/entities";
-import { useAuth } from "@clerk/nextjs";
 import { FC } from "react";
 
 type Props = {
