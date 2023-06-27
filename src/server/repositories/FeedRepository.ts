@@ -81,6 +81,30 @@ const getFeedByRssUrl = async (rssUrl: string): Promise<ResultType<FeedWithItems
 };
 
 const getFeedByInternalIdentifier = async (
+    feedInternalIdentifier: string
+): Promise<ResultType<FeedWithItems>> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            internalIdentifier: feedInternalIdentifier,
+        },
+        include: {
+            items: {
+                include: {
+                    content: true,
+                },
+            },
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Feed not found with internalIdentifier: ${feedInternalIdentifier}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    return Result.ok(feed);
+};
+
+const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
 ): Promise<ResultType<FeedWithItems>> => {
@@ -253,6 +277,7 @@ export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
     getFeedByRssUrl,
+    getUserFeedByInternalIdentifier,
     getFeedByInternalIdentifier,
     createFeed,
     addFeedToUser,

@@ -23,7 +23,7 @@ function items(items: CompleteItem[]): CleanItem[] {
     return items.map(element => item(element));
 }
 
-function feed(feed: FeedWithItems): CleanFeedWithItems {
+function feed(feed: FeedWithItems, isSubscribed: boolean): CleanFeedWithItems {
     return {
         id: feed.id,
         name: feed.name,
@@ -35,11 +35,12 @@ function feed(feed: FeedWithItems): CleanFeedWithItems {
         description: feed.description,
         updatedAt: feed.updatedAt,
         items: feed.items.length > 0 ? items(feed.items) : [],
+        isSubscribed,
     };
 }
 
-function feeds(feeds: FeedWithItems[]): CleanFeedWithItems[] {
-    return feeds.map(element => feed(element));
+function feeds(feeds: FeedWithItems[], isSubscribed: boolean): CleanFeedWithItems[] {
+    return feeds.map(element => feed(element, isSubscribed));
 }
 
 function user(user: User): CleanUser {

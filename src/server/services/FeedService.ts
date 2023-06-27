@@ -7,16 +7,21 @@ import { ContentRepository } from "@/server/repositories/ContentRepository";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { ParseService } from "@/server/services/ParseService";
-import { CleanFeedWithItems, CreateItemWithContentId, SearchFeed } from "@/shared/models/entities";
+import {
+    CleanFeedWithItems,
+    CleanItem,
+    CreateItemWithContentId,
+    SearchFeed,
+} from "@/shared/models/entities";
 import { Result, ResultType } from "@/shared/models/result";
 
 const logger = createLogger("FeedService");
 
-const getFeedByInternalIdentifier = async (
+const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
 ): Promise<ResultType<CleanFeedWithItems>> => {
-    const feedResponse = await FeedRepository.getFeedByInternalIdentifier(
+    const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier(
         feedInternalIdentifier,
         userId
     );
@@ -26,7 +31,7 @@ const getFeedByInternalIdentifier = async (
         return Result.error("Feed not found", "NotFound");
     }
 
-    return Result.ok(DatabaseMapper.feed(feedResponse.data));
+    return Result.ok(DatabaseMapper.feed(feedResponse.data, true));
 };
 
 const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeedWithItems[]>> => {
@@ -37,7 +42,7 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeed
         return Result.error("No feeds found", "NotFound");
     }
 
-    return Result.ok(feedsResponse.data.map(feed => DatabaseMapper.feed(feed)));
+    return Result.ok(feedsResponse.data.map(feed => DatabaseMapper.feed(feed, true)));
 };
 
 const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
@@ -164,7 +169,10 @@ const unsubscribeFromFeed = async (
     internalIdentifier: string,
     userId: number
 ): Promise<ResultType<void>> => {
-    const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier, userId);
+    const feedResult = await FeedRepository.getUserFeedByInternalIdentifier(
+        internalIdentifier,
+        userId
+    );
 
     if (!feedResult.success) {
         if (feedResult.type === "NotFound") {
@@ -197,10 +205,72 @@ const unsubscribeFromFeed = async (
     return Result.okEmpty();
 };
 
+const getContentFeedByInternalIdentifier = async (
+    internalIdentifier: string
+): Promise<ResultType<CleanFeedWithItems>> => {
+    const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier);
+
+    if (!feedResult.success) {
+        logger.error(`Could not find feed with identifier ${internalIdentifier}`);
+        return Result.error("Could not find feed", "NotFound");
+    }
+
+    const contentListResult = await ContentRepository.getAllContentById(feedResult.data.id);
+
+    if (!contentListResult.success) {
+        logger.error(`Could not fetch content for feed with id ${feedResult.data.id}`);
+        return Result.error("Could not find content for feed", "NotFound");
+    }
+
+    return Result.ok({
+        ...feedResult.data,
+        isSubscribed: false,
+        items: contentListResult.data.map(content => {
+            return {
+                updatedAt: new Date(),
+                createdAt: new Date(),
+                isRead: false,
+                isBookmarked: false,
+                isFavorite: false,
+                content,
+                id: content.id,
+            } satisfies CleanItem;
+        }),
+    });
+};
+
+const getFeedWithItemsOrContent = async (
+    internalIdentifier: string,
+    userId: number
+): Promise<ResultType<CleanFeedWithItems>> => {
+    const feedResponse = await getUserFeedByInternalIdentifier(internalIdentifier, userId);
+
+    if (!feedResponse.success) {
+        return Result.error("Could not fetch user feed", "InternalError");
+    }
+
+    const hasNoItems = feedResponse.data.items.length === 0;
+
+    let finalFeed: CleanFeedWithItems = feedResponse.data;
+    if (hasNoItems) {
+        const result = await getContentFeedByInternalIdentifier(internalIdentifier);
+
+        if (!result.success) {
+            return Result.error("Could not get content feed by identifier", "InternalError");
+        }
+
+        finalFeed = result.data;
+    }
+
+    return Result.ok(finalFeed);
+};
+
 export const FeedService = {
     addFeed,
-    getFeedByInternalIdentifier,
+    getUserFeedByInternalIdentifier,
     getAllFeedsByUserId,
     searchFeeds,
     unsubscribeFromFeed,
+    getContentFeedByInternalIdentifier,
+    getFeedWithItemsOrContent,
 };

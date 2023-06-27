@@ -55,6 +55,7 @@ export const FeedWithItemsSchema = FeedModel.extend({
 
 export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
     items: CleanItemSchema.array(),
+    isSubscribed: z.boolean(),
 });
 
 export type FeedWithUser = z.TypeOf<typeof FeedWithUsersSchema>;

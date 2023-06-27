@@ -24,14 +24,14 @@ export async function GET(req: Request, { params }: GetProps) {
         );
     }
 
-    const item = await FeedService.getFeedByInternalIdentifier(
+    const feedResult = await FeedService.getFeedWithItemsOrContent(
         internalIdentifierResult.data,
         userId
     );
 
-    if (!item.success) {
-        return ResponseService.error(item.message, item.type);
+    if (!feedResult.success) {
+        return ResponseService.error(feedResult.message, feedResult.type);
     }
 
-    return ResponseService.success(item.data);
+    return ResponseService.success(feedResult.data);
 }

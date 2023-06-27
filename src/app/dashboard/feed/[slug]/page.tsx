@@ -2,6 +2,8 @@ import { ClientAuthContainer } from "@/client/components/utils/client-auth-conta
 import { FeedContainer } from "@/client/features/feed/containers/feed-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
+import { CleanFeedWithItems } from "@/shared/models/entities";
+import { Result, ResultType } from "@/shared/models/result";
 
 type Props = {
     params: {
@@ -11,36 +13,33 @@ type Props = {
 
 export const revalidate = 0;
 
-export default async function FeedPage({ params }: Props) {
+const fetchFeed = async (slug: string): Promise<ResultType<CleanFeedWithItems>> => {
     const userId = await ServerComponentService.getUserId();
 
-    const feed = await FeedService.getAllFeedsByUserId(userId);
-
-    if (!feed.success) {
-        return <div>Something went wrong</div>; // TODO: create error page
-    }
-
-    const slug = params.slug;
-
     if (!slug) {
-        return <div>invalid feed id</div>; // TODO: create error page
+        return Result.error("Could not get internal identifier", "BadRequest");
     }
 
-    const hasAccess = feed.data.some(f => f.internalIdentifier === slug);
+    const feedResult = await FeedService.getFeedWithItemsOrContent(slug, userId);
 
-    if (!hasAccess) {
-        return <div>User does not have access</div>; // TODO: create error page
+    if (!feedResult.success) {
+        return Result.error(feedResult.message, feedResult.type);
     }
 
-    const feedResponse = await FeedService.getFeedByInternalIdentifier(slug, userId);
+    return Result.ok(feedResult.data);
+};
 
-    if (!feedResponse.success) {
-        return <div>invalid feed id</div>; // TODO: create error page
+export default async function FeedPage({ params }: Props) {
+    const { slug } = params;
+    const res = await fetchFeed(slug);
+
+    if (!res.success) {
+        return <div>Could not fetch</div>; // TODO: Error page
     }
 
     return (
         <ClientAuthContainer>
-            <FeedContainer feed={feedResponse.data} internalIdentifier={slug} />
+            <FeedContainer feed={res.data} internalIdentifier={slug} />
         </ClientAuthContainer>
     );
 }
