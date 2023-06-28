@@ -55,6 +55,8 @@ export const TableContainer: FC<TableContainerProps> = ({
                 actions={actions}
                 title={title}
                 titleMenuOptions={titleMenuOptions}
+                isSubscribed={!multipleFeeds && feeds[0].isSubscribed}
+                feed={feeds[0]}
             />
             <Table type="list">
                 <AnimatePresence initial={false}>

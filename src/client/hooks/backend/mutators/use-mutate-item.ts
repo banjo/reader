@@ -1,5 +1,4 @@
-import { useAuth } from "@/client/hooks/backend/use-auth";
-import { fetcher } from "@/client/lib/fetcher";
+import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
 import { toast } from "react-hot-toast";
@@ -9,13 +8,7 @@ type In<T> = {
 };
 
 export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
-    const { userId } = useAuth();
-
-    if (!userId) {
-        throw new Error("No user id");
-    }
-
-    const api = fetcher(userId);
+    const api = useAuthFetcher();
 
     const toggleReadStatus = (item: T) => {
         const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {

@@ -265,6 +265,34 @@ const getFeedWithItemsOrContent = async (
     return Result.ok(finalFeed);
 };
 
+const subscribeToFeed = async (
+    internalIdentifier: string,
+    userId: number
+): Promise<ResultType<void>> => {
+    const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier);
+
+    if (!feedResult.success) {
+        logger.error(`Could not find feed with identifier ${internalIdentifier}`);
+        return Result.error("Could not find feed", "NotFound");
+    }
+
+    const addResult = await FeedRepository.addFeedToUser(feedResult.data.id, userId);
+
+    if (!addResult.success) {
+        logger.error(`Could not add feed with id ${feedResult.data.id} to user ${userId}`);
+        return Result.error("Could not add feed to user", "InternalError");
+    }
+
+    const assignResult = await assignFeedItemsToUser(feedResult.data.id, userId);
+
+    if (!assignResult.success) {
+        logger.error(`Could not assign items for feed with id ${feedResult.data.id}`);
+        return Result.error("Could not assign items for feed", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
 export const FeedService = {
     addFeed,
     getUserFeedByInternalIdentifier,
@@ -273,4 +301,5 @@ export const FeedService = {
     unsubscribeFromFeed,
     getContentFeedByInternalIdentifier,
     getFeedWithItemsOrContent,
+    subscribeToFeed,
 };
