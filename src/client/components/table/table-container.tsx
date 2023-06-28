@@ -6,47 +6,34 @@ import { FilterBar } from "@/client/components/table/table-filter-bar";
 import { TableItem } from "@/client/components/table/table-item";
 import { useTableFilters } from "@/client/components/table/use-table-filters";
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
-import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
+import { CleanFeed, CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { isDefined } from "@banjoanton/utils";
 import { AnimatePresence } from "framer-motion";
-import { FC, useMemo } from "react";
+import { FC } from "react";
 
 export type TitleMenu = {
     title: string;
 };
 
 type TableContainerProps = {
-    feeds: CleanFeedWithItems[];
+    items: CleanItem[];
+    feed?: CleanFeed;
     menuOptions?: MenuEntries<CleanItem>[];
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     refetch: Refetch<CleanItem[]>;
     title: string;
 };
 
-export type TableCard = CleanItem & {
-    feedName: string;
-};
-
 export const TableContainer: FC<TableContainerProps> = ({
-    feeds,
+    items,
     menuOptions,
     refetch,
     title,
     titleMenuOptions,
+    feed,
 }) => {
-    const multipleFeeds = useMemo(() => feeds.length > 1, [feeds]);
-
-    const formattedData: TableCard[] = useMemo(() => {
-        const tableCards: TableCard[] = [];
-        for (const feed of feeds) {
-            for (const item of feed.items) {
-                tableCards.push({ ...item, feedName: feed.name });
-            }
-        }
-        return tableCards;
-    }, [feeds]);
-
-    const { data, filters, actions } = useTableFilters(formattedData, refetch);
+    const { data, filters, actions } = useTableFilters(items, refetch);
 
     return (
         <>
@@ -55,8 +42,8 @@ export const TableContainer: FC<TableContainerProps> = ({
                 actions={actions}
                 title={title}
                 titleMenuOptions={titleMenuOptions}
-                isSubscribed={!multipleFeeds && feeds[0].isSubscribed}
-                feed={feeds[0]}
+                isSubscribed={feed?.isSubscribed ?? true}
+                feed={feed}
             />
             <Table type="list">
                 <AnimatePresence initial={false}>
@@ -67,8 +54,7 @@ export const TableContainer: FC<TableContainerProps> = ({
                                     key={item.id}
                                     item={item}
                                     type="list"
-                                    feedName={item.feedName}
-                                    showFeedName={multipleFeeds}
+                                    showFeedName={!isDefined(feed)}
                                     menuOptions={menuOptions}
                                     refetch={refetch}
                                 />

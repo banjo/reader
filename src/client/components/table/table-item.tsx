@@ -21,12 +21,11 @@ export const TableItem = <T extends CleanItem>({
     item,
     type,
     showFeedName = false,
-    feedName,
     menuOptions,
     refetch,
 }: CardProps<T>) => {
     const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem<T>({ refetch });
-    const { content, id, isRead, isFavorite, isBookmarked } = item;
+    const { content, id, isRead, isFavorite, isBookmarked, feed } = item;
 
     if (type === "card") {
         throw new Error("not implemented");
@@ -62,7 +61,7 @@ export const TableItem = <T extends CleanItem>({
             <Bookmark size="md" active={isBookmarked} onClick={toggleBookmark} />
             {showFeedName && (
                 <span className="w-32 min-w-max text-sm font-light text-gray-600 dark:text-gray-300">
-                    {feedName}
+                    {feed.name}
                 </span>
             )}
             <span className="min-w-max font-bold">{content.title}</span>

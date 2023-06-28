@@ -4,7 +4,7 @@ import { TitleMenu } from "@/client/components/table/table-container";
 import { TableActions, TableFilters } from "@/client/components/table/use-table-filters";
 import { Button } from "@/client/components/ui/button";
 import { Switch } from "@/client/components/ui/switch";
-import { CleanFeedWithItems } from "@/shared/models/entities";
+import { CleanFeed } from "@/shared/models/entities";
 import { FC } from "react";
 
 type FilterBarProps = {
@@ -13,7 +13,7 @@ type FilterBarProps = {
     title: string;
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     isSubscribed: boolean;
-    feed: CleanFeedWithItems;
+    feed?: CleanFeed;
 };
 
 export const FilterBar: FC<FilterBarProps> = ({
@@ -46,7 +46,7 @@ export const FilterBar: FC<FilterBarProps> = ({
                 <span className="mr-auto text-lg font-medium">{title}</span>
             )}
 
-            {isSubscribed ? (
+            {isSubscribed && (
                 <>
                     <Button onClick={markAllAsRead} disabled={hasReadAll}>
                         Mark all as read
@@ -62,7 +62,9 @@ export const FilterBar: FC<FilterBarProps> = ({
                         </label>
                     </div>
                 </>
-            ) : (
+            )}
+
+            {feed && !isSubscribed && (
                 <>
                     <Button onClick={async () => await subscribe(feed.internalIdentifier)}>
                         Subscribe

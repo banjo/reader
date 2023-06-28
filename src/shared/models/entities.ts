@@ -6,8 +6,8 @@ import { z } from "zod";
 // COMPLETE OBJECTS
 export const CompleteItemSchema = ItemModel.extend({
     content: ItemContentModel,
+    feed: FeedModel,
     user: UserModel.optional(),
-    feed: FeedModel.optional(),
     tag: TagModel.optional(),
 });
 
@@ -25,10 +25,13 @@ export const CleanItemSchema = ItemModel.omit({
     contentId: true,
 }).extend({
     content: ItemContentModel,
+    feed: FeedModel,
 });
 
 export const CleanFeedSchema = FeedModel.omit({
     ttl: true,
+}).extend({
+    isSubscribed: z.boolean(),
 });
 
 export const CleanUserSchema = UserModel.omit({
@@ -55,7 +58,6 @@ export const FeedWithItemsSchema = FeedModel.extend({
 
 export const CleanFeedWithItemsSchema = CleanFeedSchema.extend({
     items: CleanItemSchema.array(),
-    isSubscribed: z.boolean(),
 });
 
 export type FeedWithUser = z.TypeOf<typeof FeedWithUsersSchema>;

@@ -31,7 +31,7 @@ export const FavoriteContainer: FC<Props> = ({ feeds }) => {
     return (
         <div className="flex flex-col gap-4">
             <TableContainer
-                feeds={filtered}
+                items={filtered}
                 menuOptions={menuOptions}
                 refetch={refetchMultiple}
                 title="Favorites"

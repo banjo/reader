@@ -16,6 +16,7 @@ function item(item: CompleteItem): CleanItem {
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         content: item.content,
+        feed: item.feed,
     };
 }
 

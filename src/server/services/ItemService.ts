@@ -1,10 +1,22 @@
 import createLogger from "@/server/lib/logger";
+import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
 import { ItemMapper } from "@/server/mappers/ItemMapper";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { CleanItem } from "@/shared/models/entities";
-import { Result } from "@/shared/models/result";
+import { Result, ResultType } from "@/shared/models/result";
 
 const logger = createLogger("ItemService");
+
+const getAllItemsByUserId = async (userId: number): Promise<ResultType<CleanItem[]>> => {
+    const items = await ItemRepository.getAllItemsByUserId(userId);
+
+    if (!items.success) {
+        logger.error(`Could not find items for user with id ${userId}`);
+        return Result.error(`Could not find items for user with id ${userId}`, "NotFound");
+    }
+
+    return Result.ok(DatabaseMapper.items(items.data));
+};
 
 const markAsRead = async (id: number, markAsRead: boolean) => {
     const item = await ItemRepository.getItemById(id);
@@ -66,4 +78,10 @@ const markItemsAsRead = async (ids: number[]) => {
     return Result.okEmpty();
 };
 
-export const ItemService = { markAsRead, getItemById, updateItem, markItemsAsRead };
+export const ItemService = {
+    markAsRead,
+    getItemById,
+    updateItem,
+    markItemsAsRead,
+    getAllItemsByUserId,
+};

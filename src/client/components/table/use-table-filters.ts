@@ -1,4 +1,3 @@
-import { TableCard } from "@/client/components/table/table-container";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
@@ -21,12 +20,12 @@ export type TableActions = {
 
 type TableFiltersOut = {
     filters: TableFilters;
-    data: TableCard[];
+    data: CleanItem[];
     actions: TableActions;
 };
 
 export const useTableFilters = (
-    data: TableCard[],
+    data: CleanItem[],
     refetch: Refetch<CleanItem[]>
 ): TableFiltersOut => {
     const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(() => {

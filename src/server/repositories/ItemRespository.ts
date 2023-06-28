@@ -1,6 +1,7 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
 import {
+    CompleteItem,
     CreateItem,
     CreateItemContent,
     CreateItemWithContentId,
@@ -26,6 +27,26 @@ const getAllItemsByFeed = async (feedId: number): Promise<ResultType<Item[]>> =>
     } catch (error: unknown) {
         logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
         return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
+    }
+
+    return Result.ok(items);
+};
+
+const getAllItemsByUserId = async (userId: number): Promise<ResultType<CompleteItem[]>> => {
+    let items: CompleteItem[];
+    try {
+        items = await prisma.item.findMany({
+            where: {
+                userId: userId,
+            },
+            include: {
+                content: true,
+                feed: true,
+            },
+        });
+    } catch (error: unknown) {
+        logger.error(`Could not find items for user with id ${userId} - ${error}`);
+        return Result.error(`Could not find items for user with id ${userId}`, "InternalError");
     }
 
     return Result.ok(items);
@@ -215,4 +236,5 @@ export const ItemRepository = {
     createItemsWithContentFromContent,
     updateItem,
     removeFeedItemsForUser,
+    getAllItemsByUserId,
 };
