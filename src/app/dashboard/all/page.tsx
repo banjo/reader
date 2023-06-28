@@ -13,11 +13,9 @@ export default async function AllPage() {
         throw new Error(allItemsResponse.message);
     }
 
-    const items = allItemsResponse.data;
-
     return (
         <ClientAuthContainer>
-            <AllContainer items={items} />
+            <AllContainer items={allItemsResponse.data} />
         </ClientAuthContainer>
     );
 }

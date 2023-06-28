@@ -1,21 +1,21 @@
 import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
-import { FavoriteContainer } from "@/client/features/feed/containers/favorite-container";
-import { FeedService } from "@/server/services/FeedService";
+import { FavoriteContainer } from "@/client/features/items/containers/favorite-container";
+import { ItemService } from "@/server/services/ItemService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 
 export const revalidate = 0;
 
 export default async function FavoritePage() {
     const userId = await ServerComponentService.getUserId();
-    const feedResponse = await FeedService.getAllFeedsByUserId(userId);
+    const allItemsResponse = await ItemService.getAllItemsByUserId(userId);
 
-    if (!feedResponse.success) {
-        throw new Error(feedResponse.message);
+    if (!allItemsResponse.success) {
+        throw new Error(allItemsResponse.message);
     }
 
     return (
         <ClientAuthContainer>
-            <FavoriteContainer feeds={feedResponse.data} />
+            <FavoriteContainer items={allItemsResponse.data} />
         </ClientAuthContainer>
     );
 }
