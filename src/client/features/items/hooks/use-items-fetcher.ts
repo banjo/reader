@@ -29,7 +29,22 @@ export const useItemsFetcher = ({ key, fallbackData }: In): Out => {
     }, [fallbackData, fetchData]);
 
     const refetch: Refetch<CleanItem[]> = async (updatedItems, updateFn, onError) => {
-        const updatedFeed = data.map(i => {
+        // const updatedFeed = data.map(i => {
+        //     const updatedItem = updatedItems.find(ui => ui.id === i.id);
+
+        //     if (updatedItem) {
+        //         return updatedItem;
+        //     }
+
+        //     return i;
+        // });
+
+        // const updatedData = {
+        //     ...data,
+        //     items: updatedFeed,
+        // };
+
+        const allItems = data.map(i => {
             const updatedItem = updatedItems.find(ui => ui.id === i.id);
 
             if (updatedItem) {
@@ -39,12 +54,7 @@ export const useItemsFetcher = ({ key, fallbackData }: In): Out => {
             return i;
         });
 
-        const updatedData = {
-            ...data,
-            items: updatedFeed,
-        };
-
-        mutate(updatedData, false);
+        mutate(allItems, false);
         mutateSidebarItems(updatedItems);
 
         try {
