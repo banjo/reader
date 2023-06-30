@@ -14,11 +14,6 @@ export const FavoriteContainer: FC<Props> = ({ items }) => {
     const { data, refetch } = useItemsFetcher({ key: "/items", fallbackData: items });
     const { menuOptions } = useTableItemMenu({ refetch });
 
-    console.log("🪕%c Banjo | favorite-container.tsx:17 |", "color: #E91E63", {
-        data,
-        type: typeof data,
-    });
-
     const filtered = useMemo(() => data.filter(item => item.isFavorite), [data]);
 
     return (
