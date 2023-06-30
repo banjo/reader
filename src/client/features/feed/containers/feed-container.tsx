@@ -47,10 +47,11 @@ export const FeedContainer: FC<Props> = ({ feed, internalIdentifier }) => {
         <div className="flex flex-col gap-4">
             <TableContainer
                 titleMenuOptions={titleMenuOptions}
-                items={[data]}
+                items={data.items}
                 menuOptions={menuOptions}
                 refetch={refetchMultiple}
                 title={feed.name}
+                feed={data}
             />
         </div>
     );
