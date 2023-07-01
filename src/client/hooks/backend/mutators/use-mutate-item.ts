@@ -1,16 +1,16 @@
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
-import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { ItemWithContent } from "@/shared/models/types";
 import { toast } from "react-hot-toast";
 
-type In<T> = {
-    refetch: Refetch<T[]>;
+type In = {
+    refetch: Refetch<ItemWithContent[]>;
 };
 
-export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
+export const useMutateItem = ({ refetch }: In) => {
     const api = useAuthFetcher();
 
-    const toggleReadStatus = (item: T) => {
+    const toggleReadStatus = (item: ItemWithContent) => {
         const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
             ...item,
             isRead: !item.isRead,
@@ -26,7 +26,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
         });
     };
 
-    const toggleBookmarkStatus = (item: T) => {
+    const toggleBookmarkStatus = (item: ItemWithContent) => {
         const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
             ...item,
             isBookmarked: !item.isBookmarked,
@@ -42,7 +42,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
         });
     };
 
-    const toggleFavoriteStatus = (item: T) => {
+    const toggleFavoriteStatus = (item: ItemWithContent) => {
         const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
             ...item,
             isFavorite: !item.isFavorite,
@@ -58,7 +58,7 @@ export const useMutateItem = <T extends CleanItem>({ refetch }: In<T>) => {
         });
     };
 
-    const markMultipleAsRead = (items: T[]) => {
+    const markMultipleAsRead = (items: ItemWithContent[]) => {
         const updateRequest = api.SWR(`/items/read`, "POST", { ids: items.map(i => i.id) });
 
         const updatedItems = items

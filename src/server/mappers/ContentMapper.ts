@@ -1,11 +1,10 @@
 import { ParseItem } from "@/server/services/ParseService";
-import { CreateItemContent } from "@/shared/models/entities";
+import { Prisma } from "@prisma/client";
 
-const parseItemToCreateContent = (item: ParseItem, feedId: number): CreateItemContent => {
+const parseItemToCreateContent = (item: ParseItem): Prisma.ItemContentCreateManyFeedInput => {
     return {
         content: item.contentSnippet ?? item.content,
         description: item.description ?? item.contentSnippet,
-        feedId,
         htmlContent: item.content,
         imageUrl: null,
         link: item.link,

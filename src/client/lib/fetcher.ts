@@ -1,6 +1,6 @@
 import { getUrl } from "@/shared/lib/url";
 import { BadRequestError, RequestError, SuccessRequest } from "@/shared/models/request";
-import { ErrorType, Result, ResultType } from "@/shared/models/result";
+import { AsyncResultType, ErrorType, Result } from "@/shared/models/result";
 import ky, { HTTPError } from "ky-universal";
 
 /**
@@ -15,7 +15,7 @@ const isRequestError = (body: any): body is RequestError => {
     return body?.error?.message;
 };
 
-const handleError = async <T>(error: any): Promise<ResultType<T>> => {
+const handleError = async <T>(error: any): AsyncResultType<T> => {
     if (error?.message?.includes("prefixUrl")) {
         console.error("You cannot prefix URLs with '/' when using fetcher");
         return Result.error("You cannot prefix URLs with '/' when using fetcher", "InternalError");
@@ -92,7 +92,7 @@ export const fetcher = (userId: string) => {
             }).json();
     };
 
-    const GET = async <T>(path: string): Promise<ResultType<T>> => {
+    const GET = async <T>(path: string): AsyncResultType<T> => {
         try {
             const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
 
@@ -103,7 +103,7 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    const POST = async <T>(path: string, body: unknown): Promise<ResultType<T>> => {
+    const POST = async <T>(path: string, body: unknown): AsyncResultType<T> => {
         try {
             const res = await api.post(updatePath(path), { json: body }).json<SuccessRequest<T>>();
 
@@ -113,7 +113,7 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    const PUT = async <T>(path: string, body: unknown): Promise<ResultType<T>> => {
+    const PUT = async <T>(path: string, body: unknown): AsyncResultType<T> => {
         try {
             const res = await api.put(updatePath(path), { json: body }).json<SuccessRequest<T>>();
 
@@ -123,7 +123,7 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    const DELETE = async <T>(path: string): Promise<ResultType<T>> => {
+    const DELETE = async <T>(path: string): AsyncResultType<T> => {
         try {
             const res = await api.delete(updatePath(path)).json<SuccessRequest<T>>();
 

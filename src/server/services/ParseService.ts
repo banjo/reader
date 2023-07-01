@@ -1,5 +1,5 @@
 import createLogger from "@/server/lib/logger";
-import { Result, ResultType } from "@/shared/models/result";
+import { AsyncResultType, Result } from "@/shared/models/result";
 import RssParser from "rss-parser";
 
 import { z } from "zod";
@@ -29,7 +29,7 @@ export const ParseFeedSchema = z.object({
 export type ParseItem = z.infer<typeof ParseItemSchema>;
 export type ParseFeed = z.infer<typeof ParseFeedSchema>;
 
-const parseRssFeed = async (url: string): Promise<ResultType<ParseFeed>> => {
+const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
     let parsedResult;
     try {
         parsedResult = await rssParser.parseURL(url);
@@ -54,7 +54,7 @@ const parseRssFeed = async (url: string): Promise<ResultType<ParseFeed>> => {
     return Result.ok(baseFeed.data);
 };
 
-// const parseRssItem = (url: string): Promise<ResultType<any>> => {
+// const parseRssItem = (url: string): AsyncResultType<any> => {
 //     throw new Error("Not implemented");
 // };
 

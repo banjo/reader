@@ -1,6 +1,5 @@
 import { ItemService } from "@/server/services/ItemService";
 import { ResponseService } from "@/server/services/ResponseService";
-import { CleanItemSchema } from "@/shared/models/entities";
 import { z } from "zod";
 
 const putIdSchema = z.number();
@@ -20,15 +19,10 @@ export async function PUT(req: Request, { params }: PutProps) {
         const { errors } = idResult.error;
         return ResponseService.badRequest("id", errors);
     }
+    // TODO: add validation
     const body = await req.json();
-    const bodyResult = CleanItemSchema.safeParse(body);
 
-    if (!bodyResult.success) {
-        const { errors } = bodyResult.error;
-        return ResponseService.badRequest("body", errors);
-    }
-
-    const item = await ItemService.updateItem(bodyResult.data);
+    const item = await ItemService.updateItem(body);
 
     if (!item.success) {
         return ResponseService.error(item.message, item.type);

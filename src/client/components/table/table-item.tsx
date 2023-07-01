@@ -4,44 +4,62 @@ import { Bookmark } from "@/client/components/shared/icons/bookmark";
 import { Favorite } from "@/client/components/shared/icons/favorite";
 import { TableType } from "@/client/components/table/table.types";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
-import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { ItemWithContent } from "@/shared/models/types";
+import { noop } from "@banjoanton/utils";
+import { ItemContent } from "@prisma/client";
 import { motion } from "framer-motion";
 
-type CardProps<T> = {
-    item: T;
+type CardPropsItem = {
+    item: ItemWithContent;
     type: TableType;
     showFeedName?: boolean;
     feedName?: string;
-    menuOptions?: MenuEntries<T>[];
-    refetch: Refetch<T[]>;
+    menuOptions?: MenuEntries<ItemWithContent>[];
+    refetch: Refetch<ItemWithContent[]>;
+    isSubscribed: true;
 };
 
-export const TableItem = <T extends CleanItem>({
+type CardPropsContent = {
+    item: ItemContent;
+    type: TableType;
+    showFeedName?: boolean;
+    feedName?: string;
+    menuOptions?: MenuEntries<ItemContent>[];
+    refetch: Refetch<ItemContent[]>;
+    isSubscribed: false;
+};
+
+export const TableItem = ({
     item,
     type,
+    feedName,
     showFeedName = false,
     menuOptions,
     refetch,
-}: CardProps<T>) => {
-    const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem<T>({ refetch });
-    const { content, id, isRead, isFavorite, isBookmarked, feed } = item;
+    isSubscribed,
+}: CardPropsItem | CardPropsContent) => {
+    const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem({
+        refetch: isSubscribed ? refetch : noop,
+    });
 
     if (type === "card") {
         throw new Error("not implemented");
     }
 
+    const content = isSubscribed ? item.content : item;
+
     const toggleBookmark = () => {
-        toggleBookmarkStatus(item);
+        if (isSubscribed) toggleBookmarkStatus(item);
     };
 
     const toggleFavorite = () => {
-        toggleFavoriteStatus(item);
+        if (isSubscribed) toggleFavoriteStatus(item);
     };
 
     return (
         <motion.div
-            layoutId={`table-card-${id}`}
+            layoutId={`table-card-${item.id}`}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto", transition: { type: "spring", bounce: 0.3 } }} // keep in sync with height in tailwind
             style={{ minHeight: "2rem" }}
@@ -53,22 +71,27 @@ export const TableItem = <T extends CleanItem>({
                 transition-colors hover:bg-slate-100
                 dark:border dark:bg-background dark:hover:bg-slate-900"
         >
-            {isRead ? null : (
+            {isSubscribed && !item.isRead ? (
                 <div className="absolute inset-y-0 left-0 w-1 bg-primary dark:bg-foreground"></div>
+            ) : null}
+
+            {isSubscribed && (
+                <>
+                    <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
+                    <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
+                </>
             )}
 
-            <Favorite size="md" active={isFavorite} onClick={toggleFavorite} />
-            <Bookmark size="md" active={isBookmarked} onClick={toggleBookmark} />
             {showFeedName && (
                 <span className="w-32 min-w-max text-sm font-light text-gray-600 dark:text-gray-300">
-                    {feed.name}
+                    {feedName}
                 </span>
             )}
             <span className="min-w-max font-bold">{content.title}</span>
             <span className="w-0 max-w-full shrink grow truncate">
                 {content.description ?? content.content}
             </span>
-            {menuOptions && (
+            {menuOptions && isSubscribed && (
                 <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />
                 </Dropdown>

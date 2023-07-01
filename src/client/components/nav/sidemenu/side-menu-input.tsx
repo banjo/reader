@@ -1,7 +1,7 @@
 import { Icons } from "@/client/components/shared/icons";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
-import { SearchFeed } from "@/shared/models/entities";
+import { SearchFeed } from "@/server/mappers/FeedMapper";
 import { FC, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { StylesConfig } from "react-select";

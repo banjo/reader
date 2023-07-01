@@ -1,7 +1,7 @@
 import { UnsubscribeFn } from "@/client/features/feed/hooks/use-feed-fetcher";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
-import { CleanFeedWithItems } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { CleanFeedWithItems } from "@/shared/models/types";
 import { toast } from "react-hot-toast";
 
 type In<T> = {

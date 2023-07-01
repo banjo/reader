@@ -1,68 +1,35 @@
 import {
+    CleanFeedWithContent,
     CleanFeedWithItems,
-    CleanItem,
-    CleanUser,
-    CompleteItem,
+    FeedWithContent,
     FeedWithItems,
-} from "@/shared/models/entities";
-import { User } from "@prisma/client";
+} from "@/shared/models/types";
 
-function item(item: CompleteItem): CleanItem {
+function feedWithItems(feed: FeedWithItems): CleanFeedWithItems {
     return {
-        id: item.id,
-        isRead: item.isRead,
-        isBookmarked: item.isBookmarked,
-        isFavorite: item.isFavorite,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
-        content: item.content,
-        feed: item.feed,
+        ...feed,
+        isSubscribed: true,
     };
 }
 
-function items(items: CompleteItem[]): CleanItem[] {
-    return items.map(element => item(element));
+function feedsWithItems(feeds: FeedWithItems[]): CleanFeedWithItems[] {
+    return feeds.map(element => feedWithItems(element));
 }
 
-function feed(feed: FeedWithItems, isSubscribed: boolean): CleanFeedWithItems {
+function feedWithContent(feed: FeedWithContent): CleanFeedWithContent {
     return {
-        id: feed.id,
-        name: feed.name,
-        imageUrl: feed.imageUrl,
-        internalIdentifier: feed.internalIdentifier,
-        createdAt: feed.createdAt,
-        rssUrl: feed.rssUrl,
-        url: feed.url,
-        description: feed.description,
-        updatedAt: feed.updatedAt,
-        items: feed.items.length > 0 ? items(feed.items) : [],
-        isSubscribed,
+        ...feed,
+        isSubscribed: false,
     };
 }
 
-function feeds(feeds: FeedWithItems[], isSubscribed: boolean): CleanFeedWithItems[] {
-    return feeds.map(element => feed(element, isSubscribed));
-}
-
-function user(user: User): CleanUser {
-    return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-    };
-}
-
-function users(users: User[]): CleanUser[] {
-    return users.map(element => user(element));
+function feedsWithContent(feeds: FeedWithContent[]): CleanFeedWithContent[] {
+    return feeds.map(element => feedWithContent(element));
 }
 
 export const DatabaseMapper = {
-    feed,
-    feeds,
-    user,
-    users,
-    item,
-    items,
+    feedWithItems,
+    feedsWithItems,
+    feedWithContent,
+    feedsWithContent,
 };

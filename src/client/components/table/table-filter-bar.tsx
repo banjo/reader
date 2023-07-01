@@ -1,22 +1,38 @@
 import { Dropdown, MenuEntries } from "@/client/components/shared/dropdown";
 import { Icons } from "@/client/components/shared/icons";
-import { TitleMenu } from "@/client/components/table/table-container";
-import { TableActions, TableFilters } from "@/client/components/table/use-table-filters";
+import { TitleMenu } from "@/client/components/table/table-container-items";
+import {
+    TableActionsContent,
+    TableFiltersContent,
+} from "@/client/components/table/use-table-filters-content";
+import {
+    TableActionsItems,
+    TableFiltersItems,
+} from "@/client/components/table/use-table-filters-items";
 import { Button } from "@/client/components/ui/button";
 import { Switch } from "@/client/components/ui/switch";
-import { CleanFeed } from "@/shared/models/entities";
+import { FeedWithContent, FeedWithItems } from "@/shared/models/types";
 import { FC } from "react";
 
 type FilterBarProps = {
-    filters: TableFilters;
-    actions: TableActions;
+    filters: TableFiltersItems;
+    actions: TableActionsItems;
     title: string;
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     isSubscribed: boolean;
-    feed?: CleanFeed;
+    feed?: FeedWithItems;
 };
 
-export const FilterBar: FC<FilterBarProps> = ({
+type FilterBarPropsContent = {
+    filters: TableFiltersContent;
+    actions: TableActionsContent;
+    title: string;
+    titleMenuOptions?: MenuEntries<TitleMenu>[];
+    isSubscribed: false;
+    feed?: FeedWithContent;
+};
+
+export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     filters,
     actions,
     title,
@@ -24,9 +40,6 @@ export const FilterBar: FC<FilterBarProps> = ({
     isSubscribed,
     feed,
 }) => {
-    const { showUnreadOnly, toggleShowUnreadOnly, hasReadAll } = filters;
-    const { markAllAsRead, subscribe } = actions;
-
     return (
         <div className="flex h-32 w-full items-center justify-end gap-8 rounded-md border border-border p-4">
             {titleMenuOptions && isSubscribed ? (
@@ -48,14 +61,14 @@ export const FilterBar: FC<FilterBarProps> = ({
 
             {isSubscribed && (
                 <>
-                    <Button onClick={markAllAsRead} disabled={hasReadAll}>
+                    <Button onClick={actions.markAllAsRead} disabled={filters.hasReadAll}>
                         Mark all as read
                     </Button>
                     <div className="flex items-center">
                         <Switch
                             id="show-unread"
-                            checked={showUnreadOnly}
-                            onCheckedChange={() => toggleShowUnreadOnly()}
+                            checked={filters.showUnreadOnly}
+                            onCheckedChange={() => filters.toggleShowUnreadOnly()}
                         />
                         <label htmlFor="show-unread" className="ml-2 text-sm font-medium">
                             Show unread only
@@ -66,7 +79,7 @@ export const FilterBar: FC<FilterBarProps> = ({
 
             {feed && !isSubscribed && (
                 <>
-                    <Button onClick={async () => await subscribe(feed.internalIdentifier)}>
+                    <Button onClick={async () => await actions.subscribe(feed.internalIdentifier)}>
                         Subscribe
                     </Button>
                 </>

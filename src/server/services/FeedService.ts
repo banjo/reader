@@ -1,26 +1,22 @@
 import createLogger from "@/server/lib/logger";
 import { ContentMapper } from "@/server/mappers/ContentMapper";
 import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
-import { FeedMapper } from "@/server/mappers/FeedMapper";
+import { FeedMapper, SearchFeed } from "@/server/mappers/FeedMapper";
 import { ItemMapper } from "@/server/mappers/ItemMapper";
 import { ContentRepository } from "@/server/repositories/ContentRepository";
 import { FeedRepository } from "@/server/repositories/FeedRepository";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { ParseService } from "@/server/services/ParseService";
-import {
-    CleanFeedWithItems,
-    CleanItem,
-    CreateItemWithContentId,
-    SearchFeed,
-} from "@/shared/models/entities";
-import { Result, ResultType } from "@/shared/models/result";
+import { AsyncResultType, Result } from "@/shared/models/result";
+
+import { CleanFeedWithContent, CleanFeedWithItems } from "@/shared/models/types";
 
 const logger = createLogger("FeedService");
 
 const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
-): Promise<ResultType<CleanFeedWithItems>> => {
+): AsyncResultType<CleanFeedWithItems> => {
     const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier(
         feedInternalIdentifier,
         userId
@@ -31,10 +27,10 @@ const getUserFeedByInternalIdentifier = async (
         return Result.error("Feed not found", "NotFound");
     }
 
-    return Result.ok(DatabaseMapper.feed(feedResponse.data, true));
+    return Result.ok(DatabaseMapper.feedWithItems(feedResponse.data));
 };
 
-const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeedWithItems[]>> => {
+const getAllFeedsByUserId = async (userId: number): AsyncResultType<CleanFeedWithItems[]> => {
     const feedsResponse = await FeedRepository.getAllFeedsByUserId(userId);
 
     if (!feedsResponse.success) {
@@ -42,10 +38,10 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<CleanFeed
         return Result.error("No feeds found", "NotFound");
     }
 
-    return Result.ok(feedsResponse.data.map(feed => DatabaseMapper.feed(feed, true)));
+    return Result.ok(feedsResponse.data.map(feed => DatabaseMapper.feedWithItems(feed)));
 };
 
-const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
+const assignFeedItemsToUser = async (feedId: number, userId: number): AsyncResultType<void> => {
     const contentResponse = await ContentRepository.getAllContentById(feedId);
 
     if (!contentResponse.success) {
@@ -54,11 +50,11 @@ const assignFeedItemsToUser = async (feedId: number, userId: number): Promise<Re
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const newItems: CreateItemWithContentId[] = contentResponse.data.map(content => {
-        return { ...ItemMapper.defaultItem(), userId: userId, contentId: content.id };
+    const newItems = contentResponse.data.map(content => {
+        return { ...ItemMapper.defaultItem(), userId, contentId: content.id, feedId };
     });
 
-    const addItemsResult = await ItemRepository.createItems(newItems, feedId, userId);
+    const addItemsResult = await ItemRepository.createItems(newItems);
 
     if (!addItemsResult.success) {
         logger.error(`failed to add items to user with id ${userId}`);
@@ -72,7 +68,7 @@ type AddFeedResponse = {
     feedId: number;
 };
 
-const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFeedResponse>> => {
+const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedResponse> => {
     // TODO: add transactions in db
     const existingFeed = await FeedRepository.getFeedByRssUrl(rssUrl);
 
@@ -133,7 +129,7 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
     }
 
     const contentToCreate = parseResult.data.items.map(parsedItem => {
-        return ContentMapper.parseItemToCreateContent(parsedItem, createFeedResult.data.id);
+        return ContentMapper.parseItemToCreateContent(parsedItem);
     });
 
     const createContentResult = await ItemRepository.createItemsWithContentFromContent(
@@ -150,7 +146,7 @@ const addFeed = async (rssUrl: string, userId: number): Promise<ResultType<AddFe
     return Result.ok({ feedId: createFeedResult.data.id });
 };
 
-const searchFeeds = async (query: string, userId?: number): Promise<ResultType<SearchFeed[]>> => {
+const searchFeeds = async (query: string, userId?: number): AsyncResultType<SearchFeed[]> => {
     const feedsResponse = await FeedRepository.searchFeeds(query);
 
     if (!feedsResponse.success) {
@@ -168,7 +164,7 @@ const searchFeeds = async (query: string, userId?: number): Promise<ResultType<S
 const unsubscribeFromFeed = async (
     internalIdentifier: string,
     userId: number
-): Promise<ResultType<void>> => {
+): AsyncResultType<void> => {
     const feedResult = await FeedRepository.getUserFeedByInternalIdentifier(
         internalIdentifier,
         userId
@@ -205,70 +201,37 @@ const unsubscribeFromFeed = async (
     return Result.okEmpty();
 };
 
-const getContentFeedByInternalIdentifier = async (
-    internalIdentifier: string
-): Promise<ResultType<CleanFeedWithItems>> => {
-    const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier);
-
-    if (!feedResult.success) {
-        logger.error(`Could not find feed with identifier ${internalIdentifier}`);
-        return Result.error("Could not find feed", "NotFound");
-    }
-
-    const contentListResult = await ContentRepository.getAllContentById(feedResult.data.id);
-
-    if (!contentListResult.success) {
-        logger.error(`Could not fetch content for feed with id ${feedResult.data.id}`);
-        return Result.error("Could not find content for feed", "NotFound");
-    }
-
-    return Result.ok({
-        ...feedResult.data,
-        isSubscribed: false,
-        items: contentListResult.data.map(content => {
-            return {
-                updatedAt: new Date(),
-                createdAt: new Date(),
-                isRead: false,
-                isBookmarked: false,
-                isFavorite: false,
-                content,
-                id: content.id,
-            } satisfies CleanItem;
-        }),
-    });
-};
-
 const getFeedWithItemsOrContent = async (
     internalIdentifier: string,
     userId: number
-): Promise<ResultType<CleanFeedWithItems>> => {
-    const feedResponse = await getUserFeedByInternalIdentifier(internalIdentifier, userId);
+): AsyncResultType<CleanFeedWithItems | CleanFeedWithContent> => {
+    const feedWithItemsResponse = await getUserFeedByInternalIdentifier(internalIdentifier, userId);
 
-    if (!feedResponse.success) {
-        return Result.error("Could not fetch user feed", "InternalError");
+    if (!feedWithItemsResponse.success) {
+        return Result.error("Could not fetch user feed", "NotFound");
     }
 
-    const hasNoItems = feedResponse.data.items.length === 0;
+    const hasNoItems = feedWithItemsResponse.data.items.length === 0;
 
-    let finalFeed: CleanFeedWithItems = feedResponse.data;
     if (hasNoItems) {
-        const result = await getContentFeedByInternalIdentifier(internalIdentifier);
+        const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
+            internalIdentifier
+        );
 
-        if (!result.success) {
+        if (!feedWithContentResponse.success) {
             return Result.error("Could not get content feed by identifier", "InternalError");
         }
 
-        finalFeed = result.data;
+        return Result.ok({ ...feedWithContentResponse.data, isSubscribed: false });
     }
 
-    return Result.ok(finalFeed);
+    return Result.ok({ ...feedWithItemsResponse.data, isSubscribed: true });
 };
 
 const subscribeToFeed = async (
     internalIdentifier: string,
     userId: number
-): Promise<ResultType<void>> => {
+): AsyncResultType<void> => {
     const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier);
 
     if (!feedResult.success) {
@@ -299,7 +262,6 @@ export const FeedService = {
     getAllFeedsByUserId,
     searchFeeds,
     unsubscribeFromFeed,
-    getContentFeedByInternalIdentifier,
     getFeedWithItemsOrContent,
     subscribeToFeed,
 };

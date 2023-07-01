@@ -1,13 +1,14 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { CreateFeed, FeedWithItems, FeedWithUser } from "@/shared/models/entities";
-import { Result, ResultType } from "@/shared/models/result";
-import { Feed } from "@prisma/client";
+import { AsyncResultType, Result } from "@/shared/models/result";
+import { FeedWithContent, FeedWithItems, FeedWithUsers } from "@/shared/models/types";
+import { Feed, Prisma } from "@prisma/client";
+
 import "server-only";
 
 const logger = createLogger("FeedRepository");
 
-const getAllFeedsByUserId = async (userId: number): Promise<ResultType<FeedWithItems[]>> => {
+const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItems[]> => {
     const feeds = await prisma.feed.findMany({
         where: {
             users: {
@@ -36,7 +37,27 @@ const getAllFeedsByUserId = async (userId: number): Promise<ResultType<FeedWithI
     return Result.ok(feeds);
 };
 
-const getFeedById = async (feedId: number): Promise<ResultType<FeedWithItems>> => {
+const getFeedWithContentByInternalIdentifier = async (
+    internalIdentifier: string
+): AsyncResultType<FeedWithContent> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            internalIdentifier: internalIdentifier,
+        },
+        include: {
+            contentItems: true,
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Feed not found with internal identifier: ${internalIdentifier}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    return Result.ok(feed);
+};
+
+const getFeedById = async (feedId: number): AsyncResultType<FeedWithItems> => {
     const feed = await prisma.feed.findUnique({
         where: {
             id: feedId,
@@ -58,7 +79,7 @@ const getFeedById = async (feedId: number): Promise<ResultType<FeedWithItems>> =
     return Result.ok(feed);
 };
 
-const getFeedByRssUrl = async (rssUrl: string): Promise<ResultType<FeedWithItems>> => {
+const getFeedByRssUrl = async (rssUrl: string): AsyncResultType<FeedWithItems> => {
     const feed = await prisma.feed.findUnique({
         where: {
             rssUrl: rssUrl,
@@ -82,7 +103,7 @@ const getFeedByRssUrl = async (rssUrl: string): Promise<ResultType<FeedWithItems
 
 const getFeedByInternalIdentifier = async (
     feedInternalIdentifier: string
-): Promise<ResultType<FeedWithItems>> => {
+): AsyncResultType<FeedWithItems> => {
     const feed = await prisma.feed.findUnique({
         where: {
             internalIdentifier: feedInternalIdentifier,
@@ -107,7 +128,7 @@ const getFeedByInternalIdentifier = async (
 const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
-): Promise<ResultType<FeedWithItems>> => {
+): AsyncResultType<FeedWithItems> => {
     const feed = await prisma.feed.findUnique({
         where: {
             internalIdentifier: feedInternalIdentifier,
@@ -132,7 +153,7 @@ const getUserFeedByInternalIdentifier = async (
     return Result.ok(feed);
 };
 
-const createFeed = async (feed: CreateFeed, userId: number): Promise<ResultType<Feed>> => {
+const createFeed = async (feed: Prisma.FeedCreateInput, userId: number): AsyncResultType<Feed> => {
     const createdFeed = await prisma.feed.create({
         data: {
             ...feed,
@@ -152,10 +173,7 @@ const createFeed = async (feed: CreateFeed, userId: number): Promise<ResultType<
     return Result.ok(createdFeed);
 };
 
-const addFeedToUser = async (
-    feedId: number,
-    userId: number
-): Promise<ResultType<FeedWithItems>> => {
+const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<FeedWithItems> => {
     const feed = await prisma.feed.update({
         where: {
             id: feedId,
@@ -184,7 +202,7 @@ const addFeedToUser = async (
     return Result.ok(feed);
 };
 
-const removeFeedFromUser = async (feedId: number, userId: number): Promise<ResultType<void>> => {
+const removeFeedFromUser = async (feedId: number, userId: number): AsyncResultType<void> => {
     const feed = await prisma.feed.update({
         where: {
             id: feedId,
@@ -206,11 +224,11 @@ const removeFeedFromUser = async (feedId: number, userId: number): Promise<Resul
     return Result.okEmpty();
 };
 
-const searchFeeds = async (searchTerm: string): Promise<ResultType<FeedWithUser[]>> => {
+const searchFeeds = async (searchTerm: string): AsyncResultType<FeedWithUsers[]> => {
     // TODO: change to search instead of contains when it works with prisma
     // TODO2: Exclude feeds that have connection to user by id here instead of in service
 
-    const feeds: FeedWithUser[] = await prisma.feed.findMany({
+    const feeds = await prisma.feed.findMany({
         where: {
             OR: [
                 {
@@ -251,7 +269,7 @@ const searchFeeds = async (searchTerm: string): Promise<ResultType<FeedWithUser[
 const checkIfFeedIsAssignedToUser = async (
     feedId: number,
     userId: number
-): Promise<ResultType<boolean>> => {
+): AsyncResultType<boolean> => {
     const feed = await prisma.feed.findUnique({
         where: {
             id: feedId,
@@ -279,6 +297,7 @@ export const FeedRepository = {
     getFeedByRssUrl,
     getUserFeedByInternalIdentifier,
     getFeedByInternalIdentifier,
+    getFeedWithContentByInternalIdentifier,
     createFeed,
     addFeedToUser,
     searchFeeds,

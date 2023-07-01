@@ -1,4 +1,4 @@
-import { CleanFeedWithItems, CleanItem } from "@/shared/models/entities";
+import { CleanFeedWithItems, ItemWithContent } from "@/shared/models/types";
 import { mutate } from "swr";
 
 const KEY = "/feed";
@@ -22,7 +22,7 @@ const mutateSidebarFeed = (item: CleanFeedWithItems) => {
     );
 };
 
-const mutateSidebarItem = (item: CleanItem) => {
+const mutateSidebarItem = (item: ItemWithContent) => {
     mutate<CleanFeedWithItems[]>(
         KEY,
         previous => {
@@ -47,7 +47,7 @@ const mutateSidebarItem = (item: CleanItem) => {
     );
 };
 
-const mutateSidebarItems = (items: CleanItem[]) => {
+const mutateSidebarItems = (items: ItemWithContent[]) => {
     mutate<CleanFeedWithItems[]>(
         KEY,
         previous => {

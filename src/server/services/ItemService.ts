@@ -1,13 +1,11 @@
 import createLogger from "@/server/lib/logger";
-import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
-import { ItemMapper } from "@/server/mappers/ItemMapper";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
-import { CleanItem } from "@/shared/models/entities";
-import { Result, ResultType } from "@/shared/models/result";
+import { AsyncResultType, Result } from "@/shared/models/result";
+import { ItemWithContent, ItemWithContentAndFeed } from "@/shared/models/types";
 
 const logger = createLogger("ItemService");
 
-const getAllItemsByUserId = async (userId: number): Promise<ResultType<CleanItem[]>> => {
+const getAllItemsByUserId = async (userId: number): AsyncResultType<ItemWithContentAndFeed[]> => {
     const items = await ItemRepository.getAllItemsByUserId(userId);
 
     if (!items.success) {
@@ -15,7 +13,7 @@ const getAllItemsByUserId = async (userId: number): Promise<ResultType<CleanItem
         return Result.error(`Could not find items for user with id ${userId}`, "NotFound");
     }
 
-    return Result.ok(DatabaseMapper.items(items.data));
+    return Result.ok(items.data);
 };
 
 const markAsRead = async (id: number, markAsRead: boolean) => {
@@ -26,7 +24,10 @@ const markAsRead = async (id: number, markAsRead: boolean) => {
         return Result.error(`Could not find item with id ${id}`, "NotFound");
     }
 
-    const updated = await ItemRepository.updateItem({ ...item.data, isRead: markAsRead });
+    const updated = await ItemRepository.updateItem(id, {
+        ...item.data,
+        isRead: markAsRead,
+    });
 
     if (!updated.success) {
         logger.error(`Could not update item with id ${id}`);
@@ -47,7 +48,7 @@ const getItemById = async (id: number) => {
     return Result.ok(item.data);
 };
 
-const updateItem = async (item: CleanItem) => {
+const updateItem = async (item: ItemWithContent) => {
     const existingItem = await ItemRepository.getItemById(item.id);
 
     if (!existingItem.success) {
@@ -55,9 +56,9 @@ const updateItem = async (item: CleanItem) => {
         return Result.error(`Could not find item with id ${item.id}`, "NotFound");
     }
 
-    const updatedItem: CleanItem = { ...existingItem.data, ...item };
+    const updatedItem: ItemWithContent = { ...existingItem.data, ...item };
 
-    const updated = await ItemRepository.updateItem(ItemMapper.cleanItemToUpdateItem(updatedItem));
+    const updated = await ItemRepository.updateItem(item.id, updatedItem);
 
     if (!updated.success) {
         logger.error(`Could not update item with id ${item.id}`);

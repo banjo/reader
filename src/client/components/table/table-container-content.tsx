@@ -4,11 +4,11 @@ import { MenuEntries } from "@/client/components/shared/dropdown";
 import { Table } from "@/client/components/table/table";
 import { FilterBar } from "@/client/components/table/table-filter-bar";
 import { TableItem } from "@/client/components/table/table-item";
-import { useTableFilters } from "@/client/components/table/use-table-filters";
+import { useTableFiltersContent } from "@/client/components/table/use-table-filters-content";
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
-import { CleanFeed, CleanItem } from "@/shared/models/entities";
-import { Refetch } from "@/shared/models/swr";
-import { isDefined } from "@banjoanton/utils";
+import { CleanFeedWithContent } from "@/shared/models/types";
+import { isDefined, noop } from "@banjoanton/utils";
+import { ItemContent } from "@prisma/client";
 import { AnimatePresence } from "framer-motion";
 import { FC } from "react";
 
@@ -17,23 +17,21 @@ export type TitleMenu = {
 };
 
 type TableContainerProps = {
-    items: CleanItem[];
-    feed?: CleanFeed;
-    menuOptions?: MenuEntries<CleanItem>[];
+    content: ItemContent[];
+    feed?: CleanFeedWithContent;
+    menuOptions?: MenuEntries<ItemContent>[];
     titleMenuOptions?: MenuEntries<TitleMenu>[];
-    refetch: Refetch<CleanItem[]>;
     title: string;
 };
 
-export const TableContainer: FC<TableContainerProps> = ({
-    items,
+export const TableContainerContent: FC<TableContainerProps> = ({
+    content,
     menuOptions,
-    refetch,
     title,
     titleMenuOptions,
     feed,
 }) => {
-    const { data, filters, actions } = useTableFilters(items, refetch);
+    const { filters, actions, data } = useTableFiltersContent(content);
 
     return (
         <>
@@ -42,21 +40,22 @@ export const TableContainer: FC<TableContainerProps> = ({
                 actions={actions}
                 title={title}
                 titleMenuOptions={titleMenuOptions}
-                isSubscribed={feed?.isSubscribed ?? true}
+                isSubscribed={false}
                 feed={feed}
             />
             <Table type="list">
                 <AnimatePresence initial={false}>
                     {data.length > 0 &&
-                        data.map(item => {
+                        data.map(c => {
                             return (
                                 <TableItem
-                                    key={item.id}
-                                    item={item}
+                                    key={c.id}
+                                    item={c}
                                     type="list"
                                     showFeedName={!isDefined(feed)}
                                     menuOptions={menuOptions}
-                                    refetch={refetch}
+                                    refetch={noop}
+                                    isSubscribed={false}
                                 />
                             );
                         })}
@@ -64,7 +63,7 @@ export const TableContainer: FC<TableContainerProps> = ({
                     {data.length === 0 && (
                         <Alert>
                             <AlertTitle>Ops!</AlertTitle>
-                            <AlertDescription>No items found</AlertDescription>
+                            <AlertDescription>No content found</AlertDescription>
                         </Alert>
                     )}
                 </AnimatePresence>

@@ -1,20 +1,14 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import {
-    CompleteItem,
-    CreateItem,
-    CreateItemContent,
-    CreateItemWithContentId,
-    UpdateItem,
-} from "@/shared/models/entities";
-import { Result, ResultType } from "@/shared/models/result";
-import { Item } from "@prisma/client";
+import { AsyncResultType, Result } from "@/shared/models/result";
+import { ItemWithContent, ItemWithContentAndFeed } from "@/shared/models/types";
+import { Item, Prisma } from "@prisma/client";
 import "server-only";
 
 const logger = createLogger("ItemRepository");
 
-const getAllItemsByFeed = async (feedId: number): Promise<ResultType<Item[]>> => {
-    let items: Item[];
+const getAllItemsByFeed = async (feedId: number): AsyncResultType<ItemWithContent[]> => {
+    let items: ItemWithContent[];
     try {
         items = await prisma.item.findMany({
             where: {
@@ -32,8 +26,8 @@ const getAllItemsByFeed = async (feedId: number): Promise<ResultType<Item[]>> =>
     return Result.ok(items);
 };
 
-const getAllItemsByUserId = async (userId: number): Promise<ResultType<CompleteItem[]>> => {
-    let items: CompleteItem[];
+const getAllItemsByUserId = async (userId: number): AsyncResultType<ItemWithContentAndFeed[]> => {
+    let items: ItemWithContentAndFeed[];
     try {
         items = await prisma.item.findMany({
             where: {
@@ -52,8 +46,8 @@ const getAllItemsByUserId = async (userId: number): Promise<ResultType<CompleteI
     return Result.ok(items);
 };
 
-const getItemById = async (itemId: number): Promise<ResultType<Item>> => {
-    let item: Item | null;
+const getItemById = async (itemId: number): AsyncResultType<ItemWithContent> => {
+    let item: ItemWithContent | null;
     try {
         item = await prisma.item.findUnique({
             where: {
@@ -76,24 +70,27 @@ const getItemById = async (itemId: number): Promise<ResultType<Item>> => {
     return Result.ok(item);
 };
 
-const updateItem = async (item: UpdateItem): Promise<ResultType<Item>> => {
+const updateItem = async (id: number, item: ItemWithContent): AsyncResultType<Item> => {
     let updatedItem: Item;
     try {
         updatedItem = await prisma.item.update({
             where: {
-                id: item.id,
+                id: id,
             },
-            data: item,
+            data: {
+                ...item,
+                content: undefined,
+            },
         });
     } catch (error: unknown) {
-        logger.error(`Could not update item with id ${item.id} - ${error}`);
-        return Result.error(`Could not update item with id ${item.id}`, "InternalError");
+        logger.error(`Could not update item with id ${id} - ${error}`);
+        return Result.error(`Could not update item with id ${id}`, "InternalError");
     }
 
     return Result.ok(updatedItem);
 };
 
-const markItemsAsRead = async (itemIds: number[]): Promise<ResultType<void>> => {
+const markItemsAsRead = async (itemIds: number[]): AsyncResultType<void> => {
     try {
         await prisma.item.updateMany({
             where: {
@@ -114,21 +111,17 @@ const markItemsAsRead = async (itemIds: number[]): Promise<ResultType<void>> => 
 };
 
 type CreateItemProps = {
-    item: CreateItem;
+    item: Prisma.ItemCreateManyInput;
     contentId: number;
     feedId: number;
     userId: number;
 };
 
-const createItem = async ({
-    item,
-    contentId,
-    feedId,
-    userId,
-}: CreateItemProps): Promise<ResultType<Item>> => {
+// TODO: update create item to accomodate for content
+const createItem = async ({ item }: CreateItemProps): AsyncResultType<Item> => {
     try {
         const createdItem = await prisma.item.create({
-            data: { ...item, feedId, userId, contentId },
+            data: item,
         });
 
         return Result.ok(createdItem);
@@ -138,21 +131,13 @@ const createItem = async ({
     }
 };
 
-const createItems = async (
-    itemsWithContentId: CreateItemWithContentId[],
-    feedId: number,
-    userId: number
-) => {
+const createItems = async (items: Prisma.ItemCreateManyInput[]) => {
     try {
         const createdItems = await prisma.item.createMany({
-            data: itemsWithContentId.map(item => ({
-                ...item,
-                feedId,
-                userId,
-            })),
+            data: items,
         });
 
-        if (createdItems.count !== itemsWithContentId.length) {
+        if (createdItems.count !== items.length) {
             logger.error(`Could not create all items`);
             return Result.error(`Could not create all items`, "InternalError");
         }
@@ -165,13 +150,16 @@ const createItems = async (
 };
 
 const createItemsWithContentFromContent = async (
-    content: CreateItemContent[],
+    content: Prisma.ItemContentCreateManyFeedInput[],
     feedId: number,
     userId: number
-): Promise<ResultType<void>> => {
+): AsyncResultType<void> => {
     try {
         const createdContentResult = await prisma.itemContent.createMany({
-            data: content,
+            data: content.map(itemContent => ({
+                ...itemContent,
+                feedId,
+            })),
         });
 
         if (createdContentResult.count !== content.length) {
@@ -208,10 +196,7 @@ const createItemsWithContentFromContent = async (
     }
 };
 
-const removeFeedItemsForUser = async (
-    feedId: number,
-    userId: number
-): Promise<ResultType<void>> => {
+const removeFeedItemsForUser = async (feedId: number, userId: number): AsyncResultType<void> => {
     try {
         await prisma.item.deleteMany({
             where: {

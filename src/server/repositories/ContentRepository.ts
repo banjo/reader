@@ -1,11 +1,11 @@
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
-import { Result, ResultType } from "@/shared/models/result";
+import { AsyncResultType, Result } from "@/shared/models/result";
 import { ItemContent } from "@prisma/client";
 
 const logger = createLogger("ContentRepository");
 
-const getAllContentById = async (feedId: number): Promise<ResultType<ItemContent[]>> => {
+const getAllContentById = async (feedId: number): AsyncResultType<ItemContent[]> => {
     let items: ItemContent[];
     try {
         items = await prisma.itemContent.findMany({

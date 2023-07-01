@@ -1,32 +1,32 @@
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
-import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { ItemWithContent } from "@/shared/models/types";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useSWRConfig } from "swr";
 
-export type TableFilters = {
+export type TableFiltersItems = {
     showUnreadOnly: boolean;
     hasReadAll: boolean;
     toggleShowUnreadOnly: () => void;
 };
 
-export type TableActions = {
+export type TableActionsItems = {
     markAllAsRead: () => void;
     subscribe: (internalIdentifier: string) => Promise<void>;
 };
 
 type TableFiltersOut = {
-    filters: TableFilters;
-    data: CleanItem[];
-    actions: TableActions;
+    filters: TableFiltersItems;
+    data: ItemWithContent[];
+    actions: TableActionsItems;
 };
 
-export const useTableFilters = (
-    data: CleanItem[],
-    refetch: Refetch<CleanItem[]>
+export const useTableFiltersItems = (
+    data: ItemWithContent[],
+    refetch: Refetch<ItemWithContent[]>
 ): TableFiltersOut => {
     const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(() => {
         return data.some(item => item.isRead === false);

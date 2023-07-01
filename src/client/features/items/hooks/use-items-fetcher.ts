@@ -1,26 +1,26 @@
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
-import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { ItemWithContent } from "@/shared/models/types";
 import { useMemo } from "react";
 import useSWR from "swr";
 
 type Out = {
-    data: CleanItem[];
+    data: ItemWithContent[];
     isLoading: boolean;
-    refetch: Refetch<CleanItem[]>;
+    refetch: Refetch<ItemWithContent[]>;
 };
 
 type In = {
     key: string;
-    fallbackData: CleanItem[];
+    fallbackData: ItemWithContent[];
 };
 
 export const useItemsFetcher = ({ key, fallbackData }: In): Out => {
     const { SWR_AUTH: fetcher } = useAuthFetcher();
     const { fetchLatestInSidebar, mutateSidebarItems } = useUpdateSidebar();
 
-    const { data: fetchData, mutate } = useSWR<CleanItem[], Error>(key, fetcher, {
+    const { data: fetchData, mutate } = useSWR<ItemWithContent[], Error>(key, fetcher, {
         fallbackData: fallbackData,
     });
 
@@ -28,7 +28,7 @@ export const useItemsFetcher = ({ key, fallbackData }: In): Out => {
         return fetchData ?? fallbackData;
     }, [fallbackData, fetchData]);
 
-    const refetch: Refetch<CleanItem[]> = async (updatedItems, updateFn, onError) => {
+    const refetch: Refetch<ItemWithContent[]> = async (updatedItems, updateFn, onError) => {
         const allItems = data.map(i => {
             const updatedItem = updatedItems.find(ui => ui.id === i.id);
 

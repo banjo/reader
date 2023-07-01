@@ -1,20 +1,23 @@
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
-import { CleanItem } from "@/shared/models/entities";
 import { Refetch } from "@/shared/models/swr";
+import { ItemWithContent } from "@/shared/models/types";
+import { ItemContent } from "@prisma/client";
 
-type Out<T> = {
-    menuOptions: MenuEntries<T>[];
+type Out = {
+    menuOptionsItems: MenuEntries<ItemWithContent>[];
+    menuOptionsContent: MenuEntries<ItemContent>[];
 };
 
-type In<T> = {
-    refetch: Refetch<T[]>;
+type In = {
+    refetchContentMultiple: Refetch<ItemContent[]>;
+    refetchItemsMultiple: Refetch<ItemWithContent[]>;
 };
 
-export const useTableItemMenu = <T extends CleanItem>({ refetch }: In<T>): Out<T> => {
-    const { toggleReadStatus } = useMutateItem<T>({ refetch });
+export const useTableItemMenu = ({ refetchItemsMultiple }: In): Out => {
+    const { toggleReadStatus } = useMutateItem({ refetch: refetchItemsMultiple });
 
-    const menuOptions: MenuEntries<T>[] = [
+    const menuOptionsItems: MenuEntries<ItemWithContent>[] = [
         { label: "Edit", type: "label" },
         { type: "separator" },
         { type: "select", content: "Read", onSelect: () => 0 },
@@ -26,7 +29,10 @@ export const useTableItemMenu = <T extends CleanItem>({ refetch }: In<T>): Out<T
         { type: "select", content: "Visit site", onSelect: () => 0 },
     ];
 
+    const menuOptionsContent: MenuEntries<ItemContent>[] = [];
+
     return {
-        menuOptions: menuOptions,
+        menuOptionsItems: menuOptionsItems,
+        menuOptionsContent: menuOptionsContent,
     };
 };

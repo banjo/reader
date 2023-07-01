@@ -2,8 +2,8 @@ import { ClientAuthContainer } from "@/client/components/utils/client-auth-conta
 import { FeedContainer } from "@/client/features/feed/containers/feed-container";
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
-import { CleanFeedWithItems } from "@/shared/models/entities";
-import { Result, ResultType } from "@/shared/models/result";
+import { AsyncResultType, Result } from "@/shared/models/result";
+import { CleanFeedWithContent, CleanFeedWithItems } from "@/shared/models/types";
 
 type Props = {
     params: {
@@ -13,7 +13,9 @@ type Props = {
 
 export const revalidate = 0;
 
-const fetchFeed = async (slug: string): Promise<ResultType<CleanFeedWithItems>> => {
+const fetchFeed = async (
+    slug: string
+): AsyncResultType<CleanFeedWithItems | CleanFeedWithContent> => {
     const userId = await ServerComponentService.getUserId();
 
     if (!slug) {

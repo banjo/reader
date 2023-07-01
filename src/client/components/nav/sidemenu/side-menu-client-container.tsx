@@ -2,7 +2,7 @@
 
 import { SideMenuContainer } from "@/client/components/nav/sidemenu/side-menu-container";
 import { useAuth } from "@/client/hooks/backend/use-auth";
-import { CleanFeedWithItems } from "@/shared/models/entities";
+import { CleanFeedWithItems } from "@/shared/models/types";
 import { FC } from "react";
 
 type Props = {
