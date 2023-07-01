@@ -1,4 +1,3 @@
-import { Icons } from "@/client/components/shared/icons";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
 import { SearchFeed } from "@/server/mappers/FeedMapper";
@@ -99,7 +98,7 @@ export const SideMenuInput: FC = () => {
         <div className="flex items-center gap-2">
             <Select
                 ref={ref}
-                className="max-w-56 ml-8 flex h-10"
+                className="ml-8 flex h-10"
                 styles={customStyles}
                 onChange={(props: any) => {
                     const result = props as Option;
@@ -117,16 +116,6 @@ export const SideMenuInput: FC = () => {
                 loadOptions={loadOptions}
                 noOptionsMessage={() => "No feeds found, submit an RSS URL to add a new feed"}
             />
-
-            <button
-                type="button"
-                className="ml-2 hover:text-slate-400"
-                onClick={async () => {
-                    await addFeed();
-                }}
-            >
-                <Icons.add className="h-6 w-6" />
-            </button>
         </div>
     );
 };
