@@ -80,6 +80,7 @@ const updateItem = async (id: number, item: ItemWithContent): AsyncResultType<It
             data: {
                 ...item,
                 content: undefined,
+                feed: undefined,
             },
         });
     } catch (error: unknown) {
