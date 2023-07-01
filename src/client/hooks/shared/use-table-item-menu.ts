@@ -26,7 +26,13 @@ export const useTableItemMenu = ({ refetchItemsMultiple }: In): Out => {
             content: item => (item.isRead ? "Mark as unread" : "Mark as read"),
             onSelect: toggleReadStatus,
         },
-        { type: "select", content: "Visit site", onSelect: () => 0 },
+        {
+            type: "select",
+            content: "Visit site",
+            onSelect: item => {
+                window.open(item.content.link, "_blank");
+            },
+        },
     ];
 
     const menuOptionsContent: MenuEntries<ItemContent>[] = [];
