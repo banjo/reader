@@ -18,7 +18,7 @@
     "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
     "db:local:run": "docker compose -f ./docker/docker-compose.yml up -d --remove-orphans",
     "db:local:stop": "docker compose -f ./docker/docker-compose.yml down",
-    "db:generate:types": "npx prisma generate && esno scripts/updateZodModels.ts && nr format:write",
+    "db:generate:types": "npx prisma generate && nr format:write",
     "db:update": "npx prisma migrate reset --skip-seed --skip-generate --force && npx prisma db push && nr db:generate:types && npx prisma db seed"
   },
   "prisma": {
@@ -52,8 +52,7 @@
     "tailwindcss-animate": "^1.0.5",
     "tslog": "^4.8.2",
     "type-fest": "^3.11.1",
-    "zod": "^3.21.4",
-    "zod-prisma": "^0.5.4"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@antfu/ni": "^0.21.3",
