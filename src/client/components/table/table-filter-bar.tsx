@@ -41,7 +41,7 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     feed,
 }) => {
     return (
-        <div className="flex h-32 w-full items-center justify-end gap-8 rounded-md border border-border p-4">
+        <div className="flex h-20 w-full items-center justify-end gap-8 rounded-md border border-border p-4">
             {titleMenuOptions && isSubscribed ? (
                 <Dropdown
                     align="start"
