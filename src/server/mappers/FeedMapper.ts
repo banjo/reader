@@ -2,11 +2,15 @@ import { ParseFeed } from "@/server/services/ParseService";
 import { FeedWithUsers } from "@/shared/models/types";
 import { Feed, Prisma } from "@prisma/client";
 
-const parseFeedToCreateFeed = (feed: ParseFeed, rssUrl: string): Prisma.FeedCreateInput => {
+const parseFeedToCreateFeed = (
+    feed: ParseFeed,
+    rssUrl: string,
+    faviconUrl?: string
+): Prisma.FeedCreateInput => {
     return {
         description: feed.description,
         rssUrl: rssUrl,
-        imageUrl: null,
+        imageUrl: faviconUrl ?? null,
         name: feed.title,
         url: feed.link,
     };

@@ -119,7 +119,14 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         return Result.error("Failed to parse feed", "InternalError");
     }
 
-    const feedToCreate = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl);
+    const faviconResult = await ParseService.parseFavicon(parseResult.data.link);
+
+    let faviconUrl: undefined | string;
+    if (faviconResult.success) {
+        faviconUrl = faviconResult.data;
+    }
+
+    const feedToCreate = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl, faviconUrl);
 
     const createFeedResult = await FeedRepository.createFeed(feedToCreate, userId);
 
