@@ -56,8 +56,6 @@ const fetchAndUpdateRssFeed = async (
                 items.length
             );
 
-            console.log("🪕%c Banjo | FeedService.ts:57 |", "color: #E91E63", { notAddedContent });
-
             const createContentResult = await ItemRepository.createItemsOnlyFromContent(
                 notAddedContent,
                 feedContentResponse.data.id,
