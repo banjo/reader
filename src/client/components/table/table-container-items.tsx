@@ -8,7 +8,6 @@ import { useTableFiltersItems } from "@/client/components/table/use-table-filter
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
 import { Refetch } from "@/shared/models/swr";
 import { CleanFeedWithItems, ItemWithContent } from "@/shared/models/types";
-import { isDefined } from "@banjoanton/utils";
 import { AnimatePresence } from "framer-motion";
 import { FC } from "react";
 
@@ -55,7 +54,7 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                                     item={item}
                                     type="list"
                                     feedName={feed?.name}
-                                    showFeedName={isDefined(feed)}
+                                    showFeedName={false}
                                     menuOptions={menuOptions}
                                     refetch={refetch}
                                     isSubscribed={feed?.isSubscribed ?? true}

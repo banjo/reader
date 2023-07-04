@@ -1,10 +1,10 @@
+import { sortItems } from "@/client/lib/utils";
 import createLogger from "@/server/lib/logger";
 import prisma from "@/server/repositories/prisma";
 import { AsyncResultType, Result } from "@/shared/models/result";
 import { FeedWithContent, FeedWithItems, FeedWithUsers } from "@/shared/models/types";
+import { sortBy } from "@banjoanton/utils";
 import { Feed, Prisma } from "@prisma/client";
-
-import "server-only";
 
 const logger = createLogger("FeedRepository");
 
@@ -51,6 +51,25 @@ const getFeedWithContentByInternalIdentifier = async (
 
     if (!feed) {
         logger.error(`Feed not found with internal identifier: ${internalIdentifier}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    feed.contentItems = sortBy(feed.contentItems, "createdAt", "desc");
+    return Result.ok(feed);
+};
+
+const getFeedWithContentById = async (feedId: number): AsyncResultType<FeedWithContent> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            id: feedId,
+        },
+        include: {
+            contentItems: true,
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Feed not found with id: ${feedId}`);
         return Result.error("Feed not found", "NotFound");
     }
 
@@ -122,6 +141,7 @@ const getFeedByInternalIdentifier = async (
         return Result.error("Feed not found", "NotFound");
     }
 
+    feed.items = sortItems(feed.items);
     return Result.ok(feed);
 };
 
@@ -150,6 +170,7 @@ const getUserFeedByInternalIdentifier = async (
         return Result.error("Feed not found", "NotFound");
     }
 
+    feed.items = sortItems(feed.items);
     return Result.ok(feed);
 };
 
@@ -199,6 +220,7 @@ const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<Fe
         return Result.error("Could not add feed to user", "InternalError");
     }
 
+    feed.items = sortItems(feed.items);
     return Result.ok(feed);
 };
 
@@ -294,6 +316,7 @@ const checkIfFeedIsAssignedToUser = async (
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
+    getFeedWithContentById,
     getFeedByRssUrl,
     getUserFeedByInternalIdentifier,
     getFeedByInternalIdentifier,

@@ -10,13 +10,101 @@ import { ParseService } from "@/server/services/ParseService";
 import { AsyncResultType, Result } from "@/shared/models/result";
 
 import { CleanFeedWithContent, CleanFeedWithItems } from "@/shared/models/types";
+import { first } from "@banjoanton/utils";
 
 const logger = createLogger("FeedService");
+
+// TODO: add items to users that also follow the feed or do it when they sign in?
+// TODO: better logic for when to scan for new items, within a certain time? or just when they sign in? worker?
+// TODO: update latest fetch and check if it's been a while since last fetch
+const fetchAndUpdateRssFeed = async (
+    internalIdentifier: string,
+    userId: number
+): AsyncResultType<void> => {
+    const feedContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
+        internalIdentifier
+    );
+
+    if (!feedContentResponse.success) {
+        logger.error(`no feed found in db with internal identifier ${internalIdentifier}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    const currentFeedWithItemsResponse = await FeedRepository.getFeedByInternalIdentifier(
+        internalIdentifier
+    );
+
+    if (currentFeedWithItemsResponse.success) {
+        const currentFeedWithItems = currentFeedWithItemsResponse.data;
+
+        const latestItem = first(currentFeedWithItems.items);
+        const latestContent = first(feedContentResponse.data.contentItems);
+
+        if (latestItem.content.title !== latestContent.title) {
+            logger.info("Content has been updated, updating feed");
+            const content = feedContentResponse.data.contentItems;
+            const items = currentFeedWithItems.items;
+
+            const notAddedContent = content.filter(
+                c => !items.some(item => item.content.title === c.title)
+            );
+
+            console.log(
+                "🪕%c Banjo | FeedService.ts:52 |",
+                "color: #E91E63",
+                content.length,
+                items.length
+            );
+
+            console.log("🪕%c Banjo | FeedService.ts:57 |", "color: #E91E63", { notAddedContent });
+
+            const createContentResult = await ItemRepository.createItemsOnlyFromContent(
+                notAddedContent,
+                feedContentResponse.data.id,
+                userId
+            );
+
+            if (!createContentResult.success) {
+                logger.error(
+                    `failed to create content for feed with url ${feedContentResponse.data.rssUrl}`
+                );
+                return Result.error("Failed to create content", "InternalError");
+            }
+        }
+    }
+
+    const updatedItems = await ParseService.shouldParseAgain(
+        feedContentResponse.data.contentItems,
+        feedContentResponse.data.rssUrl
+    );
+
+    if (!updatedItems) {
+        logger.info("no need to fetch again");
+        return Result.okEmpty();
+    }
+
+    const createContentResult = await ItemRepository.createItemsWithContentFromContent(
+        updatedItems,
+        feedContentResponse.data.id,
+        userId
+    );
+
+    if (!createContentResult.success) {
+        logger.error(
+            `failed to create content for feed with url ${feedContentResponse.data.rssUrl}`
+        );
+        return Result.error("Failed to create content", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
 
 const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
 ): AsyncResultType<CleanFeedWithItems> => {
+    await fetchAndUpdateRssFeed(feedInternalIdentifier, userId);
+
     const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier(
         feedInternalIdentifier,
         userId
@@ -271,4 +359,5 @@ export const FeedService = {
     unsubscribeFromFeed,
     getFeedWithItemsOrContent,
     subscribeToFeed,
+    fetchAndUpdateRssFeed,
 };

@@ -3,7 +3,6 @@ import prisma from "@/server/repositories/prisma";
 import { AsyncResultType, Result } from "@/shared/models/result";
 import { ItemWithContent, ItemWithContentAndFeed } from "@/shared/models/types";
 import { Item, Prisma } from "@prisma/client";
-import "server-only";
 
 const logger = createLogger("ItemRepository");
 
@@ -150,6 +149,34 @@ const createItems = async (items: Prisma.ItemCreateManyInput[]) => {
     }
 };
 
+const createItemsOnlyFromContent = async (
+    content: Prisma.ItemContentCreateManyFeedInput[],
+    feedId: number,
+    userId: number
+): AsyncResultType<void> => {
+    try {
+        const createdItems = await prisma.item.createMany({
+            data: content.map(itemContent => ({
+                contentId: itemContent.id!,
+                feedId,
+                userId,
+                isBookmarked: false,
+                isRead: false,
+            })),
+        });
+
+        if (createdItems.count !== content.length) {
+            logger.error(`Could not create all items`);
+            return Result.error(`Could not create all items`, "InternalError");
+        }
+
+        return Result.okEmpty();
+    } catch (error: unknown) {
+        logger.error(`Could not create items - ${error}`);
+        return Result.error(`Could not create items`, "InternalError");
+    }
+};
+
 const createItemsWithContentFromContent = async (
     content: Prisma.ItemContentCreateManyFeedInput[],
     feedId: number,
@@ -161,6 +188,7 @@ const createItemsWithContentFromContent = async (
                 ...itemContent,
                 feedId,
             })),
+            skipDuplicates: true,
         });
 
         if (createdContentResult.count !== content.length) {
@@ -168,9 +196,13 @@ const createItemsWithContentFromContent = async (
             return Result.error(`Could not create all content`, "InternalError");
         }
 
+        // fetch only the created content as prisma do not return ids for createMany
         const createdContent = await prisma.itemContent.findMany({
             where: {
                 feedId,
+                title: {
+                    in: content.map(itemContent => itemContent.title),
+                },
             },
         });
 
@@ -183,6 +215,7 @@ const createItemsWithContentFromContent = async (
                 isRead: false,
                 isFavorite: false,
             })),
+            skipDuplicates: true,
         });
 
         if (createdItems.count !== content.length) {
@@ -220,6 +253,7 @@ export const ItemRepository = {
     createItems,
     createItem,
     createItemsWithContentFromContent,
+    createItemsOnlyFromContent,
     updateItem,
     removeFeedItemsForUser,
     getAllItemsByUserId,

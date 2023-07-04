@@ -1,3 +1,4 @@
+import { sortItems } from "@/client/lib/utils";
 import createLogger from "@/server/lib/logger";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { AsyncResultType, Result } from "@/shared/models/result";
@@ -13,7 +14,7 @@ const getAllItemsByUserId = async (userId: number): AsyncResultType<ItemWithCont
         return Result.error(`Could not find items for user with id ${userId}`, "NotFound");
     }
 
-    return Result.ok(items.data);
+    return Result.ok(sortItems(items.data));
 };
 
 const markAsRead = async (id: number, markAsRead: boolean) => {

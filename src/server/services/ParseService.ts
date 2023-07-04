@@ -1,6 +1,8 @@
 import createLogger from "@/server/lib/logger";
+import { ContentMapper } from "@/server/mappers/ContentMapper";
 import { AsyncResultType, Result } from "@/shared/models/result";
-import { sortBy } from "@banjoanton/utils";
+import { first, sortBy } from "@banjoanton/utils";
+import { ItemContent, Prisma } from "@prisma/client";
 import getFavicons from "get-website-favicon";
 import RssParser from "rss-parser";
 
@@ -101,6 +103,49 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
     }
 };
 
+const shouldParseAgain = async (
+    currentContent: ItemContent[],
+    url: string
+): Promise<Prisma.ItemContentCreateManyFeedInput[] | null> => {
+    const newFeed = await parseRssFeed(url);
+
+    if (!newFeed.success) {
+        logger.error(`Failed to parse feed with url: ${url}`, newFeed.message);
+        return null;
+    }
+
+    const latestFeed = newFeed.data;
+
+    if (latestFeed.items.length === 0) {
+        logger.error(`Feed with url: ${url} has no items`);
+        return null;
+    }
+
+    const firstItem = first(latestFeed.items);
+
+    if (!firstItem || !firstItem.pubDate) {
+        logger.error(`Feed with url: ${url} has no items`);
+        return null;
+    }
+
+    // TODO: pubDate or created at?
+    const latestContent = first(sortBy(currentContent, "createdAt"));
+
+    // TODO: better logic for getting latest?
+    if (latestContent.title === firstItem.title) {
+        return null;
+    }
+
+    const contentToCreate = latestFeed.items
+        .filter(item => currentContent.every(contentItem => contentItem.link !== item.link))
+        .map(parsedItem => {
+            return ContentMapper.parseItemToCreateContent(parsedItem);
+        });
+
+    logger.info(`Feed with url: ${url} has new items`);
+    return contentToCreate;
+};
+
 // const parseRssItem = (url: string): AsyncResultType<any> => {
 //     throw new Error("Not implemented");
 // };
@@ -108,5 +153,6 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
 export const ParseService = {
     parseRssFeed,
     parseFavicon,
+    shouldParseAgain,
     // parseRssItem,
 };

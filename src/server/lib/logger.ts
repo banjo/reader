@@ -1,4 +1,3 @@
-import "server-only";
 import { Logger } from "tslog";
 
 const createLogger = (name: string) =>
