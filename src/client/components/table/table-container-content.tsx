@@ -7,7 +7,7 @@ import { TableItem } from "@/client/components/table/table-item";
 import { useTableFiltersContent } from "@/client/components/table/use-table-filters-content";
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
 import { CleanFeedWithContent } from "@/shared/models/types";
-import { isDefined, noop } from "@banjoanton/utils";
+import { noop } from "@banjoanton/utils";
 import { ItemContent } from "@prisma/client";
 import { AnimatePresence } from "framer-motion";
 import { FC } from "react";
@@ -52,10 +52,11 @@ export const TableContainerContent: FC<TableContainerProps> = ({
                                     key={c.id}
                                     item={c}
                                     type="list"
-                                    showFeedName={isDefined(feed)}
+                                    showFeedName={false}
                                     menuOptions={menuOptions}
                                     refetch={noop}
                                     isSubscribed={false}
+                                    onClick={noop}
                                 />
                             );
                         })}

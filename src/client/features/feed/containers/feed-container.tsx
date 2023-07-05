@@ -34,6 +34,8 @@ export const FeedContainer: FC<Props> = ({ feed, internalIdentifier }) => {
 
     const isSubscribed = data.isSubscribed;
 
+    console.log("🪕%c Banjo | feed-container.tsx:37 |", "color: #E91E63", data);
+
     const titleMenuOptions: MenuEntries<TitleMenu>[] = [
         {
             type: "select",

@@ -21,6 +21,18 @@ const fetchAndUpdateRssFeed = async (
     internalIdentifier: string,
     userId: number
 ): AsyncResultType<void> => {
+    const isSubscribedResponse = await FeedRepository.isSubscribedToFeed(
+        internalIdentifier,
+        userId
+    );
+
+    if (!isSubscribedResponse.success || isSubscribedResponse.data === false) {
+        logger.error(
+            `user is not subscribed to feed with internal identifier ${internalIdentifier}`
+        );
+        return Result.error("User is not subscribed to feed", "NotFound");
+    }
+
     const feedContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
         internalIdentifier
     );

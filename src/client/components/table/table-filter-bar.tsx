@@ -43,18 +43,18 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 }) => {
     return (
         <div className="flex h-20 w-full items-center justify-end gap-6 rounded-md border border-border p-4">
+            {feed && (
+                <img
+                    className="rounded-full"
+                    height={40}
+                    width={40}
+                    alt="feed avatar"
+                    src={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
+                />
+            )}
+
             {titleMenuOptions && isSubscribed ? (
                 <>
-                    {feed && (
-                        <img
-                            className="rounded-full"
-                            height={40}
-                            width={40}
-                            alt="feed avatar"
-                            src={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
-                        />
-                    )}
-
                     <Dropdown
                         align="start"
                         side="bottom"

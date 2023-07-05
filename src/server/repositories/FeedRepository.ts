@@ -313,6 +313,31 @@ const checkIfFeedIsAssignedToUser = async (
     return Result.ok(feed.users.length > 0);
 };
 
+const isSubscribedToFeed = async (
+    internalIdentifier: string,
+    userId: number
+): AsyncResultType<boolean> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            internalIdentifier: internalIdentifier,
+        },
+        include: {
+            users: {
+                where: {
+                    id: userId,
+                },
+            },
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Feed not found with id: ${internalIdentifier}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    return Result.ok(feed.users.length > 0);
+};
+
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
@@ -326,4 +351,5 @@ export const FeedRepository = {
     searchFeeds,
     checkIfFeedIsAssignedToUser,
     removeFeedFromUser,
+    isSubscribedToFeed,
 };
