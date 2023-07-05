@@ -18,6 +18,7 @@ type CardPropsItem = {
     menuOptions?: MenuEntries<ItemWithContent>[];
     refetch: Refetch<ItemWithContent[]>;
     isSubscribed: true;
+    onClick: () => void;
 };
 
 type CardPropsContent = {
@@ -28,6 +29,7 @@ type CardPropsContent = {
     menuOptions?: MenuEntries<ItemContent>[];
     refetch: Refetch<ItemContent[]>;
     isSubscribed: false;
+    onClick: () => void;
 };
 
 export const TableItem = ({
@@ -38,6 +40,7 @@ export const TableItem = ({
     menuOptions,
     refetch,
     isSubscribed,
+    onClick,
 }: CardPropsItem | CardPropsContent) => {
     const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem({
         refetch: isSubscribed ? refetch : noop,
@@ -83,12 +86,17 @@ export const TableItem = ({
             )}
 
             {showFeedName && (
-                <span className="w-32 min-w-max text-sm font-light text-gray-600 dark:text-gray-300">
+                <span
+                    className="w-32 min-w-max text-sm font-light text-gray-600 dark:text-gray-300"
+                    onClick={onClick}
+                >
                     {feedName}
                 </span>
             )}
-            <span className="min-w-max font-bold">{content.title}</span>
-            <span className="w-0 max-w-full shrink grow truncate">
+            <span className="min-w-max font-bold" onClick={onClick}>
+                {content.title}
+            </span>
+            <span className="w-0 max-w-full shrink grow truncate" onClick={onClick}>
                 {content.description ?? content.content}
             </span>
             {menuOptions && isSubscribed && (

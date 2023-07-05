@@ -6,6 +6,7 @@ import { FilterBar } from "@/client/components/table/table-filter-bar";
 import { TableItem } from "@/client/components/table/table-item";
 import { useTableFiltersItems } from "@/client/components/table/use-table-filters-items";
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
+import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { Refetch } from "@/shared/models/swr";
 import { CleanFeedWithItems, ItemWithContent } from "@/shared/models/types";
 import { AnimatePresence } from "framer-motion";
@@ -33,6 +34,12 @@ export const TableContainerItems: FC<TableContainerProps> = ({
     feed,
 }) => {
     const { data, filters, actions } = useTableFiltersItems(items, refetch);
+    const { toggleReadStatus } = useMutateItem({ refetch });
+
+    const onClick = (item: ItemWithContent) => {
+        toggleReadStatus(item);
+        window.open(item.content.link, "_blank");
+    };
 
     return (
         <>
@@ -58,6 +65,7 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                                     menuOptions={menuOptions}
                                     refetch={refetch}
                                     isSubscribed={feed?.isSubscribed ?? true}
+                                    onClick={() => onClick(item)}
                                 />
                             );
                         })}
