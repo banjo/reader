@@ -1,10 +1,9 @@
 import { sortItems } from "@/client/lib/utils";
 import createLogger from "@/server/lib/logger";
-import prisma from "@/server/repositories/prisma";
 import { AsyncResultType, Result } from "@/shared/models/result";
 import { FeedWithContent, FeedWithItems, FeedWithUsers } from "@/shared/models/types";
 import { sortBy } from "@banjoanton/utils";
-import { Feed, Prisma } from "@prisma/client";
+import { Feed, Prisma, prisma } from "db";
 
 const logger = createLogger("FeedRepository");
 
