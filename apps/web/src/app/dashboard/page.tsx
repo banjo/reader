@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs";
 
 export default function IndexPage() {
     const { userId } = auth();

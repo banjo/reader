@@ -9,16 +9,13 @@
         "dist/**"
     ],
     "scripts": {
-        "build": "tsup",
+        "build": "nr db:generate:types && tsup",
+        "dev": "tsup --watch --clean",
         "clean": "rimraf node_modules dist",
-        "dev": "tsup --watch",
         "db:migrate:dev": "pnpm exec prisma migrate dev && nr db:generate:types",
         "db:migrate:prod": "pnpm exec prisma migrate deploy",
-        "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
-        "db:local:run": "docker compose -f ./docker/docker-compose.yml up -d --remove-orphans",
-        "db:local:stop": "docker compose -f ./docker/docker-compose.yml down",
-        "db:generate:types": "pnpm exec prisma generate && nr format:write",
-        "db:update": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && nr db:generate:types && pnpm exec prisma db seed"
+        "db:generate:types": "pnpm exec prisma generate",
+        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && nr db:generate:types && pnpm exec prisma db seed"
     },
     "prisma": {
         "seed": "esno src/seed.ts"

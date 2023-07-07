@@ -61,13 +61,6 @@ const fetchAndUpdateRssFeed = async (
                 c => !items.some(item => item.content.title === c.title)
             );
 
-            console.log(
-                "🪕%c Banjo | FeedService.ts:52 |",
-                "color: #E91E63",
-                content.length,
-                items.length
-            );
-
             const createContentResult = await ItemRepository.createItemsOnlyFromContent(
                 notAddedContent,
                 feedContentResponse.data.id,
@@ -80,6 +73,7 @@ const fetchAndUpdateRssFeed = async (
                 );
                 return Result.error("Failed to create content", "InternalError");
             }
+
         }
     }
 
@@ -92,6 +86,7 @@ const fetchAndUpdateRssFeed = async (
         logger.info("no need to fetch again");
         return Result.okEmpty();
     }
+
 
     const createContentResult = await ItemRepository.createItemsWithContentFromContent(
         updatedItems,

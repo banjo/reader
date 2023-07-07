@@ -1,13 +1,19 @@
 "use client";
 
+import { FC } from "react";
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { TableContainerContent } from "@/client/components/table/table-container-content";
-import { TableContainerItems, TitleMenu } from "@/client/components/table/table-container-items";
+import {
+    TableContainerItems,
+    TitleMenu,
+} from "@/client/components/table/table-container-items";
 import { useFeedFetcher } from "@/client/features/feed/hooks/use-feed-fetcher";
 import { useMutateFeed } from "@/client/hooks/backend/mutators/use-mutate-feed";
 import { useTableItemMenu } from "@/client/hooks/shared/use-table-item-menu";
-import { CleanFeedWithContent, CleanFeedWithItems } from "@/shared/models/types";
-import { FC } from "react";
+import {
+    CleanFeedWithContent,
+    CleanFeedWithItems,
+} from "@/shared/models/types";
 
 type Props = {
     feed: CleanFeedWithItems | CleanFeedWithContent;
@@ -30,11 +36,12 @@ export const FeedContainer: FC<Props> = ({ feed, internalIdentifier }) => {
         refetchContentMultiple: refetchContentMultiple,
         refetchItemsMultiple: refetchItemsMultiple,
     });
-    const { unsubscribe } = useMutateFeed({ refetch: refetchFeed, unsubscribeFn: unsubscribeFn });
+    const { unsubscribe } = useMutateFeed({
+        refetch: refetchFeed,
+        unsubscribeFn: unsubscribeFn,
+    });
 
     const isSubscribed = data.isSubscribed;
-
-    console.log("🪕%c Banjo | feed-container.tsx:37 |", "color: #E91E63", data);
 
     const titleMenuOptions: MenuEntries<TitleMenu>[] = [
         {
@@ -65,7 +72,11 @@ export const FeedContainer: FC<Props> = ({ feed, internalIdentifier }) => {
                     feed={data}
                 />
             ) : (
-                <TableContainerContent content={data.contentItems} feed={data} title={data.name} />
+                <TableContainerContent
+                    content={data.contentItems}
+                    feed={data}
+                    title={data.name}
+                />
             )}
         </div>
     );

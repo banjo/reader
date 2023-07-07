@@ -87,8 +87,7 @@ const itemContents: ItemContent[] = [
         imageUrl: null,
         link: "https://www.example.com/post/css/grids",
         content: "example content about CSS.Grids",
-        htmlContent:
-            "<p>Quick example of htmlContent for <em>CSS Grids</em></p>",
+        htmlContent: "<p>Quick example of htmlContent for <em>CSS Grids</em></p>",
         lastFetch: new Date(),
         pubDate: new Date(),
     },
@@ -131,8 +130,7 @@ const itemContents: ItemContent[] = [
         link: "https://www.example.com/post/vue/beginners-guide",
         content: "Get started with Vue.js and learn the basics",
         imageUrl: "https://picsum.photos/1080/720",
-        htmlContent:
-            "<p><strong>Vue.js</strong> can make your life easier!</p>",
+        htmlContent: "<p><strong>Vue.js</strong> can make your life easier!</p>",
         lastFetch: new Date(),
         pubDate: new Date(),
     },
@@ -146,8 +144,7 @@ const itemContents: ItemContent[] = [
         description: "A beginner's guide to Vue.js",
         link: "https://www.example.com/post/vue/beginners-guide",
         content: "Get started with Vue.js and learn the basics",
-        htmlContent:
-            "<p><strong>Vue.js</strong> can make your life easier!</p>",
+        htmlContent: "<p><strong>Vue.js</strong> can make your life easier!</p>",
         lastFetch: new Date(),
         pubDate: new Date(),
     },
@@ -249,7 +246,7 @@ async function main() {
             create: {
                 ...user,
                 feeds: {
-                    connect: feeds.map((feed) => ({ id: feed.id })),
+                    connect: feeds.map(feed => ({ id: feed.id })),
                 },
             },
         });
@@ -280,7 +277,7 @@ main()
         return process.exit(0);
     })
     // eslint-disable-next-line unicorn/prefer-top-level-await
-    .catch(async (error) => {
+    .catch(async error => {
         console.error(error);
         await prisma.$disconnect();
         process.exit(1);
