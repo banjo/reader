@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@antfu/ni':
+        specifier: ^0.21.3
+        version: 0.21.3
       '@banjoanton/eslint-config':
         specifier: ^0.1.8
         version: 0.1.8(eslint@8.41.0)(prettier@3.0.0)(typescript@4.9.5)
