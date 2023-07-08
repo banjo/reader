@@ -9,13 +9,13 @@
         "dist/**"
     ],
     "scripts": {
-        "build": "pnpm exec db:generate:types && tsup",
+        "build": "pnpm run db:generate:types && tsup",
         "dev": "tsup --watch --clean",
         "clean": "rimraf node_modules dist",
-        "db:migrate:dev": "pnpm exec prisma migrate dev && pnpm exec db:generate:types",
+        "db:migrate:dev": "pnpm exec prisma migrate dev && pnpm run db:generate:types",
         "db:migrate:prod": "pnpm exec prisma migrate deploy",
         "db:generate:types": "pnpm exec prisma generate",
-        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && pnpm exec db:generate:types && pnpm exec prisma db seed"
+        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && pnpm run db:generate:types && pnpm exec prisma db seed"
     },
     "prisma": {
         "seed": "esno src/seed.ts"
