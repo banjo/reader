@@ -1,5 +1,5 @@
-import { Variants } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
+import { Variants } from "framer-motion";
 
 export type UseBoopProps = {
     x?: number;

@@ -1,7 +1,7 @@
+import { FC } from "react";
 import { Icons, iconSizeMapper } from "@/client/components/shared/icons";
 import { IconBase } from "@/client/components/shared/icons/icon-base";
 import { Size } from "@/shared/models/size";
-import { FC } from "react";
 
 type Props = {
     active: boolean;
@@ -29,7 +29,10 @@ export const Favorite: FC<Props> = ({ active, onClick, size = "md" }) => {
             }}
             tooltip={tooltip}
         >
-            <Icons.star className={`${iconSizeMapper[size]} ${color}`} onClick={handleClick} />
+            <Icons.star
+                className={`${iconSizeMapper[size]} ${color}`}
+                onClick={handleClick}
+            />
         </IconBase>
     );
 };

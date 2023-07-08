@@ -15,18 +15,19 @@ export async function GET(req: Request, { params }: GetProps) {
     const internalIdentifier = params.internalIdentifier;
     const userId = RequestService.getUserId(req);
 
-    const internalIdentifierResult = internalIdentifierSchema.safeParse(internalIdentifier);
+    const internalIdentifierResult =
+        internalIdentifierSchema.safeParse(internalIdentifier);
 
     if (!internalIdentifierResult.success) {
         return ResponseService.badRequest(
             "Internal identifier",
-            internalIdentifierResult.error.errors
+            internalIdentifierResult.error.errors,
         );
     }
 
     const feedResult = await FeedService.getFeedWithItemsOrContent(
         internalIdentifierResult.data,
-        userId
+        userId,
     );
 
     if (!feedResult.success) {

@@ -1,5 +1,5 @@
-import { Size } from "@/shared/models/size";
 import { FC } from "react";
+import { Size } from "@/shared/models/size";
 
 type Props = {
     size: Size;

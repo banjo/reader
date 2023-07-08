@@ -1,7 +1,7 @@
-import { Tooltip } from "@/client/components/shared/tooltip";
-import { useBoop, UseBoopProps } from "@/client/hooks/animation/use-boop";
-import { motion } from "framer-motion";
 import { FC, ReactNode, useMemo } from "react";
+import { Tooltip } from "@/client/components/shared/tooltip";
+import { UseBoopProps, useBoop } from "@/client/hooks/animation/use-boop";
+import { motion } from "framer-motion";
 
 type Props = {
     tooltip: string;

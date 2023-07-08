@@ -1,5 +1,5 @@
-import { TableType } from "@/client/components/table/table.types";
 import { FC, ReactNode } from "react";
+import { TableType } from "@/client/components/table/table.types";
 
 type TableProps = {
     type: TableType;

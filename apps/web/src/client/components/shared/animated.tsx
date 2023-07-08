@@ -1,5 +1,5 @@
-import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion";
 import { FC, ReactNode } from "react";
+import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion";
 
 type Props = {
     show: boolean;

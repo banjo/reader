@@ -1,6 +1,5 @@
 import "@/client/styles/globals.css";
 import { Metadata } from "next";
-
 import { SiteHeader } from "@/client/components/nav/site-header";
 import { TailwindIndicator } from "@/client/components/utils/tailwind-indicator";
 import { ThemeProvider } from "@/client/components/utils/theme-provider";
@@ -40,10 +39,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     <body
                         className={cn(
                             "min-h-screen bg-background font-sans antialiased",
-                            fontSans.variable
+                            fontSans.variable,
                         )}
                     >
-                        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                        >
                             <Toaster position={"bottom-center"} />
                             <div className="relative flex min-h-screen flex-col">
                                 <SiteHeader />

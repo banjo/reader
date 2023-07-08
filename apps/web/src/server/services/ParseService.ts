@@ -5,7 +5,6 @@ import { first, sortBy } from "@banjoanton/utils";
 import { ItemContent, Prisma } from "@prisma/client";
 import getFavicons from "get-website-favicon";
 import RssParser from "rss-parser";
-
 import { z } from "zod";
 
 const rssParser = new RssParser();
@@ -84,7 +83,10 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
         const baseFavicon = WebsiteSchema.safeParse(faviconResponse);
 
         if (!baseFavicon.success) {
-            logger.error(`Failed to parse favicon with url: ${url}`, baseFavicon.error);
+            logger.error(
+                `Failed to parse favicon with url: ${url}`,
+                baseFavicon.error,
+            );
             return Result.error("Failed to parse favicon", "InternalError");
         }
 
@@ -105,7 +107,7 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
 
 const shouldParseAgain = async (
     currentContent: ItemContent[],
-    url: string
+    url: string,
 ): Promise<Prisma.ItemContentCreateManyFeedInput[] | null> => {
     const newFeed = await parseRssFeed(url);
 
@@ -137,8 +139,12 @@ const shouldParseAgain = async (
     }
 
     const contentToCreate = latestFeed.items
-        .filter(item => currentContent.every(contentItem => contentItem.link !== item.link))
-        .map(parsedItem => {
+        .filter((item) =>
+            currentContent.every(
+                (contentItem) => contentItem.link !== item.link,
+            ),
+        )
+        .map((parsedItem) => {
             return ContentMapper.parseItemToCreateContent(parsedItem);
         });
 

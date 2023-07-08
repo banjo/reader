@@ -1,5 +1,5 @@
-import { UserRepository } from "@/server/repositories/UserRepository";
 import { NextResponse } from "next/server";
+import { UserRepository } from "@/server/repositories/UserRepository";
 
 export async function GET(req: Request) {
     const headers = new Headers(req.headers);

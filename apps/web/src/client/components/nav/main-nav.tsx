@@ -1,11 +1,10 @@
+import { useMemo } from "react";
 import Link from "next/link";
-
 import { Icons } from "@/client/components/shared/icons";
 import { siteConfig } from "@/client/config/site";
 import { useAuth } from "@/client/hooks/backend/use-auth";
 import { cn } from "@/client/lib/utils";
 import { NavItem } from "@/client/types/nav";
-import { useMemo } from "react";
 
 interface MainNavProps {
     items?: NavItem[];
@@ -15,7 +14,7 @@ export function MainNav({ items }: MainNavProps) {
     const { userId } = useAuth();
 
     const linksToRender = useMemo(() => {
-        return items?.filter(item => {
+        return items?.filter((item) => {
             if (item.public) return true;
 
             return !!userId;
@@ -26,7 +25,9 @@ export function MainNav({ items }: MainNavProps) {
         <div className="flex gap-6 md:gap-10">
             <Link href="/" className="flex items-center space-x-2">
                 <Icons.logo className="h-6 w-6" />
-                <span className="inline-block font-bold">{siteConfig.name}</span>
+                <span className="inline-block font-bold">
+                    {siteConfig.name}
+                </span>
             </Link>
 
             <nav className="flex gap-6">
@@ -36,7 +37,7 @@ export function MainNav({ items }: MainNavProps) {
                         href={item.href}
                         className={cn(
                             "flex items-center text-sm font-medium text-muted-foreground",
-                            item.disabled && "cursor-not-allowed opacity-80"
+                            item.disabled && "cursor-not-allowed opacity-80",
                         )}
                     >
                         {item.title}

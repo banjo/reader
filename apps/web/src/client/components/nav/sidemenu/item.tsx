@@ -1,7 +1,7 @@
+import { FC, ReactNode } from "react";
+import Link from "next/link";
 import { Badge } from "@/client/components/shared/badge";
 import { IconType } from "@/client/components/shared/icons";
-import Link from "next/link";
-import { FC, ReactNode } from "react";
 
 type ItemProps = {
     title: string;

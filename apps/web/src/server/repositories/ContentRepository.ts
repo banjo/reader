@@ -5,7 +5,9 @@ import { prisma } from "db";
 
 const logger = createLogger("ContentRepository");
 
-const getAllContentById = async (feedId: number): AsyncResultType<ItemContent[]> => {
+const getAllContentById = async (
+    feedId: number,
+): AsyncResultType<ItemContent[]> => {
     let items: ItemContent[];
     try {
         items = await prisma.itemContent.findMany({
@@ -16,8 +18,13 @@ const getAllContentById = async (feedId: number): AsyncResultType<ItemContent[]>
 
         return Result.ok(items);
     } catch (error: unknown) {
-        logger.error(`Could not find content for feed with id ${feedId} - ${error}`);
-        return Result.error(`Could not find content for feed with id ${feedId}`, "InternalError");
+        logger.error(
+            `Could not find content for feed with id ${feedId} - ${error}`,
+        );
+        return Result.error(
+            `Could not find content for feed with id ${feedId}`,
+            "InternalError",
+        );
     }
 };
 
