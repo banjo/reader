@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "pnpm run --parallel dev",
         "clean": "pnpm run --parallel clean && rimraf node_modules",
-        "build": "pnpm run --parallel build",
+        "build": "pnpm run --filter db build && pnpm run --filter web build",
         "web:build": "pnpm --filter web build",
         "web:start": "pnpm --filter web start",
         "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
