@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm run --parallel dev",
+    "dev": "turbo dev",
     "clean": "pnpm run --parallel clean && rimraf node_modules",
-    "build": "pnpm run --filter db build && pnpm run --filter web build",
-    "lint": "pnpm run --filter db lint && pnpm run --filter web lint",
+    "build": "turbo build",
+    "lint": "turbo lint",
     "web:build": "pnpm --filter web build",
     "web:start": "pnpm --filter web start",
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",

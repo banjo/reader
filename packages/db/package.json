@@ -2,20 +2,20 @@
     "name": "db",
     "version": "1.0.0",
     "license": "MIT",
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
     "files": [
         "dist/**"
     ],
     "scripts": {
-        "build": "pnpm run db:generate:types && tsup",
+        "build": "pnpm run db:generate && tsup",
         "dev": "tsup --watch --clean",
         "clean": "rimraf node_modules dist",
-        "db:migrate:dev": "pnpm exec prisma migrate dev && pnpm run db:generate:types",
+        "db:migrate:dev": "pnpm exec prisma migrate dev && pnpm run db:generate",
         "db:migrate:prod": "pnpm exec prisma migrate deploy",
-        "db:generate:types": "pnpm exec prisma generate",
-        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && pnpm run db:generate:types && pnpm exec prisma db seed"
+        "db:generate": "pnpm exec prisma generate",
+        "db:push": "pnpm exec prisma db push --skip-generate",
+        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && pnpm run db:generate && pnpm exec prisma db seed"
     },
     "prisma": {
         "seed": "esno src/seed.ts"
