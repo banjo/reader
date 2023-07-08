@@ -5,9 +5,9 @@ import { Favorite } from "@/client/components/shared/icons/favorite";
 import { TableType } from "@/client/components/table/table.types";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { Refetch } from "@/shared/models/swr";
-import { ItemWithContent } from "@/shared/models/types";
 import { noop } from "@banjoanton/utils";
 import { ItemContent } from "@prisma/client";
+import { ItemWithContent } from "db";
 import { motion } from "framer-motion";
 
 type CardPropsItem = {
@@ -64,7 +64,11 @@ export const TableItem = ({
         <motion.div
             layoutId={`table-card-${item.id}`}
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto", transition: { type: "spring", bounce: 0.3 } }} // keep in sync with height in tailwind
+            animate={{
+                opacity: 1,
+                height: "auto",
+                transition: { type: "spring", bounce: 0.3 },
+            }} // keep in sync with height in tailwind
             style={{ minHeight: "2rem" }}
             transition={{ type: "spring", bounce: 0 }}
             exit={{ opacity: 0, height: 0, transition: { duration: 0.3 } }}
@@ -80,8 +84,16 @@ export const TableItem = ({
 
             {isSubscribed && (
                 <>
-                    <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
-                    <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
+                    <Favorite
+                        size="md"
+                        active={item.isFavorite}
+                        onClick={toggleFavorite}
+                    />
+                    <Bookmark
+                        size="md"
+                        active={item.isBookmarked}
+                        onClick={toggleBookmark}
+                    />
                 </>
             )}
 
@@ -96,11 +108,19 @@ export const TableItem = ({
             <span className="min-w-max font-bold" onClick={onClick}>
                 {content.title}
             </span>
-            <span className="w-0 max-w-full shrink grow truncate" onClick={onClick}>
+            <span
+                className="w-0 max-w-full shrink grow truncate"
+                onClick={onClick}
+            >
                 {content.description ?? content.content}
             </span>
             {menuOptions && isSubscribed && (
-                <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
+                <Dropdown
+                    align="start"
+                    side="left"
+                    menuEntries={menuOptions}
+                    item={item}
+                >
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />
                 </Dropdown>
             )}

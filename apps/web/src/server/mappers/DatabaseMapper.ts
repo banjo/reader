@@ -3,7 +3,7 @@ import {
     CleanFeedWithItems,
     FeedWithContent,
     FeedWithItems,
-} from "@/shared/models/types";
+} from "db";
 
 function feedWithItems(feed: FeedWithItems): CleanFeedWithItems {
     return {
@@ -13,7 +13,7 @@ function feedWithItems(feed: FeedWithItems): CleanFeedWithItems {
 }
 
 function feedsWithItems(feeds: FeedWithItems[]): CleanFeedWithItems[] {
-    return feeds.map(element => feedWithItems(element));
+    return feeds.map((element) => feedWithItems(element));
 }
 
 function feedWithContent(feed: FeedWithContent): CleanFeedWithContent {
@@ -24,7 +24,7 @@ function feedWithContent(feed: FeedWithContent): CleanFeedWithContent {
 }
 
 function feedsWithContent(feeds: FeedWithContent[]): CleanFeedWithContent[] {
-    return feeds.map(element => feedWithContent(element));
+    return feeds.map((element) => feedWithContent(element));
 }
 
 export const DatabaseMapper = {

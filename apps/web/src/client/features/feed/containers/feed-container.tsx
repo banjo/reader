@@ -10,10 +10,7 @@ import {
 import { useFeedFetcher } from "@/client/features/feed/hooks/use-feed-fetcher";
 import { useMutateFeed } from "@/client/hooks/backend/mutators/use-mutate-feed";
 import { useTableItemMenu } from "@/client/hooks/shared/use-table-item-menu";
-import {
-    CleanFeedWithContent,
-    CleanFeedWithItems,
-} from "@/shared/models/types";
+import { CleanFeedWithContent, CleanFeedWithItems } from "db";
 
 type Props = {
     feed: CleanFeedWithItems | CleanFeedWithContent;

@@ -1,9 +1,9 @@
+import { useMemo, useState } from "react";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
 import { Refetch } from "@/shared/models/swr";
-import { ItemWithContent } from "@/shared/models/types";
-import { useMemo, useState } from "react";
+import { ItemWithContent } from "db";
 import toast from "react-hot-toast";
 import { useSWRConfig } from "swr";
 
@@ -26,10 +26,10 @@ type TableFiltersOut = {
 
 export const useTableFiltersItems = (
     data: ItemWithContent[],
-    refetch: Refetch<ItemWithContent[]>
+    refetch: Refetch<ItemWithContent[]>,
 ): TableFiltersOut => {
     const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(() => {
-        return data.some(item => item.isRead === false);
+        return data.some((item) => item.isRead === false);
     });
     const { markMultipleAsRead } = useMutateItem({ refetch });
     const { fetchLatestInSidebar } = useUpdateSidebar();
@@ -39,18 +39,18 @@ export const useTableFiltersItems = (
     // FILTERED DATA
     const filteredData = useMemo(() => {
         if (showUnreadOnly) {
-            return data.filter(item => item.isRead === false);
+            return data.filter((item) => item.isRead === false);
         }
         return data;
     }, [data, showUnreadOnly]);
 
     // FILTERS
     const hasReadAll = useMemo(() => {
-        return filteredData.every(item => item.isRead === true);
+        return filteredData.every((item) => item.isRead === true);
     }, [filteredData]);
 
     const toggleShowUnreadOnly = () => {
-        setShowUnreadOnly(prev => !prev);
+        setShowUnreadOnly((prev) => !prev);
     };
 
     // ACTIONS
@@ -59,7 +59,10 @@ export const useTableFiltersItems = (
     };
 
     const subscribe = async (internalIdentifier: string) => {
-        const subscribeResult = await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
+        const subscribeResult = await api.POST(
+            `/feed/${internalIdentifier}/subscribe`,
+            {},
+        );
 
         if (!subscribeResult.success) {
             toast.error("Failed to subscribe to feed");

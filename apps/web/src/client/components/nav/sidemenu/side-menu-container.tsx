@@ -1,5 +1,7 @@
 "use client";
 
+import { FC, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { Category } from "@/client/components/nav/sidemenu/category";
 import { Divider } from "@/client/components/nav/sidemenu/divider";
 import { Item } from "@/client/components/nav/sidemenu/item";
@@ -9,9 +11,7 @@ import { SubMenu } from "@/client/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/client/components/shared/icons";
 import { useGet } from "@/client/hooks/backend/use-get";
 import { avatarUrl } from "@/client/lib/utils";
-import { CleanFeedWithItems } from "@/shared/models/types";
-import { usePathname } from "next/navigation";
-import { FC, useMemo } from "react";
+import { CleanFeedWithItems } from "db";
 
 type Props = {
     prefix?: string;
@@ -37,7 +37,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                 return acc;
             }
 
-            return acc + feed.items.filter(item => !item.isRead).length;
+            return acc + feed.items.filter((item) => !item.isRead).length;
         }, 0);
     }, [data]);
 
@@ -48,7 +48,11 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                 return acc;
             }
 
-            return acc + feed.items.filter(item => !item.isRead && item.isBookmarked).length;
+            return (
+                acc +
+                feed.items.filter((item) => !item.isRead && item.isBookmarked)
+                    .length
+            );
         }, 0);
     }, [data]);
 
@@ -59,7 +63,11 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                 return acc;
             }
 
-            return acc + feed.items.filter(item => !item.isRead && item.isFavorite).length;
+            return (
+                acc +
+                feed.items.filter((item) => !item.isRead && item.isFavorite)
+                    .length
+            );
         }, 0);
     }, [data]);
 
@@ -87,7 +95,9 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     Icon={Icons.bookmark}
                     selected={isSelected("/bookmarks")}
                     highlight={Boolean(bookmarksUnread)}
-                    notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
+                    notification={
+                        bookmarksUnread > 0 ? bookmarksUnread : undefined
+                    }
                     notificationTooltip="Unread items"
                 />
                 <Item
@@ -96,7 +106,9 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     Icon={Icons.star}
                     selected={isSelected("/favorites")}
                     highlight={Boolean(favoritesUnread)}
-                    notification={favoritesUnread > 0 ? favoritesUnread : undefined}
+                    notification={
+                        favoritesUnread > 0 ? favoritesUnread : undefined
+                    }
                     notificationTooltip="Unread items"
                 />
             </SubMenu>
@@ -113,16 +125,22 @@ export const SideMenuContainer: FC<Props> = ({ prefix, feeds }) => {
                     notification={totalUnread > 0 ? totalUnread : undefined}
                     notificationTooltip="Unread items"
                 />
-                {data.map(feed => {
-                    const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
+                {data.map((feed) => {
+                    const unread =
+                        feed.items?.filter((item) => !item.isRead).length ?? 0;
 
                     return (
                         <Item
                             key={feed.id}
                             title={feed.name}
                             url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
-                            image={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
-                            selected={isSelected(`/feed/${feed.internalIdentifier}`)}
+                            image={
+                                feed.imageUrl ??
+                                avatarUrl(feed.internalIdentifier)
+                            }
+                            selected={isSelected(
+                                `/feed/${feed.internalIdentifier}`,
+                            )}
                             notification={unread > 0 ? unread : undefined}
                             highlight={Boolean(unread)}
                             notificationTooltip="Unread items"

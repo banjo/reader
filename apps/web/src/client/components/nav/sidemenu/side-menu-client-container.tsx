@@ -1,9 +1,9 @@
 "use client";
 
+import { FC } from "react";
 import { SideMenuContainer } from "@/client/components/nav/sidemenu/side-menu-container";
 import { useAuth } from "@/client/hooks/backend/use-auth";
-import { CleanFeedWithItems } from "@/shared/models/types";
-import { FC } from "react";
+import { CleanFeedWithItems } from "db";
 
 type Props = {
     prefix?: string;

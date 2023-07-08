@@ -1,16 +1,20 @@
 "use client";
 
+import { FC } from "react";
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { Table } from "@/client/components/table/table";
 import { FilterBar } from "@/client/components/table/table-filter-bar";
 import { TableItem } from "@/client/components/table/table-item";
 import { useTableFiltersItems } from "@/client/components/table/use-table-filters-items";
-import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/client/components/ui/alert";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { Refetch } from "@/shared/models/swr";
-import { CleanFeedWithItems, ItemWithContent } from "@/shared/models/types";
+import { CleanFeedWithItems, ItemWithContent } from "db";
 import { AnimatePresence } from "framer-motion";
-import { FC } from "react";
 
 export type TitleMenu = {
     title: string;
@@ -54,7 +58,7 @@ export const TableContainerItems: FC<TableContainerProps> = ({
             <Table type="list">
                 <AnimatePresence initial={false}>
                     {data.length > 0 &&
-                        data.map(item => {
+                        data.map((item) => {
                             return (
                                 <TableItem
                                     key={item.id}

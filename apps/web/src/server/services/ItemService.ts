@@ -2,16 +2,21 @@ import { sortItems } from "@/client/lib/utils";
 import createLogger from "@/server/lib/logger";
 import { ItemRepository } from "@/server/repositories/ItemRespository";
 import { AsyncResultType, Result } from "@/shared/models/result";
-import { ItemWithContent, ItemWithContentAndFeed } from "@/shared/models/types";
+import { ItemWithContent, ItemWithContentAndFeed } from "db";
 
 const logger = createLogger("ItemService");
 
-const getAllItemsByUserId = async (userId: number): AsyncResultType<ItemWithContentAndFeed[]> => {
+const getAllItemsByUserId = async (
+    userId: number,
+): AsyncResultType<ItemWithContentAndFeed[]> => {
     const items = await ItemRepository.getAllItemsByUserId(userId);
 
     if (!items.success) {
         logger.error(`Could not find items for user with id ${userId}`);
-        return Result.error(`Could not find items for user with id ${userId}`, "NotFound");
+        return Result.error(
+            `Could not find items for user with id ${userId}`,
+            "NotFound",
+        );
     }
 
     return Result.ok(sortItems(items.data));
@@ -32,7 +37,10 @@ const markAsRead = async (id: number, markAsRead: boolean) => {
 
     if (!updated.success) {
         logger.error(`Could not update item with id ${id}`);
-        return Result.error(`Could not update item with id ${id}`, "InternalError");
+        return Result.error(
+            `Could not update item with id ${id}`,
+            "InternalError",
+        );
     }
 
     return Result.ok(updated.data);
@@ -54,7 +62,10 @@ const updateItem = async (item: ItemWithContent) => {
 
     if (!existingItem.success) {
         logger.error(`Could not find item with id ${item.id}`);
-        return Result.error(`Could not find item with id ${item.id}`, "NotFound");
+        return Result.error(
+            `Could not find item with id ${item.id}`,
+            "NotFound",
+        );
     }
 
     const updatedItem: ItemWithContent = { ...existingItem.data, ...item };
@@ -63,7 +74,10 @@ const updateItem = async (item: ItemWithContent) => {
 
     if (!updated.success) {
         logger.error(`Could not update item with id ${item.id}`);
-        return Result.error(`Could not update item with id ${item.id}`, "InternalError");
+        return Result.error(
+            `Could not update item with id ${item.id}`,
+            "InternalError",
+        );
     }
 
     return Result.ok(updated.data);

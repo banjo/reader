@@ -1,3 +1,4 @@
+import { FC } from "react";
 import { Dropdown, MenuEntries } from "@/client/components/shared/dropdown";
 import { Icons } from "@/client/components/shared/icons";
 import { TitleMenu } from "@/client/components/table/table-container-items";
@@ -12,8 +13,7 @@ import {
 import { Button } from "@/client/components/ui/button";
 import { Switch } from "@/client/components/ui/switch";
 import { avatarUrl } from "@/client/lib/utils";
-import { FeedWithContent, FeedWithItems } from "@/shared/models/types";
-import { FC } from "react";
+import { FeedWithContent, FeedWithItems } from "db";
 
 type FilterBarProps = {
     filters: TableFiltersItems;
@@ -74,16 +74,24 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 
             {isSubscribed && (
                 <>
-                    <Button onClick={actions.markAllAsRead} disabled={filters.hasReadAll}>
+                    <Button
+                        onClick={actions.markAllAsRead}
+                        disabled={filters.hasReadAll}
+                    >
                         Mark all as read
                     </Button>
                     <div className="flex items-center">
                         <Switch
                             id="show-unread"
                             checked={filters.showUnreadOnly}
-                            onCheckedChange={() => filters.toggleShowUnreadOnly()}
+                            onCheckedChange={() =>
+                                filters.toggleShowUnreadOnly()
+                            }
                         />
-                        <label htmlFor="show-unread" className="ml-2 text-sm font-medium">
+                        <label
+                            htmlFor="show-unread"
+                            className="ml-2 text-sm font-medium"
+                        >
                             Show unread only
                         </label>
                     </div>
@@ -92,7 +100,11 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 
             {feed && !isSubscribed && (
                 <>
-                    <Button onClick={async () => await actions.subscribe(feed.internalIdentifier)}>
+                    <Button
+                        onClick={async () =>
+                            await actions.subscribe(feed.internalIdentifier)
+                        }
+                    >
                         Subscribe
                     </Button>
                 </>

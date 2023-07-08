@@ -3,10 +3,7 @@ import { FeedContainer } from "@/client/features/feed/containers/feed-container"
 import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 import { AsyncResultType, Result } from "@/shared/models/result";
-import {
-    CleanFeedWithContent,
-    CleanFeedWithItems,
-} from "@/shared/models/types";
+import { CleanFeedWithContent, CleanFeedWithItems } from "db";
 
 type Props = {
     params: {

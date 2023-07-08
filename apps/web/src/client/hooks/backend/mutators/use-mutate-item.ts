@@ -1,6 +1,6 @@
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { Refetch } from "@/shared/models/swr";
-import { ItemWithContent } from "@/shared/models/types";
+import { ItemWithContent } from "db";
 import { toast } from "react-hot-toast";
 
 type In = {
@@ -59,11 +59,13 @@ export const useMutateItem = ({ refetch }: In) => {
     };
 
     const markMultipleAsRead = (items: ItemWithContent[]) => {
-        const updateRequest = api.SWR(`/items/read`, "POST", { ids: items.map(i => i.id) });
+        const updateRequest = api.SWR(`/items/read`, "POST", {
+            ids: items.map((i) => i.id),
+        });
 
         const updatedItems = items
-            .filter(i => !i.isRead)
-            .map(i => ({
+            .filter((i) => !i.isRead)
+            .map((i) => ({
                 ...i,
                 isRead: true,
             }));
