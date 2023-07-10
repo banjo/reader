@@ -1,9 +1,6 @@
 {
     "root": true,
-    "extends": [
-        "prettier",
-        "@banjoanton/eslint-config"
-    ],
+    "extends": ["prettier", "@banjoanton/eslint-config"],
     "plugins": [],
     "rules": {},
     "settings": {},
