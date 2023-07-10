@@ -1,13 +1,4 @@
 {
-    "compilerOptions": {
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "outDir": "dist",
-        "target": "ESNext",
-        "moduleResolution": "node",
-        "module": "ESNext"
-    },
+    "extends": "tsconfig/library.json",
     "exclude": ["node_modules"]
 }
