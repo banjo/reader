@@ -1,9 +1,6 @@
 version: "3.8"
 
-name: prisma-prisma
-
-# For connection urls to the following instances, see
-# https://github.com/prisma/prisma/blob/main/TESTING.md#environment-variables
+name: local-dev
 services:
     mysql:
         container_name: prisma-mysql
@@ -18,6 +15,15 @@ services:
             - "3306:3306"
         volumes:
             - mysql-data:/var/lib/mysql
+    redis:
+        image: "redis:7.0"
+        container_name: redis_container
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
 
 volumes:
     mysql-data:
+    redis_data:
