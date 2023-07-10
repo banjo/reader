@@ -29,10 +29,7 @@ export const Favorite: FC<Props> = ({ active, onClick, size = "md" }) => {
             }}
             tooltip={tooltip}
         >
-            <Icons.star
-                className={`${iconSizeMapper[size]} ${color}`}
-                onClick={handleClick}
-            />
+            <Icons.star className={`${iconSizeMapper[size]} ${color}`} onClick={handleClick} />
         </IconBase>
     );
 };

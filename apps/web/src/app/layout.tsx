@@ -39,14 +39,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     <body
                         className={cn(
                             "min-h-screen bg-background font-sans antialiased",
-                            fontSans.variable,
+                            fontSans.variable
                         )}
                     >
-                        <ThemeProvider
-                            attribute="class"
-                            defaultTheme="system"
-                            enableSystem
-                        >
+                        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                             <Toaster position={"bottom-center"} />
                             <div className="relative flex min-h-screen flex-col">
                                 <SiteHeader />

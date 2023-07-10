@@ -6,11 +6,7 @@ import { Table } from "@/client/components/table/table";
 import { FilterBar } from "@/client/components/table/table-filter-bar";
 import { TableItem } from "@/client/components/table/table-item";
 import { useTableFiltersContent } from "@/client/components/table/use-table-filters-content";
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/client/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
 import { noop } from "@banjoanton/utils";
 import { ItemContent } from "@prisma/client";
 import { CleanFeedWithContent } from "db";
@@ -50,7 +46,7 @@ export const TableContainerContent: FC<TableContainerProps> = ({
             <Table type="list">
                 <AnimatePresence initial={false}>
                     {data.length > 0 &&
-                        data.map((c) => {
+                        data.map(c => {
                             return (
                                 <TableItem
                                     key={c.id}
@@ -68,9 +64,7 @@ export const TableContainerContent: FC<TableContainerProps> = ({
                     {data.length === 0 && (
                         <Alert>
                             <AlertTitle>Ops!</AlertTitle>
-                            <AlertDescription>
-                                No content found
-                            </AlertDescription>
+                            <AlertDescription>No content found</AlertDescription>
                         </Alert>
                     )}
                 </AnimatePresence>

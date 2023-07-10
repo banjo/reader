@@ -20,25 +20,17 @@ export const useItemsFetcher = ({ key, fallbackData }: In): Out => {
     const { SWR_AUTH: fetcher } = useAuthFetcher();
     const { fetchLatestInSidebar, mutateSidebarItems } = useUpdateSidebar();
 
-    const { data: fetchData, mutate } = useSWR<ItemWithContent[], Error>(
-        key,
-        fetcher,
-        {
-            fallbackData: fallbackData,
-        },
-    );
+    const { data: fetchData, mutate } = useSWR<ItemWithContent[], Error>(key, fetcher, {
+        fallbackData: fallbackData,
+    });
 
     const data = useMemo(() => {
         return fetchData ?? fallbackData;
     }, [fallbackData, fetchData]);
 
-    const refetch: Refetch<ItemWithContent[]> = async (
-        updatedItems,
-        updateFn,
-        onError,
-    ) => {
-        const allItems = data.map((i) => {
-            const updatedItem = updatedItems.find((ui) => ui.id === i.id);
+    const refetch: Refetch<ItemWithContent[]> = async (updatedItems, updateFn, onError) => {
+        const allItems = data.map(i => {
+            const updatedItem = updatedItems.find(ui => ui.id === i.id);
 
             if (updatedItem) {
                 return updatedItem;

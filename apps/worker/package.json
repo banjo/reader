@@ -1,24 +1,24 @@
 {
-  "name": "worker",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/index.ts",
-  "type": "module",
-  "scripts": {
-    "run": "esno src/index.ts",
-    "build": "tsup",
-    "dev": "tsup --watch --clean",
-    "clean": "rimraf node_modules dist"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "esno": "^0.16.3",
-    "tsup": "^7.1.0",
-    "tsconfig": "workspace:*"
-  },
-  "dependencies": {
-    "bullmq": "^4.2.0"
-  }
+    "name": "worker",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/index.ts",
+    "type": "module",
+    "scripts": {
+        "run": "esno src/index.ts",
+        "build": "tsup",
+        "dev": "tsup --watch --clean",
+        "clean": "rimraf node_modules dist"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "esno": "^0.16.3",
+        "tsup": "^7.1.0",
+        "tsconfig": "workspace:*"
+    },
+    "dependencies": {
+        "bullmq": "^4.2.0"
+    }
 }

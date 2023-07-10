@@ -84,16 +84,8 @@ export const TableItem = ({
 
             {isSubscribed && (
                 <>
-                    <Favorite
-                        size="md"
-                        active={item.isFavorite}
-                        onClick={toggleFavorite}
-                    />
-                    <Bookmark
-                        size="md"
-                        active={item.isBookmarked}
-                        onClick={toggleBookmark}
-                    />
+                    <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
+                    <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
                 </>
             )}
 
@@ -108,19 +100,11 @@ export const TableItem = ({
             <span className="min-w-max font-bold" onClick={onClick}>
                 {content.title}
             </span>
-            <span
-                className="w-0 max-w-full shrink grow truncate"
-                onClick={onClick}
-            >
+            <span className="w-0 max-w-full shrink grow truncate" onClick={onClick}>
                 {content.description ?? content.content}
             </span>
             {menuOptions && isSubscribed && (
-                <Dropdown
-                    align="start"
-                    side="left"
-                    menuEntries={menuOptions}
-                    item={item}
-                >
+                <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />
                 </Dropdown>
             )}

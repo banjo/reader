@@ -9,15 +9,13 @@ type In<T> = {
     unsubscribeFn: UnsubscribeFn;
 };
 
-export const useMutateFeed = <T extends CleanFeedWithItems>({
-    unsubscribeFn,
-}: In<T>) => {
+export const useMutateFeed = <T extends CleanFeedWithItems>({ unsubscribeFn }: In<T>) => {
     const api = useAuthFetcher();
 
     const unsubscribe = async (feed: T) => {
         const unsubscribeRequest = await api.SWR(
             `/feed/${feed.internalIdentifier}/unsubscribe`,
-            "POST",
+            "POST"
         );
 
         await unsubscribeFn(unsubscribeRequest, () => {

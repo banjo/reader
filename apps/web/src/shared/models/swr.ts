@@ -4,5 +4,5 @@ export type RefetchUpdateFn = () => Promise<undefined>;
 export type Refetch<T> = (
     updatedItem: T,
     updateFn: RefetchUpdateFn,
-    onError?: RefetchOnError,
+    onError?: RefetchOnError
 ) => void;

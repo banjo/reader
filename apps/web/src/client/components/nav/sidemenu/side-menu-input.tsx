@@ -69,7 +69,7 @@ export const SideMenuInput: FC = () => {
     };
 
     const customStyles: StylesConfig = {
-        control: (provided) => ({
+        control: provided => ({
             ...provided,
             width: "14rem", // important for width to work
         }),
@@ -83,7 +83,7 @@ export const SideMenuInput: FC = () => {
             return [];
         }
 
-        const options = res.data.map((feed) => ({
+        const options = res.data.map(feed => ({
             value: feed.rssUrl,
             label: feed.name,
         }));
@@ -114,9 +114,7 @@ export const SideMenuInput: FC = () => {
                 isLoading={isLoading}
                 placeholder={isLoading ? "Adding feed..." : "Search for a feed"}
                 loadOptions={loadOptions}
-                noOptionsMessage={() =>
-                    "No feeds found, submit an RSS URL to add a new feed"
-                }
+                noOptionsMessage={() => "No feeds found, submit an RSS URL to add a new feed"}
             />
         </div>
     );

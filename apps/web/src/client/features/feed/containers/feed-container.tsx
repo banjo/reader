@@ -3,10 +3,7 @@
 import { FC } from "react";
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { TableContainerContent } from "@/client/components/table/table-container-content";
-import {
-    TableContainerItems,
-    TitleMenu,
-} from "@/client/components/table/table-container-items";
+import { TableContainerItems, TitleMenu } from "@/client/components/table/table-container-items";
 import { useFeedFetcher } from "@/client/features/feed/hooks/use-feed-fetcher";
 import { useMutateFeed } from "@/client/hooks/backend/mutators/use-mutate-feed";
 import { useTableItemMenu } from "@/client/hooks/shared/use-table-item-menu";
@@ -69,11 +66,7 @@ export const FeedContainer: FC<Props> = ({ feed, internalIdentifier }) => {
                     feed={data}
                 />
             ) : (
-                <TableContainerContent
-                    content={data.contentItems}
-                    feed={data}
-                    title={data.name}
-                />
+                <TableContainerContent content={data.contentItems} feed={data} title={data.name} />
             )}
         </div>
     );

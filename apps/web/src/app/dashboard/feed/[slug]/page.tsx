@@ -14,7 +14,7 @@ type Props = {
 export const revalidate = 0;
 
 const fetchFeed = async (
-    slug: string,
+    slug: string
 ): AsyncResultType<CleanFeedWithItems | CleanFeedWithContent> => {
     const userId = await ServerComponentService.getUserId();
 
@@ -22,10 +22,7 @@ const fetchFeed = async (
         return Result.error("Could not get internal identifier", "BadRequest");
     }
 
-    const feedResult = await FeedService.getFeedWithItemsOrContent(
-        slug,
-        userId,
-    );
+    const feedResult = await FeedService.getFeedWithItemsOrContent(slug, userId);
 
     if (!feedResult.success) {
         return Result.error(feedResult.message, feedResult.type);

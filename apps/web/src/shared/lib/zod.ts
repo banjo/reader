@@ -25,37 +25,25 @@ const createErrorMessages = (issues: z.ZodIssue[]): Error => {
     };
 };
 
-export const safeParseArray = <T>(
-    array: T[],
-    model: z.ZodSchema<T>,
-): ResultType<T[]> => {
+export const safeParseArray = <T>(array: T[], model: z.ZodSchema<T>): ResultType<T[]> => {
     try {
-        const res = array.map((element) => model.parse(element));
+        const res = array.map(element => model.parse(element));
         return Result.ok(res);
     } catch (error: unknown) {
         if (error instanceof z.ZodError) {
-            return Result.error(
-                createErrorMessages(error.issues).message,
-                "BadRequest",
-            );
+            return Result.error(createErrorMessages(error.issues).message, "BadRequest");
         }
         return Result.error("Unknown error", "InternalError");
     }
 };
 
-export const safeParse = <T>(
-    object: T,
-    model: z.ZodSchema<T>,
-): ResultType<T> => {
+export const safeParse = <T>(object: T, model: z.ZodSchema<T>): ResultType<T> => {
     try {
         const res = model.parse(object);
         return Result.ok(res);
     } catch (error: unknown) {
         if (error instanceof z.ZodError) {
-            return Result.error(
-                createErrorMessages(error.issues).message,
-                "BadRequest",
-            );
+            return Result.error(createErrorMessages(error.issues).message, "BadRequest");
         }
         return Result.error("Unknown error", "InternalError");
     }

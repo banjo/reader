@@ -74,24 +74,16 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 
             {isSubscribed && (
                 <>
-                    <Button
-                        onClick={actions.markAllAsRead}
-                        disabled={filters.hasReadAll}
-                    >
+                    <Button onClick={actions.markAllAsRead} disabled={filters.hasReadAll}>
                         Mark all as read
                     </Button>
                     <div className="flex items-center">
                         <Switch
                             id="show-unread"
                             checked={filters.showUnreadOnly}
-                            onCheckedChange={() =>
-                                filters.toggleShowUnreadOnly()
-                            }
+                            onCheckedChange={() => filters.toggleShowUnreadOnly()}
                         />
-                        <label
-                            htmlFor="show-unread"
-                            className="ml-2 text-sm font-medium"
-                        >
+                        <label htmlFor="show-unread" className="ml-2 text-sm font-medium">
                             Show unread only
                         </label>
                     </div>
@@ -100,11 +92,7 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 
             {feed && !isSubscribed && (
                 <>
-                    <Button
-                        onClick={async () =>
-                            await actions.subscribe(feed.internalIdentifier)
-                        }
-                    >
+                    <Button onClick={async () => await actions.subscribe(feed.internalIdentifier)}>
                         Subscribe
                     </Button>
                 </>

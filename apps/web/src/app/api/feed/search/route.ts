@@ -6,11 +6,7 @@ import { z } from "zod";
 const searchQuerySchema = z.string();
 
 export async function GET(req: Request) {
-    const queryResult = RequestService.getQueryParams(
-        req,
-        "query",
-        searchQuerySchema,
-    );
+    const queryResult = RequestService.getQueryParams(req, "query", searchQuerySchema);
 
     if (!queryResult.success) {
         return ResponseService.error(queryResult.message, queryResult.type);
@@ -21,10 +17,7 @@ export async function GET(req: Request) {
     const queryParseResult = searchQuerySchema.safeParse(queryResult.data);
 
     if (!queryParseResult.success) {
-        return ResponseService.badRequest(
-            "query parameter",
-            queryParseResult.error.issues,
-        );
+        return ResponseService.badRequest("query parameter", queryParseResult.error.issues);
     }
 
     const item = await FeedService.searchFeeds(queryParseResult.data, userId);

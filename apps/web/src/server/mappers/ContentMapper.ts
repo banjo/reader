@@ -1,9 +1,7 @@
 import { ParseItem } from "@/server/services/ParseService";
 import { Prisma } from "@prisma/client";
 
-const parseItemToCreateContent = (
-    item: ParseItem,
-): Prisma.ItemContentCreateManyFeedInput => {
+const parseItemToCreateContent = (item: ParseItem): Prisma.ItemContentCreateManyFeedInput => {
     return {
         content: item.contentSnippet ?? item.content,
         description: item.description ?? item.contentSnippet,

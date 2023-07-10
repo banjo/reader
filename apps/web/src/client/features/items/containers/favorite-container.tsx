@@ -21,10 +21,7 @@ export const FavoriteContainer: FC<Props> = ({ items }) => {
         refetchContentMultiple: noop,
     });
 
-    const filtered = useMemo(
-        () => data.filter((item) => item.isFavorite),
-        [data],
-    );
+    const filtered = useMemo(() => data.filter(item => item.isFavorite), [data]);
 
     return (
         <div className="flex flex-col gap-4">

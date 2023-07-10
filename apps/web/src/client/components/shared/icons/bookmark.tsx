@@ -19,10 +19,7 @@ export const Bookmark: FC<Props> = ({ active, onClick, size = "md" }) => {
 
     return (
         <IconBase tooltip={tooltip}>
-            <Icons.bookmark
-                className={`${iconSizeMapper[size]} ${filled}`}
-                onClick={handleClick}
-            />
+            <Icons.bookmark className={`${iconSizeMapper[size]} ${filled}`} onClick={handleClick} />
         </IconBase>
     );
 };

@@ -4,9 +4,7 @@ import { prisma } from "db";
 
 const logger = createLogger("UserRepository");
 
-const getIdByExternalId = async (
-    externalId: string,
-): AsyncResultType<number> => {
+const getIdByExternalId = async (externalId: string): AsyncResultType<number> => {
     const user = await prisma.user.findUnique({
         where: {
             externalId,

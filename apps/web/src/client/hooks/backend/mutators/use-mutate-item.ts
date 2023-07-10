@@ -60,12 +60,12 @@ export const useMutateItem = ({ refetch }: In) => {
 
     const markMultipleAsRead = (items: ItemWithContent[]) => {
         const updateRequest = api.SWR(`/items/read`, "POST", {
-            ids: items.map((i) => i.id),
+            ids: items.map(i => i.id),
         });
 
         const updatedItems = items
-            .filter((i) => !i.isRead)
-            .map((i) => ({
+            .filter(i => !i.isRead)
+            .map(i => ({
                 ...i,
                 isRead: true,
             }));

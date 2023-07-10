@@ -26,10 +26,10 @@ type TableFiltersOut = {
 
 export const useTableFiltersItems = (
     data: ItemWithContent[],
-    refetch: Refetch<ItemWithContent[]>,
+    refetch: Refetch<ItemWithContent[]>
 ): TableFiltersOut => {
     const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(() => {
-        return data.some((item) => item.isRead === false);
+        return data.some(item => item.isRead === false);
     });
     const { markMultipleAsRead } = useMutateItem({ refetch });
     const { fetchLatestInSidebar } = useUpdateSidebar();
@@ -39,18 +39,18 @@ export const useTableFiltersItems = (
     // FILTERED DATA
     const filteredData = useMemo(() => {
         if (showUnreadOnly) {
-            return data.filter((item) => item.isRead === false);
+            return data.filter(item => item.isRead === false);
         }
         return data;
     }, [data, showUnreadOnly]);
 
     // FILTERS
     const hasReadAll = useMemo(() => {
-        return filteredData.every((item) => item.isRead === true);
+        return filteredData.every(item => item.isRead === true);
     }, [filteredData]);
 
     const toggleShowUnreadOnly = () => {
-        setShowUnreadOnly((prev) => !prev);
+        setShowUnreadOnly(prev => !prev);
     };
 
     // ACTIONS
@@ -59,10 +59,7 @@ export const useTableFiltersItems = (
     };
 
     const subscribe = async (internalIdentifier: string) => {
-        const subscribeResult = await api.POST(
-            `/feed/${internalIdentifier}/subscribe`,
-            {},
-        );
+        const subscribeResult = await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
 
         if (!subscribeResult.success) {
             toast.error("Failed to subscribe to feed");

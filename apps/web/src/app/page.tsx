@@ -16,8 +16,7 @@ export default function IndexPage() {
                     Banjo RSS
                 </h1>
                 <p className="max-w-[700px] text-lg text-muted-foreground">
-                    A super simple RSS feed reader. Not much more than that
-                    actually.
+                    A super simple RSS feed reader. Not much more than that actually.
                 </p>
             </div>
 
@@ -31,10 +30,7 @@ export default function IndexPage() {
                         <Link href="/sign-in" className={buttonVariants()}>
                             Sign in
                         </Link>
-                        <Link
-                            href="/sign-up"
-                            className={buttonVariants({ variant: "outline" })}
-                        >
+                        <Link href="/sign-up" className={buttonVariants({ variant: "outline" })}>
                             Sign up
                         </Link>
                     </>

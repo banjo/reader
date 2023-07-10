@@ -25,14 +25,13 @@ export const useTableItemMenu = ({ refetchItemsMultiple }: In): Out => {
         { type: "select", content: "Read", onSelect: () => 0 },
         {
             type: "select",
-            content: (item) =>
-                item.isRead ? "Mark as unread" : "Mark as read",
+            content: item => (item.isRead ? "Mark as unread" : "Mark as read"),
             onSelect: toggleReadStatus,
         },
         {
             type: "select",
             content: "Visit site",
-            onSelect: (item) => {
+            onSelect: item => {
                 window.open(item.content.link, "_blank");
             },
         },

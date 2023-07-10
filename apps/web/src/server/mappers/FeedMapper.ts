@@ -5,7 +5,7 @@ import { FeedWithUsers } from "db";
 const parseFeedToCreateFeed = (
     feed: ParseFeed,
     rssUrl: string,
-    faviconUrl?: string,
+    faviconUrl?: string
 ): Prisma.FeedCreateInput => {
     return {
         description: feed.description,

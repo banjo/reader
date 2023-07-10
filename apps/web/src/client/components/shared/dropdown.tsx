@@ -42,9 +42,7 @@ export const Dropdown = <T,>({
 }: Props<T>) => {
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className={buttonClasses}>
-                {children}
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger className={buttonClasses}>{children}</DropdownMenuTrigger>
             <DropdownMenuContent side={side} align={align}>
                 {menuEntries.map((entry, index) => {
                     switch (entry.type) {
@@ -62,11 +60,7 @@ export const Dropdown = <T,>({
                             );
                         }
                         case "label": {
-                            return (
-                                <DropdownMenuLabel key={index}>
-                                    {entry.label}
-                                </DropdownMenuLabel>
-                            );
+                            return <DropdownMenuLabel key={index}>{entry.label}</DropdownMenuLabel>;
                         }
                         case "separator": {
                             return <DropdownMenuSeparator key={index} />;

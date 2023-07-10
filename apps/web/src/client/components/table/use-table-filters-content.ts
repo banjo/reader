@@ -16,19 +16,14 @@ type TableFiltersOut = {
     actions: TableActionsContent;
 };
 
-export const useTableFiltersContent = (
-    data: ItemContent[],
-): TableFiltersOut => {
+export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => {
     const { fetchLatestInSidebar } = useUpdateSidebar();
     const { mutate } = useSWRConfig();
     const api = useAuthFetcher();
 
     // ACTIONS
     const subscribe = async (internalIdentifier: string) => {
-        const subscribeResult = await api.POST(
-            `/feed/${internalIdentifier}/subscribe`,
-            {},
-        );
+        const subscribeResult = await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
 
         if (!subscribeResult.success) {
             toast.error("Failed to subscribe to feed");
