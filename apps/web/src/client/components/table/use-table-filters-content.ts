@@ -1,6 +1,6 @@
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
-import { ItemContent } from "@prisma/client";
+import { ItemContent } from "db";
 import toast from "react-hot-toast";
 import { useSWRConfig } from "swr";
 

@@ -1,6 +1,6 @@
-import { FeedService } from "@/server/services/FeedService";
 import { RequestService } from "@/server/services/RequestService";
 import { ResponseService } from "@/server/services/ResponseService";
+import { FeedService } from "server";
 import { z } from "zod";
 
 const searchQuerySchema = z.string();

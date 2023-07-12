@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
 import { SideMenuContainer } from "@/client/components/nav/sidemenu/side-menu-container";
 import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
-import { FeedService } from "@/server/services/FeedService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
+import { redirect } from "next/navigation";
+import { FeedService } from "server";
 
 type Props = {
     children: React.ReactNode;

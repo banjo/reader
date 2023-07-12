@@ -1,5 +1,5 @@
-import { ParseItem } from "@/server/services/ParseService";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "db";
+import { ParseItem } from "../services/ParseService";
 
 const parseItemToCreateContent = (item: ParseItem): Prisma.ItemContentCreateManyFeedInput => {
     return {

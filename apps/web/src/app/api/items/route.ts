@@ -1,6 +1,6 @@
-import { ItemService } from "@/server/services/ItemService";
 import { RequestService } from "@/server/services/RequestService";
 import { ResponseService } from "@/server/services/ResponseService";
+import { ItemService } from "server";
 
 export async function GET(req: Request) {
     const userId = RequestService.getUserId(req);

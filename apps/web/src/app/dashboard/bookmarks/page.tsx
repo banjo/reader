@@ -1,7 +1,7 @@
 import { ClientAuthContainer } from "@/client/components/utils/client-auth-container";
 import { BookmarkContainer } from "@/client/features/items/containers/bookmark-container";
-import { ItemService } from "@/server/services/ItemService";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
+import { ItemService } from "server";
 
 export const revalidate = 0;
 

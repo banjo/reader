@@ -1,8 +1,7 @@
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { Refetch } from "@/shared/models/swr";
-import { ItemContent } from "@prisma/client";
-import { ItemWithContent } from "db";
+import { ItemContent, ItemWithContent } from "db";
 
 type Out = {
     menuOptionsItems: MenuEntries<ItemWithContent>[];

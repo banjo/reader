@@ -1,15 +1,15 @@
-import createLogger from "@/server/lib/logger";
-import { ContentMapper } from "@/server/mappers/ContentMapper";
-import { DatabaseMapper } from "@/server/mappers/DatabaseMapper";
-import { FeedMapper, SearchFeed } from "@/server/mappers/FeedMapper";
-import { ItemMapper } from "@/server/mappers/ItemMapper";
-import { ContentRepository } from "@/server/repositories/ContentRepository";
-import { FeedRepository } from "@/server/repositories/FeedRepository";
-import { ItemRepository } from "@/server/repositories/ItemRespository";
-import { ParseService } from "@/server/services/ParseService";
-import { AsyncResultType, Result } from "@/shared/models/result";
 import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
+import { createLogger } from "../lib/logger";
+import { ContentMapper } from "../mappers/ContentMapper";
+import { DatabaseMapper } from "../mappers/DatabaseMapper";
+import { FeedMapper, SearchFeed } from "../mappers/FeedMapper";
+import { ItemMapper } from "../mappers/ItemMapper";
+import { ContentRepository } from "../repositories/ContentRepository";
+import { FeedRepository } from "../repositories/FeedRepository";
+import { ItemRepository } from "../repositories/ItemRepository";
+import { AsyncResultType, Result } from "../shared/models/result";
+import { ParseService } from "./ParseService";
 
 const logger = createLogger("FeedService");
 

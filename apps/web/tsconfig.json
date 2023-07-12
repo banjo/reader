@@ -10,7 +10,8 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "../../packages/db/src/types.ts"
+        "../../packages/db/src/types.ts",
+        "../../packages/server/src/shared/modules.d.ts"
     ],
     "exclude": ["node_modules"]
 }

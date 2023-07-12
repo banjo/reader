@@ -6,8 +6,7 @@ import { TableType } from "@/client/components/table/table.types";
 import { useMutateItem } from "@/client/hooks/backend/mutators/use-mutate-item";
 import { Refetch } from "@/shared/models/swr";
 import { noop } from "@banjoanton/utils";
-import { ItemContent } from "@prisma/client";
-import { ItemWithContent } from "db";
+import { ItemContent, ItemWithContent } from "db";
 import { motion } from "framer-motion";
 
 type CardPropsItem = {
@@ -72,14 +71,14 @@ export const TableItem = ({
             style={{ minHeight: "2rem" }}
             transition={{ type: "spring", bounce: 0 }}
             exit={{ opacity: 0, height: 0, transition: { duration: 0.3 } }}
-            className="relative flex w-full cursor-pointer
-                items-center justify-start gap-1 overflow-hidden rounded-md
-                border border-border px-2 text-sm
-                transition-colors hover:bg-slate-100
-                dark:border dark:bg-background dark:hover:bg-slate-900"
+            className="border-border dark:bg-background relative flex
+                w-full cursor-pointer items-center justify-start gap-1
+                overflow-hidden rounded-md border px-2
+                text-sm transition-colors
+                hover:bg-slate-100 dark:border dark:hover:bg-slate-900"
         >
             {isSubscribed && !item.isRead ? (
-                <div className="absolute inset-y-0 left-0 w-1 bg-primary dark:bg-foreground"></div>
+                <div className="bg-primary dark:bg-foreground absolute inset-y-0 left-0 w-1"></div>
             ) : null}
 
             {isSubscribed && (

@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
+import { getUrl } from "@/shared/lib/url";
 import { authMiddleware } from "@clerk/nextjs";
-
-import { getUrl } from "./shared/lib/url";
+import { NextResponse } from "next/server";
 
 export default authMiddleware({
     publicRoutes: ["/"],

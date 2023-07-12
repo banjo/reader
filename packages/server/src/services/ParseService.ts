@@ -1,11 +1,11 @@
-import createLogger from "@/server/lib/logger";
-import { ContentMapper } from "@/server/mappers/ContentMapper";
-import { AsyncResultType, Result } from "@/shared/models/result";
 import { first, sortBy } from "@banjoanton/utils";
-import { ItemContent, Prisma } from "@prisma/client";
+import { ItemContent, Prisma } from "db";
 import getFavicons from "get-website-favicon";
 import RssParser from "rss-parser";
 import { z } from "zod";
+import { createLogger } from "../lib/logger";
+import { ContentMapper } from "../mappers/ContentMapper";
+import { AsyncResultType, Result } from "../shared/models/result";
 
 const rssParser = new RssParser();
 

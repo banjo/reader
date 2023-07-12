@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
-import { UserRepository } from "@/server/repositories/UserRepository";
 import { auth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+import { UserRepository } from "server";
 
 const getUserId = async () => {
     const { userId: externalUserId } = auth();

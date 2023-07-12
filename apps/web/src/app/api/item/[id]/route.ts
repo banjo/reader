@@ -1,5 +1,5 @@
-import { ItemService } from "@/server/services/ItemService";
 import { ResponseService } from "@/server/services/ResponseService";
+import { ItemService } from "server";
 import { z } from "zod";
 
 const putIdSchema = z.number();

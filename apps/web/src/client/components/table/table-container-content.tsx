@@ -1,6 +1,5 @@
 "use client";
 
-import { FC } from "react";
 import { MenuEntries } from "@/client/components/shared/dropdown";
 import { Table } from "@/client/components/table/table";
 import { FilterBar } from "@/client/components/table/table-filter-bar";
@@ -8,9 +7,9 @@ import { TableItem } from "@/client/components/table/table-item";
 import { useTableFiltersContent } from "@/client/components/table/use-table-filters-content";
 import { Alert, AlertDescription, AlertTitle } from "@/client/components/ui/alert";
 import { noop } from "@banjoanton/utils";
-import { ItemContent } from "@prisma/client";
-import { CleanFeedWithContent } from "db";
+import { CleanFeedWithContent, ItemContent } from "db";
 import { AnimatePresence } from "framer-motion";
+import { FC } from "react";
 
 export type TitleMenu = {
     title: string;

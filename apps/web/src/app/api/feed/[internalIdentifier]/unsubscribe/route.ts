@@ -1,6 +1,6 @@
-import { FeedService } from "@/server/services/FeedService";
 import { RequestService } from "@/server/services/RequestService";
 import { ResponseService } from "@/server/services/ResponseService";
+import { FeedService } from "server";
 
 export async function POST(req: Request, context: { params: { internalIdentifier: string } }) {
     const userId = RequestService.getUserId(req);

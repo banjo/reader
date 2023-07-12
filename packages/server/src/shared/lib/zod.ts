@@ -1,5 +1,5 @@
-import { Result, ResultType } from "@/shared/models/result";
 import * as z from "zod";
+import { Result, ResultType } from "../models/result";
 
 type Error = {
     code: string;

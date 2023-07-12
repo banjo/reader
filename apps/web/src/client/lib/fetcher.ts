@@ -1,7 +1,13 @@
 import { getUrl } from "@/shared/lib/url";
-import { BadRequestError, RequestError, SuccessRequest } from "@/shared/models/request";
-import { AsyncResultType, ErrorType, Result } from "@/shared/models/result";
 import ky, { HTTPError } from "ky-universal";
+import {
+    AsyncResultType,
+    BadRequestError,
+    ErrorType,
+    RequestError,
+    Result,
+    SuccessRequest,
+} from "server";
 
 /**
  * HELPERS

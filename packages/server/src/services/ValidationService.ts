@@ -1,5 +1,5 @@
-import { Result } from "@/shared/models/result";
 import { KeySchema, ZodIssue } from "zod";
+import { Result } from "../shared/models/result";
 
 const createErrorMessage = (issues: ZodIssue[], value: string, name: string): string => {
     const firstError = issues[0];

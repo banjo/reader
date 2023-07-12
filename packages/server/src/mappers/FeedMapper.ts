@@ -1,6 +1,5 @@
-import { ParseFeed } from "@/server/services/ParseService";
-import { Feed, Prisma } from "@prisma/client";
-import { FeedWithUsers } from "db";
+import { Feed, FeedWithUsers, Prisma } from "db";
+import { ParseFeed } from "../services/ParseService";
 
 const parseFeedToCreateFeed = (
     feed: ParseFeed,

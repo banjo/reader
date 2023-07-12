@@ -1,10 +1,10 @@
-import { FC, useMemo, useRef, useState } from "react";
 import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/client/hooks/backend/use-update-sidebar";
-import { SearchFeed } from "@/server/mappers/FeedMapper";
+import { FC, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { StylesConfig } from "react-select";
 import Select from "react-select/async";
+import { SearchFeed } from "server";
 
 type Option = {
     value: string;

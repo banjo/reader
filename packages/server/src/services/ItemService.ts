@@ -1,8 +1,8 @@
-import { sortItems } from "@/client/lib/utils";
-import createLogger from "@/server/lib/logger";
-import { ItemRepository } from "@/server/repositories/ItemRespository";
-import { AsyncResultType, Result } from "@/shared/models/result";
 import { ItemWithContent, ItemWithContentAndFeed } from "db";
+import { createLogger } from "../lib/logger";
+import { ItemRepository } from "../repositories/ItemRepository";
+import { sortItems } from "../shared/lib/utils";
+import { AsyncResultType, Result } from "../shared/models/result";
 
 const logger = createLogger("ItemService");
 
