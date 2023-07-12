@@ -1,4 +1,10 @@
 {
+    "compilerOptions": {
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
     "extends": "tsconfig/library.json",
+    "include": ["src/**/*", "vitest.config.ts"],
     "exclude": ["node_modules"]
 }

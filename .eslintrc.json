@@ -1,13 +1,4 @@
 {
     "root": true,
-    "extends": ["@banjoanton/eslint-config"],
-    "plugins": [],
-    "rules": {},
-    "settings": {},
-    "overrides": [
-        {
-            "files": ["*.ts", "*.tsx"],
-            "parser": "@typescript-eslint/parser"
-        }
-    ]
+    "extends": ["@banjoanton/eslint-config"]
 }

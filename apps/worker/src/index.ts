@@ -1,5 +1,5 @@
-import { start } from "./startup";
-import { fetchWorker } from "./workers/fetch/fetch-worker";
+import { start } from "@/startup";
+import { fetchWorker } from "@/workers/fetch/fetch-worker";
 
 process.on("SIGTERM", async () => {
     console.info("SIGTERM signal received: closing queues");
@@ -10,5 +10,3 @@ process.on("SIGTERM", async () => {
 });
 
 start();
-
-await fetchWorker.stopRepeatable();

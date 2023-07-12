@@ -7,6 +7,7 @@
     "scripts": {
         "run": "esno src/index.ts",
         "build": "tsup",
+        "test": "vitest",
         "dev": "tsup --watch --clean",
         "clean": "rimraf node_modules dist"
     },
@@ -14,9 +15,12 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@banjoanton/utils": "^0.1.44",
+        "db": "workspace:*",
         "esno": "^0.16.3",
+        "tsconfig": "workspace:*",
         "tsup": "^7.1.0",
-        "tsconfig": "workspace:*"
+        "vitest": "^0.33.0"
     },
     "dependencies": {
         "bullmq": "^4.2.0"
