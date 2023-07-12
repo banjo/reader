@@ -22,6 +22,7 @@ npx prisma studio
 ```
 
 ## TODO:
+
 -   [ ] Create user in database on sign up
 -   [x] Fix problem with externalId and local id, auth() only contains externalId
 -   [x] Add createdAt and updatedAt to all models
@@ -37,9 +38,6 @@ npx prisma studio
 -   [ ] Add delay for "no items found" box
 -   [ ] Add transactions to database
 -   [ ] CleanFeedWithItems currently can return items or content as items, should be consistent and type safe in future.
-
-
-
 
 ## License
 

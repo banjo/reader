@@ -1,4 +1,7 @@
 {
     "root": true,
-    "extends": ["@banjoanton/eslint-config"]
+    "extends": ["@banjoanton/eslint-config"],
+    "rules": {
+        "n/no-unpublished-import": "off"
+    }
 }
