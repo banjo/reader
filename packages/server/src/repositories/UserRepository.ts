@@ -20,6 +20,21 @@ const getIdByExternalId = async (externalId: string): AsyncResultType<number> =>
     return Result.ok(user.id);
 };
 
+const getUsersByFeedId = async (feedId: number) => {
+    const users = await prisma.user.findMany({
+        where: {
+            feeds: {
+                some: {
+                    id: feedId,
+                },
+            },
+        },
+    });
+
+    return users;
+};
+
 export const UserRepository = {
     getIdByExternalId,
+    getUsersByFeedId,
 };

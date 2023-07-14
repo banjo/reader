@@ -26,8 +26,8 @@ importers:
                 specifier: ^0.16.3
                 version: 0.16.3
             hoks:
-                specifier: ^0.1.13
-                version: 0.1.13(typescript@4.9.5)
+                specifier: ^0.1.14
+                version: 0.1.14(typescript@4.9.5)
             prettier:
                 specifier: ^3.0.0
                 version: 3.0.0
@@ -210,6 +210,9 @@ importers:
             esno:
                 specifier: ^0.16.3
                 version: 0.16.3
+            server:
+                specifier: workspace:*
+                version: link:../../packages/server
             tsconfig:
                 specifier: workspace:*
                 version: link:../../packages/tsconfig
@@ -6054,10 +6057,10 @@ packages:
             react-is: 16.13.1
         dev: false
 
-    /hoks@0.1.13(typescript@4.9.5):
+    /hoks@0.1.14(typescript@4.9.5):
         resolution:
             {
-                integrity: sha512-/0tPofQltrZTsx51KId+DOpkH20LWtDywOZ33KS1TK2G1WhaIGJ4Ly2G+5f05KBHc1bAJJmO9INDviztGr1N1Q==,
+                integrity: sha512-/V2lbAKCSk6WN2/7N4BazhXcOlCrGkHqCvY1FLYN486ZNd3f8SpJCnNCn1mbFTFQXFDrdAyLwNS80U9JmVc4jg==,
             }
         hasBin: true
         dependencies:

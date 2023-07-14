@@ -1,10 +1,14 @@
 import { fetchWorker } from "@/workers/fetch/fetch-worker";
-import { prisma } from "db";
+import { FeedWithContent, prisma } from "db";
 
-const addFetchRss = async () => {
-    const feeds = await prisma.feed.findMany();
-
-    feeds.forEach(async feed => {
-        await fetchWorker.repeatable({ url: feed.url });
+export const addFetchRss = async () => {
+    const feeds: FeedWithContent[] = await prisma.feed.findMany({
+        include: {
+            contentItems: true,
+        },
     });
+
+    for (const feed of feeds) {
+        await fetchWorker.repeatable({ feed });
+    }
 };

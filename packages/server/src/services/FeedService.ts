@@ -60,7 +60,7 @@ const fetchAndUpdateRssFeed = async (
                 c => !items.some(item => item.content.title === c.title)
             );
 
-            const createContentResult = await ItemRepository.createItemsOnlyFromContent(
+            const createContentResult = await ItemRepository.createItemsFromContent(
                 notAddedContent,
                 feedContentResponse.data.id,
                 userId
@@ -75,25 +75,37 @@ const fetchAndUpdateRssFeed = async (
         }
     }
 
-    const updatedItems = await ParseService.shouldParseAgain(
+    const updatedContent = await ParseService.shouldParseAgain(
         feedContentResponse.data.contentItems,
         feedContentResponse.data.rssUrl
     );
 
-    if (!updatedItems) {
+    if (!updatedContent) {
         logger.info("no need to fetch again");
         return Result.okEmpty();
     }
 
-    const createContentResult = await ItemRepository.createItemsWithContentFromContent(
-        updatedItems,
-        feedContentResponse.data.id,
-        userId
+    const createContentResult = await ItemRepository.createContent(
+        updatedContent,
+        feedContentResponse.data.id
     );
 
     if (!createContentResult.success) {
         logger.error(
             `failed to create content for feed with url ${feedContentResponse.data.rssUrl}`
+        );
+        return Result.error("Failed to create content", "InternalError");
+    }
+
+    const createItemsResult = await ItemRepository.createItemsFromContent(
+        createContentResult.data,
+        feedContentResponse.data.id,
+        userId
+    );
+
+    if (!createItemsResult.success) {
+        logger.error(
+            `failed to create items for user ${userId} with url ${feedContentResponse.data.rssUrl}`
         );
         return Result.error("Failed to create content", "InternalError");
     }
@@ -234,15 +246,25 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         return ContentMapper.parseItemToCreateContent(parsedItem);
     });
 
-    const createContentResult = await ItemRepository.createItemsWithContentFromContent(
+    const createContentResult = await ItemRepository.createContent(
         contentToCreate,
-        createFeedResult.data.id,
-        userId
+        createFeedResult.data.id
     );
 
     if (!createContentResult.success) {
         logger.error(`failed to create content for feed with url ${rssUrl}`);
         return Result.error("Failed to create content", "InternalError");
+    }
+
+    const createItemsResult = await ItemRepository.createItemsFromContent(
+        createContentResult.data,
+        createFeedResult.data.id,
+        userId
+    );
+
+    if (!createItemsResult.success) {
+        logger.error(`failed to create items for feed with url ${rssUrl}`);
+        return Result.error("Failed to create items", "InternalError");
     }
 
     return Result.ok({ feedId: createFeedResult.data.id });

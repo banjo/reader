@@ -1,4 +1,4 @@
-import { Item, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
+import { Item, ItemContent, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
 import { createLogger } from "../lib/logger";
 import { AsyncResultType, Result } from "../shared/models/result";
 
@@ -147,39 +147,10 @@ const createItems = async (items: Prisma.ItemCreateManyInput[]) => {
     }
 };
 
-const createItemsOnlyFromContent = async (
+const createContent = async (
     content: Prisma.ItemContentCreateManyFeedInput[],
-    feedId: number,
-    userId: number
-): AsyncResultType<void> => {
-    try {
-        const createdItems = await prisma.item.createMany({
-            data: content.map(itemContent => ({
-                contentId: itemContent.id!,
-                feedId,
-                userId,
-                isBookmarked: false,
-                isRead: false,
-            })),
-        });
-
-        if (createdItems.count !== content.length) {
-            logger.error(`Could not create all items`);
-            return Result.error(`Could not create all items`, "InternalError");
-        }
-
-        return Result.okEmpty();
-    } catch (error: unknown) {
-        logger.error(`Could not create items - ${error}`);
-        return Result.error(`Could not create items`, "InternalError");
-    }
-};
-
-const createItemsWithContentFromContent = async (
-    content: Prisma.ItemContentCreateManyFeedInput[],
-    feedId: number,
-    userId: number
-): AsyncResultType<void> => {
+    feedId: number
+): AsyncResultType<ItemContent[]> => {
     try {
         const createdContentResult = await prisma.itemContent.createMany({
             data: content.map(itemContent => ({
@@ -204,8 +175,21 @@ const createItemsWithContentFromContent = async (
             },
         });
 
+        return Result.ok(createdContent);
+    } catch (error: unknown) {
+        logger.error(`Could not create content - ${error}`);
+        return Result.error(`Could not create content`, "InternalError");
+    }
+};
+
+const createItemsFromContent = async (
+    content: ItemContent[],
+    feedId: number,
+    userId: number
+): AsyncResultType<void> => {
+    try {
         const createdItems = await prisma.item.createMany({
-            data: createdContent.map(itemContent => ({
+            data: content.map(itemContent => ({
                 contentId: itemContent.id,
                 feedId,
                 userId,
@@ -250,9 +234,9 @@ export const ItemRepository = {
     markItemsAsRead,
     createItems,
     createItem,
-    createItemsWithContentFromContent,
-    createItemsOnlyFromContent,
+    createItemsFromContent,
     updateItem,
     removeFeedItemsForUser,
     getAllItemsByUserId,
+    createContent,
 };
