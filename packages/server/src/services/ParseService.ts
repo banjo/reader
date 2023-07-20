@@ -91,11 +91,17 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
 
         const sorted = sortBy(baseFavicon.data.icons, "rank");
 
-        if (sorted[0].rank > 100) {
+        const icon = first(sorted);
+
+        if (!icon) {
             return Result.error("Failed to parse favicon", "NotFound");
         }
 
-        return Result.ok(sorted[0].src);
+        if (icon.rank > 100) {
+            return Result.error("Failed to parse favicon", "NotFound");
+        }
+
+        return Result.ok(icon.src);
     } catch (error) {
         logger.error(error);
         return Result.error("Failed to parse favicon", "InternalError");
