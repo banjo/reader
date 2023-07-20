@@ -10,8 +10,6 @@ export * from "./repositories/UserRepository";
 export * from "./services/FeedService";
 export * from "./services/ItemService";
 export * from "./services/ParseService";
-export * from "./services/ValidationService";
 export * from "./shared/lib/utils";
-export * from "./shared/lib/zod";
 export * from "./shared/models/request";
 export * from "./shared/models/result";
