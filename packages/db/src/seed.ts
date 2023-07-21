@@ -231,13 +231,13 @@ const items: Item[] = [
 ];
 
 async function main() {
-    for (const feed of feeds) {
-        await prisma.feed.upsert({
-            where: { id: feed.id },
-            update: {},
-            create: feed,
-        });
-    }
+    // for (const feed of feeds) {
+    //     await prisma.feed.upsert({
+    //         where: { id: feed.id },
+    //         update: {},
+    //         create: feed,
+    //     });
+    // }
 
     for (const user of users) {
         await prisma.user.upsert({
@@ -245,28 +245,25 @@ async function main() {
             update: {},
             create: {
                 ...user,
-                feeds: {
-                    connect: feeds.map(feed => ({ id: feed.id })),
-                },
             },
         });
     }
 
-    for (const content of itemContents) {
-        await prisma.itemContent.upsert({
-            where: { id: content.id },
-            update: {},
-            create: content,
-        });
-    }
+    // for (const content of itemContents) {
+    //     await prisma.itemContent.upsert({
+    //         where: { id: content.id },
+    //         update: {},
+    //         create: content,
+    //     });
+    // }
 
-    for (const item of items) {
-        await prisma.item.upsert({
-            where: { id: item.id },
-            update: {},
-            create: item,
-        });
-    }
+    // for (const item of items) {
+    //     await prisma.item.upsert({
+    //         where: { id: item.id },
+    //         update: {},
+    //         create: item,
+    //     });
+    // }
 
     console.log("Done with seed!");
 }

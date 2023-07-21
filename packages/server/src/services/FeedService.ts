@@ -117,7 +117,6 @@ const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
 ): AsyncResultType<CleanFeedWithItems> => {
-    await fetchAndUpdateRssFeed(feedInternalIdentifier, userId);
 
     const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier(
         feedInternalIdentifier,
