@@ -1,13 +1,10 @@
 import { defineConfig } from "hoks";
 
 export default defineConfig({
-    debug: true,
+    debug: false,
     installOnLockChange: true,
     branchName: false,
     commitMessage: false,
-    staged: {
-        "*": "prettier --write",
-    },
     preventCommit: false,
     syncBeforePush: false,
     enforceConventionalCommits: true,
