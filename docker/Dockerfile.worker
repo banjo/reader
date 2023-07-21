@@ -42,13 +42,12 @@ COPY . .
 
 # Install Packages and build
 RUN pnpm install tsup -w
-RUN pnpm install --prod
+RUN pnpm install --prod --filter db
+RUN pnpm install --prod --filter worker
 WORKDIR /app/packages/db
 RUN pnpm run build
 WORKDIR /app/apps/worker
 RUN pnpm run build
-
-
 
 # Production Stage
 FROM node:18-alpine AS production
@@ -67,7 +66,7 @@ COPY --from=builder /app/package.json ./package.json
 WORKDIR /app/apps/worker
 
 # Defining environment variables
-# ENV NODE_ENV=production
+ENV NODE_ENV=production
 ENV REDIS_HOST=host.docker.internal
 ENV REDIS_PORT=6379
 ENV DATABASE_URL=mysql://root:root@host.docker.internal:3306/banjo-rss
