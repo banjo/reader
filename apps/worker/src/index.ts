@@ -12,6 +12,7 @@ process.on("SIGTERM", async () => {
 });
 
 export const start = async () => {
+    console.info("Workers started...");
     await fetchWorker.start();
     await addToUsersWorker.start();
 
@@ -19,7 +20,6 @@ export const start = async () => {
     await addToUsersWorker.stopRepeatable();
 
     await addFetchRss();
-    const a = await fetchWorker.activeCount();
 };
 
 start();

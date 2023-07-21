@@ -221,7 +221,7 @@ importers:
                 version: link:../../packages/tsconfig
             tsup:
                 specifier: ^7.1.0
-                version: 7.1.0(typescript@4.9.5)
+                version: 7.1.0
             vitest:
                 specifier: ^0.33.0
                 version: 0.33.0
@@ -7736,6 +7736,25 @@ packages:
             camelcase-css: 2.0.1
             postcss: 8.4.24
 
+    /postcss-load-config@4.0.1:
+        resolution:
+            {
+                integrity: sha512-vEJIc8RdiBRu3oRAI0ymerOn+7rPuMvRXslTvZUKZonDHFIczxztIyJ1urxM1x9JXEikvpWWTUUqal5j/8QgvA==,
+            }
+        engines: { node: ">= 14" }
+        peerDependencies:
+            postcss: ">=8.0.9"
+            ts-node: ">=9.0.0"
+        peerDependenciesMeta:
+            postcss:
+                optional: true
+            ts-node:
+                optional: true
+        dependencies:
+            lilconfig: 2.1.0
+            yaml: 2.3.1
+        dev: true
+
     /postcss-load-config@4.0.1(postcss@8.4.24):
         resolution:
             {
@@ -8344,10 +8363,10 @@ packages:
             glob: 10.3.1
         dev: true
 
-    /rollup@3.26.2:
+    /rollup@3.26.3:
         resolution:
             {
-                integrity: sha512-6umBIGVz93er97pMgQO08LuH3m6PUb3jlDUUGFsNJB6VgTCUaDFpupf5JfU30529m/UKOgmiX+uY6Sx8cOYpLA==,
+                integrity: sha512-7Tin0C8l86TkpcMtXvQu6saWH93nhG3dGQ1/+l5V2TDMceTxO7kDiK6GzbfLWNNxqJXm591PcEZUozZm51ogwQ==,
             }
         engines: { node: ">=14.18.0", npm: ">=8.0.0" }
         hasBin: true
@@ -9253,6 +9272,44 @@ packages:
         engines: { node: ">=16" }
         dev: false
 
+    /tsup@7.1.0:
+        resolution:
+            {
+                integrity: sha512-mazl/GRAk70j8S43/AbSYXGgvRP54oQeX8Un4iZxzATHt0roW0t6HYDVZIXMw0ZQIpvr1nFMniIVnN5186lW7w==,
+            }
+        engines: { node: ">=16.14" }
+        hasBin: true
+        peerDependencies:
+            "@swc/core": ^1
+            postcss: ^8.4.12
+            typescript: ">=4.1.0"
+        peerDependenciesMeta:
+            "@swc/core":
+                optional: true
+            postcss:
+                optional: true
+            typescript:
+                optional: true
+        dependencies:
+            bundle-require: 4.0.1(esbuild@0.18.11)
+            cac: 6.7.14
+            chokidar: 3.5.3
+            debug: 4.3.4
+            esbuild: 0.18.11
+            execa: 5.1.1
+            globby: 11.1.0
+            joycon: 3.1.1
+            postcss-load-config: 4.0.1
+            resolve-from: 5.0.0
+            rollup: 3.26.3
+            source-map: 0.8.0-beta.0
+            sucrase: 3.32.0
+            tree-kill: 1.2.2
+        transitivePeerDependencies:
+            - supports-color
+            - ts-node
+        dev: true
+
     /tsup@7.1.0(typescript@4.9.5):
         resolution:
             {
@@ -9282,7 +9339,7 @@ packages:
             joycon: 3.1.1
             postcss-load-config: 4.0.1(postcss@8.4.24)
             resolve-from: 5.0.0
-            rollup: 3.26.2
+            rollup: 3.26.3
             source-map: 0.8.0-beta.0
             sucrase: 3.32.0
             tree-kill: 1.2.2
@@ -9636,7 +9693,7 @@ packages:
             "@types/node": 17.0.45
             esbuild: 0.18.11
             postcss: 8.4.25
-            rollup: 3.26.2
+            rollup: 3.26.3
         optionalDependencies:
             fsevents: 2.3.2
         dev: true

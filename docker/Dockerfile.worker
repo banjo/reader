@@ -1,0 +1,29 @@
+# Use Node.js LTS version
+FROM node:18-alpine
+
+# Create the directory for the application
+WORKDIR /app
+
+# First copy the main package.json and install global dependencies
+COPY package.json .
+RUN npm install -g pnpm
+
+# Copy over the monorepo
+COPY . .
+
+# Install packages and build
+RUN pnpm install 
+
+WORKDIR /app/packages/db
+RUN pnpm run build
+
+WORKDIR /app/apps/worker
+RUN pnpm run build
+
+# ENV NODE_ENV=production
+ENV REDIS_HOST=host.docker.internal
+ENV REDIS_PORT=6379
+ENV DATABASE_URL=mysql://root:root@host.docker.internal:3306/banjo-rss
+
+# Set the command to run your app
+CMD ["node", "dist/index.cjs"]
