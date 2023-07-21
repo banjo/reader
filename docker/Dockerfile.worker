@@ -12,7 +12,8 @@ RUN npm install -g pnpm
 COPY . .
 
 # Install packages and build
-RUN pnpm install 
+RUN pnpm install tsup -w
+RUN pnpm install --prod
 
 WORKDIR /app/packages/db
 RUN pnpm run build
