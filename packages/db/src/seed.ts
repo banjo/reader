@@ -21,30 +21,45 @@ const users: User[] = [
     },
 ];
 
+// const feeds: Feed[] = [
+//     {
+//         createdAt: new Date(),
+//         updatedAt: new Date(),
+//         id: 1,
+//         description: "This is the description",
+//         rssUrl: "https://www.randomFeed.com/rss.xml",
+//         url: "https://www.randomFeed.com",
+//         name: "Banjoanton",
+//         internalIdentifier: randomUUID(),
+//         imageUrl: "https://robohash.org/do.png",
+//         ttl: 10_000,
+//     },
+//     {
+//         createdAt: new Date(),
+//         updatedAt: new Date(),
+//         id: 2,
+//         description: "This is the description 2",
+//         url: "https://www.rande.com",
+//         rssUrl: "https://www.rande.com/rss.xml",
+//         name: "Josh Comeau",
+//         internalIdentifier: randomUUID(),
+//         imageUrl: "https://robohash.org/dolare.png",
+//         ttl: 10_000,
+//     },
+// ];
+
 const feeds: Feed[] = [
     {
         createdAt: new Date(),
         updatedAt: new Date(),
+        description: "Feber",
         id: 1,
-        description: "This is the description",
-        rssUrl: "https://www.randomFeed.com/rss.xml",
-        url: "https://www.randomFeed.com",
-        name: "Banjoanton",
+        imageUrl: "https://feber.se/images/feber.png",
         internalIdentifier: randomUUID(),
-        imageUrl: "https://robohash.org/do.png",
+        name: "Feber",
+        rssUrl: "https://feber.se/rss/",
         ttl: 10_000,
-    },
-    {
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        id: 2,
-        description: "This is the description 2",
-        url: "https://www.rande.com",
-        rssUrl: "https://www.rande.com/rss.xml",
-        name: "Josh Comeau",
-        internalIdentifier: randomUUID(),
-        imageUrl: "https://robohash.org/dolare.png",
-        ttl: 10_000,
+        url: "https://feber.se",
     },
 ];
 
@@ -231,13 +246,13 @@ const items: Item[] = [
 ];
 
 async function main() {
-    // for (const feed of feeds) {
-    //     await prisma.feed.upsert({
-    //         where: { id: feed.id },
-    //         update: {},
-    //         create: feed,
-    //     });
-    // }
+    for (const feed of feeds) {
+        await prisma.feed.upsert({
+            where: { id: feed.id },
+            update: {},
+            create: feed,
+        });
+    }
 
     for (const user of users) {
         await prisma.user.upsert({
@@ -245,6 +260,9 @@ async function main() {
             update: {},
             create: {
                 ...user,
+                feeds: {
+                    connect: feeds.map(feed => ({ id: feed.id })),
+                },
             },
         });
     }

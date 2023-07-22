@@ -4,7 +4,6 @@ import { Job, Queue, Worker } from "bullmq";
 import { paramCase, pascalCase } from "change-case";
 import { ResultType, createLogger } from "server";
 
-
 export const createWorker = <T extends object>(
     name: string,
     processor: (job: Job<T>) => Promise<ResultType<void>>
@@ -29,8 +28,8 @@ export const createWorker = <T extends object>(
             await queue.close();
             await worker.close();
         },
-        repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 15 })) => {
-            logger.info(`Adding repeatable job every ${timeInMs}ms...`);
+        repeatable: async (data: T, timeInMs = toMilliseconds({ seconds: 15 })) => {
+            logger.info(`Adding repeatable job every ${timeInMs / 1000 / 60} minutes...`);
             await queue.add(JOB_NAME, data, {
                 repeat: {
                     every: timeInMs,

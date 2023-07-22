@@ -126,18 +126,18 @@ const shouldParseAgain = async (
         return null;
     }
 
-    const firstItem = first(latestFeed.items);
+    const latestNewItem = first(latestFeed.items);
 
-    if (!firstItem || !firstItem.pubDate) {
+    if (!latestNewItem || !latestNewItem.pubDate) {
         logger.error(`Feed with url: ${url} has no items`);
         return null;
     }
 
     // TODO: pubDate or created at?
-    const latestContent = first(sortBy(currentContent, "createdAt"));
+    const latestCurrentContent = first(sortBy(currentContent, "createdAt"));
 
     // TODO: better logic for getting latest?
-    if (latestContent.title === firstItem.title) {
+    if (latestCurrentContent?.title === latestNewItem?.title) {
         return null;
     }
 
@@ -151,13 +151,8 @@ const shouldParseAgain = async (
     return contentToCreate;
 };
 
-// const parseRssItem = (url: string): AsyncResultType<any> => {
-//     throw new Error("Not implemented");
-// };
-
 export const ParseService = {
     parseRssFeed,
     parseFavicon,
     shouldParseAgain,
-    // parseRssItem,
 };

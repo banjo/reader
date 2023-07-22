@@ -172,6 +172,9 @@ const createContent = async (
                 title: {
                     in: content.map(itemContent => itemContent.title),
                 },
+                link: {
+                    in: content.map(itemContent => itemContent.link),
+                },
             },
         });
 

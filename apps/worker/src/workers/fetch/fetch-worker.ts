@@ -1,17 +1,26 @@
 import { createWorker } from "@/create-worker";
 import { addToUsersWorker } from "@/workers/add-to-users/add-to-users-worker";
 import { Job } from "bullmq";
-import { FeedWithContent } from "db";
-import { ItemRepository, ParseService, Result, createLogger } from "server";
+import { FeedRepository, ItemRepository, ParseService, Result, createLogger } from "server";
 
 const logger = createLogger("FetchWorker");
 
 type FetchJobData = {
-    feed: FeedWithContent;
+    feedId: number;
 };
 
 export const processor = async (job: Job<FetchJobData>) => {
-    const { feed } = job.data;
+    const { feedId } = job.data;
+    logger.info(`Fetching feed with id ${feedId}`);
+
+    const feedResult = await FeedRepository.getFeedWithContentById(feedId);
+
+    if (!feedResult.success) {
+        logger.error(`Could not find feed with id ${feedId}`);
+        throw new Error(`Could not find feed with id ${feedId}`);
+    }
+
+    const feed = feedResult.data;
 
     logger.info(`Fetching ${feed.rssUrl}`);
 
