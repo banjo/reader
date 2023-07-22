@@ -6,11 +6,11 @@ WORKDIR /app
 
 # Copy over the monorepo
 COPY package.json .
-RUN npm install -g pnpm
+RUN npm add -g pnpm
 COPY . .
 
 # Install Packages and build
-RUN pnpm install tsup -w
+RUN pnpm add tsup -w
 RUN pnpm install --prod --filter db
 RUN pnpm install --prod --filter worker
 WORKDIR /app/packages/db
