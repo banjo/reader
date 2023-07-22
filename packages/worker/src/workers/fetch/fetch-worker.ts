@@ -1,7 +1,7 @@
-import { createWorker } from "@/create-worker";
-import { addToUsersWorker } from "@/workers/add-to-users/add-to-users-worker";
 import { Job } from "bullmq";
 import { FeedRepository, ItemRepository, ParseService, Result, createLogger } from "server";
+import { createWorker } from "../../create-worker";
+import { addToUsersWorker } from "../add-to-users/add-to-users-worker";
 
 const logger = createLogger("FetchWorker");
 

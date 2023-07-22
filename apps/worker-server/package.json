@@ -1,5 +1,5 @@
 {
-    "name": "worker",
+    "name": "worker-server",
     "version": "1.0.0",
     "description": "",
     "main": "src/index.ts",
@@ -16,15 +16,13 @@
     "license": "ISC",
     "devDependencies": {
         "@banjoanton/utils": "^0.1.44",
-        "db": "workspace:*",
         "esno": "^0.16.3",
-        "server": "workspace:*",
         "tsconfig": "workspace:*",
         "vitest": "^0.33.0",
-        "tsup": "^7.1.0"
+        "tsup": "^7.1.0",
+        "db": "workspace:*",
+        "server": "workspace:*",
+        "worker": "workspace:*"
     },
-    "dependencies": {
-        "bullmq": "^4.2.0",
-        "change-case": "^4.1.2"
-    }
+    "dependencies": {}
 }

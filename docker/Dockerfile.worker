@@ -12,10 +12,14 @@ COPY . .
 # Install Packages and build
 RUN pnpm add tsup -w
 RUN pnpm install --prod --filter db
-RUN pnpm install --prod --filter worker
+RUN pnpm install --prod --filter worker-server
+
+# install db
 WORKDIR /app/packages/db
 RUN pnpm run build
-WORKDIR /app/apps/worker
+
+# install worker-server
+WORKDIR /app/apps/worker-server
 RUN pnpm run build
 
 # Production Stage
@@ -30,12 +34,12 @@ RUN apk add dumb-init
 # Copy the required directories from the builder stage
 ## The "." at the end of the directory path maintains the directory structure
 COPY --from=builder /app/packages/db ./packages/db
-COPY --from=builder /app/apps/worker ./apps/worker
+COPY --from=builder /app/apps/worker-server ./apps/worker-server
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# Change workdir to the worker app
-WORKDIR /app/apps/worker
+# Change workdir to the worker-server app
+WORKDIR /app/apps/worker-server
 
 # Defining environment variables
 ENV NODE_ENV=production

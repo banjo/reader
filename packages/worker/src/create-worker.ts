@@ -1,8 +1,8 @@
-import { options } from "@/config";
 import { toMilliseconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
 import { paramCase, pascalCase } from "change-case";
 import { ResultType, createLogger } from "server";
+import { options } from "./config";
 
 export const createWorker = <T extends object>(
     name: string,

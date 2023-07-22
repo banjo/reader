@@ -1,7 +1,7 @@
-import { createWorker } from "@/create-worker";
 import { Job } from "bullmq";
 import { ItemContent } from "db";
 import { ItemRepository, Result, UserRepository, createLogger } from "server";
+import { createWorker } from "../../create-worker";
 
 const logger = createLogger("AddToUsersWorker");
 
