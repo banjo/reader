@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "db": "workspace:*",
+        "worker": "workspace:*",
         "get-website-favicon": "^0.0.7",
         "rss-parser": "^3.13.0",
         "tsconfig": "workspace:*",

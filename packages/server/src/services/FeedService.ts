@@ -1,5 +1,6 @@
 import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
+import { fetchWorker } from "worker";
 import { createLogger } from "../lib/logger";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
@@ -117,7 +118,6 @@ const getUserFeedByInternalIdentifier = async (
     feedInternalIdentifier: string,
     userId: number
 ): AsyncResultType<CleanFeedWithItems> => {
-
     const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier(
         feedInternalIdentifier,
         userId
@@ -265,6 +265,8 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         logger.error(`failed to create items for feed with url ${rssUrl}`);
         return Result.error("Failed to create items", "InternalError");
     }
+
+    await fetchWorker.repeatable({ feedId: createFeedResult.data.id });
 
     return Result.ok({ feedId: createFeedResult.data.id });
 };
