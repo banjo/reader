@@ -12,14 +12,14 @@ COPY . .
 # Install Packages and build
 RUN pnpm add tsup -w
 RUN pnpm install --prod --filter db
-RUN pnpm install --prod --filter worker
+RUN pnpm install --prod --filter web
 
 # install db
 WORKDIR /app/packages/db
 RUN pnpm run build
 
-# install worker
-WORKDIR /app/apps/worker
+# install web
+WORKDIR /app/apps/web
 RUN pnpm run build
 
 # Production Stage
@@ -36,7 +36,7 @@ RUN apk add dumb-init
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/web ./apps/web
 
-# Change workdir to the worker app
+# Change workdir to the web app
 WORKDIR /app/apps/web
 
 # Defining environment variables
