@@ -1,4 +1,4 @@
-import { createLogger, Result, type ResultType } from "server";
+import { createLogger, Result, ResultType } from "utils";
 import { KeySchema } from "zod";
 
 const logger = createLogger("RequestService");

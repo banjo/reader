@@ -7,7 +7,7 @@ import {
     RequestError,
     Result,
     SuccessRequest,
-} from "server";
+} from "utils";
 
 /**
  * HELPERS

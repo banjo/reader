@@ -195,6 +195,9 @@ importers:
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
+      utils:
+        specifier: workspace:*
+        version: link:../../packages/utils
 
   apps/worker:
     devDependencies:
@@ -216,6 +219,9 @@ importers:
       tsup:
         specifier: ^7.1.0
         version: 7.1.0(typescript@4.9.5)
+      utils:
+        specifier: workspace:*
+        version: link:../../packages/utils
       vitest:
         specifier: ^0.33.0
         version: 0.33.0
@@ -290,8 +296,33 @@ importers:
       typescript:
         specifier: ^4.5.5
         version: 4.9.5
+      utils:
+        specifier: workspace:*
+        version: link:../utils
 
   packages/tsconfig: {}
+
+  packages/utils:
+    dependencies:
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      tslog:
+        specifier: ^4.8.2
+        version: 4.8.2
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
+    devDependencies:
+      '@banjoanton/utils':
+        specifier: ^0.1.44
+        version: 0.1.44
+      '@types/node':
+        specifier: ^17.0.45
+        version: 17.0.45
+      typescript:
+        specifier: ^4.5.5
+        version: 4.9.5
 
 packages:
 

@@ -2,7 +2,8 @@ import { ClientAuthContainer } from "@/client/components/utils/client-auth-conta
 import { FeedContainer } from "@/client/features/feed/containers/feed-container";
 import { ServerComponentService } from "@/server/services/ServerComponentService";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { AsyncResultType, FeedService, Result } from "server";
+import { FeedService } from "server";
+import { AsyncResultType, Result } from "utils";
 
 type Props = {
     params: {

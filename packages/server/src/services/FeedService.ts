@@ -1,6 +1,6 @@
 import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { createLogger } from "../lib/logger";
+import { AsyncResultType, Result, createLogger } from "utils";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
 import { FeedMapper, SearchFeed } from "../mappers/FeedMapper";
@@ -8,7 +8,6 @@ import { ItemMapper } from "../mappers/ItemMapper";
 import { ContentRepository } from "../repositories/ContentRepository";
 import { FeedRepository } from "../repositories/FeedRepository";
 import { ItemRepository } from "../repositories/ItemRepository";
-import { AsyncResultType, Result } from "../shared/models/result";
 import { fetchWorker } from "../workers/runners/fetch/fetch-worker";
 import { ParseService } from "./ParseService";
 

@@ -1,8 +1,7 @@
 import { toMilliseconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
 import { paramCase, pascalCase } from "change-case";
-import { createLogger } from "../lib/logger";
-import { ResultType } from "../shared/models/result";
+import { ResultType, createLogger } from "utils";
 import { redisConfig } from "./config";
 
 export const createWorker = <T extends object>(

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { BadRequestError, ErrorStatus, ErrorType, RequestError, SuccessRequest } from "server";
+import { BadRequestError, ErrorStatus, ErrorType, RequestError, SuccessRequest } from "utils";
 import { ZodIssue } from "zod";
 
 const success = <T>(data: T): NextResponse<SuccessRequest<T>> => {

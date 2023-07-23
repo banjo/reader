@@ -2,10 +2,9 @@ import { first, sortBy } from "@banjoanton/utils";
 import { ItemContent, Prisma } from "db";
 import getFavicons from "get-website-favicon";
 import RssParser from "rss-parser";
+import { AsyncResultType, Result, createLogger } from "utils";
 import { z } from "zod";
-import { createLogger } from "../lib/logger";
 import { ContentMapper } from "../mappers/ContentMapper";
-import { AsyncResultType, Result } from "../shared/models/result";
 
 const rssParser = new RssParser();
 

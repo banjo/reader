@@ -1,9 +1,8 @@
 import { Job } from "bullmq";
-import { createLogger } from "../../../lib/logger";
+import { Result, createLogger } from "utils";
 import { FeedRepository } from "../../../repositories/FeedRepository";
 import { ItemRepository } from "../../../repositories/ItemRepository";
 import { ParseService } from "../../../services/ParseService";
-import { Result } from "../../../shared/models/result";
 import { createWorker } from "../../create-worker";
 import { addToUsersWorker } from "../add-to-users/add-to-users-worker";
 
