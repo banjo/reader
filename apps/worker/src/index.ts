@@ -1,5 +1,5 @@
 import { addFetchRss } from "@/add";
-import { addToUsersWorker, fetchWorker } from "worker";
+import { addToUsersWorker, fetchWorker } from "server";
 
 process.on("SIGTERM", async () => {
     console.info("SIGTERM signal received: closing queues");

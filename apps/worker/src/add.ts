@@ -1,6 +1,5 @@
 import { Feed, prisma } from "db";
-import { createLogger } from "server";
-import { fetchWorker } from "worker";
+import { createLogger, fetchWorker } from "server";
 
 const logger = createLogger("AddFetchRss");
 

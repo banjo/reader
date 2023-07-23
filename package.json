@@ -7,8 +7,6 @@
         "dev": "turbo dev",
         "clean": "pnpm run --parallel clean && rimraf node_modules",
         "build": "turbo build",
-        "worker:build": "turbo build --filter worker",
-        "worker:install": "pnpm --filter worker install",
         "web:build": "turbo build --filter web",
         "lint:all": "turbo lint",
         "format": "prettier --write .",

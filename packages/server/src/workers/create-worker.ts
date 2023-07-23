@@ -1,8 +1,9 @@
 import { toMilliseconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
 import { paramCase, pascalCase } from "change-case";
-import { ResultType, createLogger } from "server";
-import { options } from "./config";
+import { createLogger } from "../lib/logger";
+import { ResultType } from "../shared/models/result";
+import { redisConfig } from "./config";
 
 export const createWorker = <T extends object>(
     name: string,
@@ -11,8 +12,8 @@ export const createWorker = <T extends object>(
     const logger = createLogger(`CreateWorker${pascalCase(name)}`);
     const QUEUE_NAME = `${paramCase(name)}-queue`;
     const JOB_NAME = `${paramCase(name)}-job`;
-    const queue = new Queue<T>(QUEUE_NAME, options);
-    const worker = new Worker<T>(QUEUE_NAME, processor, options);
+    const queue = new Queue<T>(QUEUE_NAME, redisConfig);
+    const worker = new Worker<T>(QUEUE_NAME, processor, redisConfig);
 
     const wrapper = {
         start: async () => {

@@ -1,6 +1,9 @@
 import { Job } from "bullmq";
 import { ItemContent } from "db";
-import { ItemRepository, Result, UserRepository, createLogger } from "server";
+import { createLogger } from "../../../lib/logger";
+import { ItemRepository } from "../../../repositories/ItemRepository";
+import { UserRepository } from "../../../repositories/UserRepository";
+import { Result } from "../../../shared/models/result";
 import { createWorker } from "../../create-worker";
 
 const logger = createLogger("AddToUsersWorker");

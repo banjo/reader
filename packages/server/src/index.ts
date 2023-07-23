@@ -13,3 +13,7 @@ export * from "./services/ParseService";
 export * from "./shared/lib/utils";
 export * from "./shared/models/request";
 export * from "./shared/models/result";
+export * from "./workers/config";
+export * from "./workers/create-worker";
+export * from "./workers/runners/add-to-users/add-to-users-worker";
+export * from "./workers/runners/fetch/fetch-worker";

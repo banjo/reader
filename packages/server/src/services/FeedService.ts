@@ -1,6 +1,5 @@
 import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { fetchWorker } from "worker";
 import { createLogger } from "../lib/logger";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
@@ -10,6 +9,7 @@ import { ContentRepository } from "../repositories/ContentRepository";
 import { FeedRepository } from "../repositories/FeedRepository";
 import { ItemRepository } from "../repositories/ItemRepository";
 import { AsyncResultType, Result } from "../shared/models/result";
+import { fetchWorker } from "../workers/runners/fetch/fetch-worker";
 import { ParseService } from "./ParseService";
 
 const logger = createLogger("FeedService");
