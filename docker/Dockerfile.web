@@ -1,0 +1,49 @@
+# Use Node.js LTS version
+FROM node:18-alpine AS builder
+
+# Create directory for the application
+WORKDIR /app
+
+# Copy over the monorepo
+COPY package.json .
+RUN npm add -g pnpm
+COPY . .
+
+# Install Packages and build
+RUN pnpm add tsup -w
+RUN pnpm install --prod --filter db
+RUN pnpm install --prod --filter worker
+
+# install db
+WORKDIR /app/packages/db
+RUN pnpm run build
+
+# install worker
+WORKDIR /app/apps/worker
+RUN pnpm run build
+
+# Production Stage
+FROM node:18-alpine AS production
+
+# Create directory for the application
+WORKDIR /app
+
+# install dumb-init
+RUN apk add dumb-init
+
+# Copy the required directories from the builder stage
+## The "." at the end of the directory path maintains the directory structure
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/web ./apps/web
+
+# Change workdir to the worker app
+WORKDIR /app/apps/web
+
+# Defining environment variables
+ENV NODE_ENV=production
+ENV REDIS_HOST=host.docker.internal
+ENV REDIS_PORT=6379
+ENV DATABASE_URL=mysql://root:root@host.docker.internal:3306/banjo-rss
+
+# Set the command to run your app
+CMD ["dumb-init","npm", "start"]
