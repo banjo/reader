@@ -15,7 +15,7 @@ export default async function FavoritePage() {
 
     return (
         <ClientAuthContainer>
-            <FavoriteContainer items={allItemsResponse.data} />
+            <FavoriteContainer items={allItemsResponse.data.filter(i => i.isFavorite)} />
         </ClientAuthContainer>
     );
 }

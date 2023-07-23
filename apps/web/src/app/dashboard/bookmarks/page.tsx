@@ -15,7 +15,7 @@ export default async function BookmarksPage() {
 
     return (
         <ClientAuthContainer>
-            <BookmarkContainer items={allItemsResponse.data} />
+            <BookmarkContainer items={allItemsResponse.data.filter(i => i.isBookmarked)} />
         </ClientAuthContainer>
     );
 }
