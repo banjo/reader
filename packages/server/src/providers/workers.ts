@@ -1,7 +1,7 @@
 import ky from "ky";
 import { ResultType } from "utils";
 
-const PROD_URL = process.env.PROD_URL;
+const PROD_URL = process.env.WORKER_PROD_URL;
 const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000";
 
 const api = ky.create({
