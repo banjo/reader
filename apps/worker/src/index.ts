@@ -1,6 +1,7 @@
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ExpressAdapter } from "@bull-board/express";
+import "dotenv/config";
 import express from "express";
 import { addToUsersWorker, fetchWorker } from "server";
 import { Result } from "utils";
@@ -20,6 +21,21 @@ const run = async () => {
             new BullMQAdapter(addToUsersWorker.getQueue()),
         ],
         serverAdapter,
+    });
+
+    // eslint-disable-next-line consistent-return
+    app.use((req, res, next) => {
+        if (!req.headers["auth-token"]) {
+            return res.status(401).json(Result.error("Unauthorized", "Unauthorized"));
+        }
+
+        const token = req.headers["auth-token"];
+
+        if (token !== process.env.AUTH_TOKEN) {
+            return res.status(401).json(Result.error("Unauthorized", "Unauthorized"));
+        }
+
+        next();
     });
 
     app.use("/ui", serverAdapter.getRouter());
