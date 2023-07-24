@@ -1,24 +1,57 @@
-import { addFetchRss } from "@/add";
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { ExpressAdapter } from "@bull-board/express";
+import express from "express";
 import { addToUsersWorker, fetchWorker } from "server";
+import { Result } from "utils";
+import { start } from "./worker";
 
-process.on("SIGTERM", async () => {
-    console.info("SIGTERM signal received: closing queues");
+const PORT = Number.parseInt(process.env.PORT ?? "3000");
 
-    await fetchWorker.close();
-    await addToUsersWorker.close();
+const run = async () => {
+    const app = express();
 
-    console.info("All closed");
-});
+    const serverAdapter = new ExpressAdapter();
+    serverAdapter.setBasePath("/ui");
 
-export const start = async () => {
-    console.info("Workers started...");
-    await fetchWorker.start();
-    await addToUsersWorker.start();
+    createBullBoard({
+        queues: [
+            new BullMQAdapter(fetchWorker.getQueue()),
+            new BullMQAdapter(addToUsersWorker.getQueue()),
+        ],
+        serverAdapter,
+    });
 
-    await fetchWorker.stopRepeatable();
-    await addToUsersWorker.stopRepeatable();
+    app.use("/ui", serverAdapter.getRouter());
 
-    await addFetchRss();
+    app.use("/api/repeatable", async (req, res) => {
+        const feedId = req.query.feedId;
+
+        if (!feedId) {
+            return res.status(400).json(Result.error("feedId is required", "BadRequest"));
+        }
+
+        if (typeof feedId !== "string") {
+            return res.status(400).json(Result.error("feedId must be a string", "BadRequest"));
+        }
+
+        if (Number.isNaN(Number.parseInt(feedId))) {
+            return res.status(400).json(Result.error("feedId must be a number", "BadRequest"));
+        }
+
+        const id = Number.parseInt(feedId);
+
+        await fetchWorker.repeatable({ feedId: id });
+
+        res.json(Result.okEmpty());
+    });
+
+    await start();
+
+    app.listen(PORT, () => {
+        console.log(`Running on ${PORT}...`);
+        console.log("For the UI, open https://<url>/ui");
+    });
 };
 
-start();
+run().catch(error => console.error(error));

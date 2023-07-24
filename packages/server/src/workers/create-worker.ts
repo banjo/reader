@@ -50,6 +50,7 @@ export const createWorker = <T extends object>(
             logger.info("Getting active count...");
             return await queue.getActiveCount();
         },
+        getQueue: () => queue,
     };
 
     return wrapper;

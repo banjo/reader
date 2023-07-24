@@ -5,10 +5,10 @@ import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
 import { FeedMapper, SearchFeed } from "../mappers/FeedMapper";
 import { ItemMapper } from "../mappers/ItemMapper";
+import { addRepeatableJob } from "../providers/workers";
 import { ContentRepository } from "../repositories/ContentRepository";
 import { FeedRepository } from "../repositories/FeedRepository";
 import { ItemRepository } from "../repositories/ItemRepository";
-import { fetchWorker } from "../workers/runners/fetch/fetch-worker";
 import { ParseService } from "./ParseService";
 
 const logger = createLogger("FeedService");
@@ -265,7 +265,7 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         return Result.error("Failed to create items", "InternalError");
     }
 
-    await fetchWorker.repeatable({ feedId: createFeedResult.data.id });
+    await addRepeatableJob(createFeedResult.data.id);
 
     return Result.ok({ feedId: createFeedResult.data.id });
 };

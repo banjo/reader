@@ -47,5 +47,7 @@ ENV REDIS_HOST=host.docker.internal
 ENV REDIS_PORT=6379
 ENV DATABASE_URL=mysql://root:root@host.docker.internal:3306/banjo-rss
 
+EXPOSE 3000
+
 # Set the command to run your app
 CMD ["dumb-init","node", "dist/index.cjs"]
