@@ -9,7 +9,7 @@ const api = ky.create({
     hooks: {
         beforeRequest: [
             options => {
-                // TODO: set simple auth
+                options.headers.set("auth-token", process.env.AUTH_TOKEN ?? "");
                 options.headers.set("Content-Type", "application/json");
             },
         ],
