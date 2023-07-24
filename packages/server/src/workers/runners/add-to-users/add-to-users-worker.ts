@@ -1,11 +1,9 @@
 import { Job } from "bullmq";
 import { ItemContent } from "db";
-import { Result, createLogger } from "utils";
+import { Result } from "utils";
 import { ItemRepository } from "../../../repositories/ItemRepository";
 import { UserRepository } from "../../../repositories/UserRepository";
 import { createWorker } from "../../create-worker";
-
-const logger = createLogger("AddToUsersWorker");
 
 type AddToUsersJobData = {
     content: ItemContent[];
@@ -18,26 +16,26 @@ const processor = async (job: Job<AddToUsersJobData>) => {
     const users = await UserRepository.getUsersByFeedId(feedId);
 
     if (!users) {
-        logger.info(`No users found for feedId: ${feedId}`);
+        job.log(`No users found for feedId: ${feedId}`);
         return Result.okEmpty();
     }
 
-    logger.info(`Adding ${content.length} items to ${users.length} users`);
+    job.log(`Adding ${content.length} items to ${users.length} users`);
 
     await Promise.all(
         users.map(async user => {
             const result = await ItemRepository.createItemsFromContent(content, feedId, user.id);
 
             if (!result.success) {
-                logger.error(`Failed to add items to user ${user.id}`, result.message);
+                job.log(`Failed to add items to user ${user.id} - ${result.message}`);
                 throw new Error(`Failed to add items to user ${user.id}: ${result.message}`);
             }
 
-            logger.info(`Added ${content.length} items to user with id ${user.id}`);
+            job.log(`Added ${content.length} items to user with id ${user.id}`);
         })
     );
 
-    logger.info(`Successfully added ${content.length} items to ${users.length} users`);
+    job.log(`Successfully added ${content.length} items to ${users.length} users`);
 
     return Result.okEmpty();
 };

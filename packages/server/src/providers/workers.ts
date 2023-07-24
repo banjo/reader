@@ -1,9 +1,8 @@
 import ky from "ky";
 import { ResultType } from "utils";
-const url =
-    process.env.NODE_ENV === "production"
-        ? "https://rss-reader-2.vercel.app" // TODO: add correct url
-        : "http://localhost:3000";
+
+const PROD_URL = process.env.PROD_URL;
+const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000";
 
 const api = ky.create({
     prefixUrl: `${url}/api`,
