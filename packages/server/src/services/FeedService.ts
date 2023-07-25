@@ -265,7 +265,12 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         return Result.error("Failed to create items", "InternalError");
     }
 
-    await addRepeatableJob(createFeedResult.data.id);
+    const repeatableResult = await addRepeatableJob(createFeedResult.data.id);
+
+    if (!repeatableResult.success) {
+        logger.error(`failed to add repeatable job for feed with id ${createFeedResult.data.id}`);
+        return Result.error("Failed to add repeatable job", "InternalError");
+    }
 
     return Result.ok({ feedId: createFeedResult.data.id });
 };

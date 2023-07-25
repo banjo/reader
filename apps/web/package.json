@@ -35,14 +35,14 @@
         "react-select": "^5.7.3",
         "react-select-async-paginate": "^0.7.2",
         "rss-parser": "^3.13.0",
+        "server": "workspace:*",
         "sharp": "^0.31.3",
         "swr": "^2.1.5",
         "tailwind-merge": "^1.12.0",
         "tailwindcss-animate": "^1.0.5",
         "tslog": "^4.8.2",
         "type-fest": "^3.11.1",
-        "zod": "^3.21.4",
-        "server": "workspace:*"
+        "zod": "^3.21.4"
     },
     "devDependencies": {
         "@antfu/ni": "^0.21.3",
@@ -56,7 +56,6 @@
         "@typescript-eslint/parser": "^5.59.7",
         "autoprefixer": "^10.4.14",
         "db": "workspace:*",
-        "utils": "workspace:*",
         "eslint": "^8.44.0",
         "eslint-config-next": "13.0.0",
         "eslint-config-prettier": "^8.8.0",
@@ -68,7 +67,8 @@
         "rimraf": "^5.0.1",
         "tailwindcss": "^3.3.2",
         "tsconfig": "workspace:*",
-        "typescript": "^4.9.5"
+        "typescript": "^4.9.5",
+        "utils": "workspace:*"
     },
     "prettier": "@banjoanton/prettier-config"
 }

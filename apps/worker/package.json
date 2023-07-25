@@ -8,7 +8,6 @@
         "run": "esno src/index.ts",
         "build": "tsup",
         "test": "vitest",
-        "dev": "tsup --watch --clean",
         "clean": "rimraf node_modules dist"
     },
     "keywords": [],
