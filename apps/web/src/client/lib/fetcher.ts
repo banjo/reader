@@ -1,5 +1,5 @@
 import { getUrl } from "@/shared/lib/url";
-import ky, { HTTPError } from "ky-universal";
+import ky, { HTTPError } from "ky";
 import {
     AsyncResultType,
     BadRequestError,
