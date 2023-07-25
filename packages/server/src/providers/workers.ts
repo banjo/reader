@@ -1,6 +1,6 @@
 import { raise } from "@banjoanton/utils";
 import ky from "ky";
-import { Result, ResultType } from "utils";
+import { Result } from "utils";
 
 const PROD_URL = process.env.WORKER_PROD_URL ?? raise("Missing WORKER_PROD_URL");
 const AUTH_TOKEN = process.env.AUTH_TOKEN ?? raise("Missing AUTH_TOKEN");
@@ -16,9 +16,16 @@ const api = ky.create({
 
 export const addRepeatableJob = async (feedId: number) => {
     try {
-        await api.get(`repeatable?feedId=${feedId}`, {}).json<ResultType<void>>();
+        console.log(`Adding to URL: ${url}`);
+        // await api.get(`repeatable?feedId=${feedId}`, {}).json<ResultType<void>>();
+        await fetch(`${url}/api/repeatable?feedId=${feedId}`, {
+            headers: {
+                "auth-token": AUTH_TOKEN,
+            },
+        });
         return Result.okEmpty();
     } catch (error: unknown) {
+        console.log("Could not add repeatable job");
         let errorMessage = "Internal Server Error";
         if (error instanceof Error) {
             console.log(error.message);
