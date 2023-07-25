@@ -3,6 +3,7 @@ import { ItemContent } from "db";
 import { ItemRepository, UserRepository } from "server";
 import { Result } from "utils";
 import { createWorker } from "../../create-worker";
+import { createWorkerLogger } from "../../logger";
 
 type AddToUsersJobData = {
     content: ItemContent[];
@@ -11,30 +12,31 @@ type AddToUsersJobData = {
 
 const processor = async (job: Job<AddToUsersJobData>) => {
     const { content, feedId } = job.data;
+    const logger = createWorkerLogger("AddToUsers", job);
 
     const users = await UserRepository.getUsersByFeedId(feedId);
 
     if (!users) {
-        job.log(`No users found for feedId: ${feedId}`);
+        logger.info(`No users found for feedId: ${feedId}`);
         return Result.okEmpty();
     }
 
-    job.log(`Adding ${content.length} items to ${users.length} users`);
+    logger.info(`Adding ${content.length} items to ${users.length} users`);
 
     await Promise.all(
         users.map(async user => {
             const result = await ItemRepository.createItemsFromContent(content, feedId, user.id);
 
             if (!result.success) {
-                job.log(`Failed to add items to user ${user.id} - ${result.message}`);
+                logger.error(`Failed to add items to user ${user.id} - ${result.message}`);
                 throw new Error(`Failed to add items to user ${user.id}: ${result.message}`);
             }
 
-            job.log(`Added ${content.length} items to user with id ${user.id}`);
+            logger.info(`Added ${content.length} items to user with id ${user.id}`);
         })
     );
 
-    job.log(`Successfully added ${content.length} items to ${users.length} users`);
+    logger.info(`Successfully added ${content.length} items to ${users.length} users`);
 
     return Result.okEmpty();
 };

@@ -1,4 +1,4 @@
-import { toMilliseconds } from "@banjoanton/utils";
+import { randomString, toMilliseconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
 import { paramCase, pascalCase } from "change-case";
 import { ResultType, createLogger } from "utils";
@@ -28,13 +28,14 @@ export const createWorker = <T extends object>(
             await queue.close();
             await worker.close();
         },
-        repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 10 })) => {
+        repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 5 })) => {
             logger.info(`Adding repeatable job every ${timeInMs / 1000 / 60} minutes...`);
             await queue.add(JOB_NAME, data, {
                 repeat: {
                     every: timeInMs,
                     immediately: true,
                 },
+                jobId: `${JOB_NAME}-${randomString()}`,
             });
         },
         stopRepeatable: async () => {
