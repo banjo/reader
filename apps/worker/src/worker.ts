@@ -1,4 +1,4 @@
-import { addToUsersWorker, fetchWorker } from "server";
+import { addToUsersWorker, fetchWorker } from "worker-utils";
 import { addFetchRss } from "./add";
 
 process.on("SIGTERM", async () => {

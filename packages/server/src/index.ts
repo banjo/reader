@@ -10,7 +10,3 @@ export * from "./services/FeedService";
 export * from "./services/ItemService";
 export * from "./services/ParseService";
 export * from "./shared/lib/utils";
-export * from "./workers/config";
-export * from "./workers/create-worker";
-export * from "./workers/runners/add-to-users/add-to-users-worker";
-export * from "./workers/runners/fetch/fetch-worker";

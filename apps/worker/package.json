@@ -21,6 +21,7 @@
         "esno": "^0.16.3",
         "server": "workspace:*",
         "tsconfig": "workspace:*",
+        "worker-utils": "workspace:*",
         "tsup": "^7.1.0",
         "utils": "workspace:*",
         "vitest": "^0.33.0"

@@ -1,8 +1,6 @@
 import { Job } from "bullmq";
+import { FeedRepository, ItemRepository, ParseService } from "server";
 import { Result } from "utils";
-import { FeedRepository } from "../../../repositories/FeedRepository";
-import { ItemRepository } from "../../../repositories/ItemRepository";
-import { ParseService } from "../../../services/ParseService";
 import { createWorker } from "../../create-worker";
 import { addToUsersWorker } from "../add-to-users/add-to-users-worker";
 

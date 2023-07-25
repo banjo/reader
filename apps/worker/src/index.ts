@@ -4,8 +4,8 @@ import { ExpressAdapter } from "@bull-board/express";
 import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
-import { addToUsersWorker, fetchWorker } from "server";
 import { Result, createLogger } from "utils";
+import { addToUsersWorker, fetchWorker } from "worker-utils";
 import { start } from "./worker";
 
 const PORT = Number.parseInt(process.env.PORT ?? "3000");

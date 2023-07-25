@@ -9,19 +9,14 @@ const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost
 const api = ky.create({
     prefixUrl: `${url}/api`,
     headers: {
+        "auth-token": AUTH_TOKEN,
         "Content-Type": "application/json",
     },
 });
 
 export const addRepeatableJob = async (feedId: number) => {
     try {
-        await api
-            .get(`repeatable?feedId=${feedId}`, {
-                headers: {
-                    "auth-token": AUTH_TOKEN,
-                },
-            })
-            .json<ResultType<void>>();
+        await api.get(`repeatable?feedId=${feedId}`, {}).json<ResultType<void>>();
         return Result.okEmpty();
     } catch (error: unknown) {
         let errorMessage = "Internal Server Error";
