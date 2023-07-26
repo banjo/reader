@@ -38,6 +38,10 @@ npx prisma studio
 -   [ ] Add delay for "no items found" box
 -   [ ] Add transactions to database
 -   [ ] CleanFeedWithItems currently can return items or content as items, should be consistent and type safe in future.
+-   [ ] Do not need worker url in packages that do not use it 
+-   [ ] API Urls should be in a separate file
+-   [ ] Replace ky with something else where headers work
+-   [ ] Fix feed like this: https://www.raymondcamden.com/feed.xml
 
 ## License
 
