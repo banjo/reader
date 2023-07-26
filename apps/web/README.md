@@ -38,12 +38,12 @@ npx prisma studio
 -   [ ] Add delay for "no items found" box
 -   [ ] Add transactions to database
 -   [ ] CleanFeedWithItems currently can return items or content as items, should be consistent and type safe in future.
--   [ ] Do not need worker url in packages that do not use it 
--   [ ] API Urls should be in a separate file
+-   [x] Do not need worker url in packages that do not use it 
+-   [x] API Urls should be in a separate file
 -   [ ] Replace ky with something else where headers work
--   [ ] Fix feed like this: https://www.raymondcamden.com/feed.xml
--   [ ] Add env example file
+-   [x] Add env example file
 -   [ ] Fix why ESM does not work with TSUP in a library?
+-   [x] Fix docker cleanup job
 
 ## License
 
