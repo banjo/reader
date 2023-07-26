@@ -10,7 +10,6 @@ const logger = createLogger("WorkerProvider");
 export const addRepeatableJob = async (feedId: number) => {
     try {
         const fullUrl = `${url}/api/repeatable?feedId=${feedId}`;
-        console.log("full url", fullUrl);
         await fetch(fullUrl, {
             headers: {
                 "auth-token": AUTH_TOKEN,
