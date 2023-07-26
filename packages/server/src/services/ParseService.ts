@@ -1,6 +1,6 @@
 import { first, sortBy } from "@banjoanton/utils";
 import { ItemContent, Prisma } from "db";
-import getFavicons from "get-website-favicon";
+import { parseHTML } from "linkedom";
 import RssParser from "rss-parser";
 import { AsyncResultType, Result, createLogger } from "utils";
 import { z } from "zod";
@@ -75,34 +75,23 @@ const WebsiteSchema = z.object({
 
 const parseFavicon = async (url: string): AsyncResultType<string> => {
     try {
-        const faviconResponse = await getFavicons(url);
+        const html = await fetch(url).then(res => res.text());
+        const doc = parseHTML(html).document;
 
-        if (!faviconResponse) {
-            return Result.error("Failed to parse favicon", "InternalError");
-        }
+        const head = doc.querySelector("head");
 
-        const baseFavicon = WebsiteSchema.safeParse(faviconResponse);
-
-        if (!baseFavicon.success) {
-            logger.error(`Failed to parse favicon with url: ${url}`, baseFavicon.error);
-            return Result.error("Failed to parse favicon", "InternalError");
-        }
-
-        logger.info(`Successfully parsed favicon with url: ${url}`);
-
-        const sorted = sortBy(baseFavicon.data.icons, "rank");
-
-        const icon = first(sorted);
-
-        if (!icon) {
+        if (!head) {
             return Result.error("Failed to parse favicon", "NotFound");
         }
 
-        if (icon.rank > 100) {
+        const link = head.querySelector("link[rel*='icon']") as HTMLLinkElement;
+
+        if (!link) {
             return Result.error("Failed to parse favicon", "NotFound");
         }
 
-        return Result.ok(icon.src);
+        const href = link.href.startsWith("/") ? new URL(link.href, url).href : link.href;
+        return Result.ok(href);
     } catch (error) {
         logger.error(error);
         return Result.error("Failed to parse favicon", "InternalError");
