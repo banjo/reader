@@ -1,13 +1,18 @@
 import { raise } from "@banjoanton/utils";
-import { Result, createLogger } from "utils";
+import { createLogger, Result } from "utils";
 
-const PROD_URL = process.env.WORKER_PROD_URL ?? raise("Missing WORKER_PROD_URL");
-const AUTH_TOKEN = process.env.AUTH_TOKEN ?? raise("Missing AUTH_TOKEN");
-const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000";
+const getVariables = () => {
+    const PROD_URL = process.env.WORKER_PROD_URL ?? raise("Missing WORKER_PROD_URL");
+    const AUTH_TOKEN = process.env.AUTH_TOKEN ?? raise("Missing AUTH_TOKEN");
+    const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000";
+
+    return { url, AUTH_TOKEN };
+};
 
 const logger = createLogger("WorkerProvider");
 
 export const addRepeatableJob = async (feedId: number) => {
+    const { url, AUTH_TOKEN } = getVariables();
     try {
         const fullUrl = `${url}/api/repeatable?feedId=${feedId}`;
         await fetch(fullUrl, {

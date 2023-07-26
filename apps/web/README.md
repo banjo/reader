@@ -42,6 +42,8 @@ npx prisma studio
 -   [ ] API Urls should be in a separate file
 -   [ ] Replace ky with something else where headers work
 -   [ ] Fix feed like this: https://www.raymondcamden.com/feed.xml
+-   [ ] Add env example file
+-   [ ] Fix why ESM does not work with TSUP in a library?
 
 ## License
 
