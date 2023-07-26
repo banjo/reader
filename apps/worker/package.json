@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "run": "esno src/index.ts",
+        "dev": "esno src/index.ts",
         "build": "tsup",
         "test": "vitest",
         "clean": "rimraf node_modules dist"

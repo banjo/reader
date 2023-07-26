@@ -5,6 +5,7 @@ import RssParser from "rss-parser";
 import { AsyncResultType, Result, createLogger } from "utils";
 import { z } from "zod";
 import { ContentMapper } from "../mappers/ContentMapper";
+import { FeedMapper } from "../mappers/FeedMapper";
 
 const rssParser = new RssParser();
 
@@ -44,7 +45,8 @@ const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
         return Result.error("Failed to parse feed", "InternalError");
     }
 
-    const baseFeed = ParseFeedSchema.safeParse(parsedResult);
+    const preparedResult = FeedMapper.prepareSafeParse(parsedResult);
+    const baseFeed = ParseFeedSchema.safeParse(preparedResult);
 
     if (!baseFeed.success) {
         logger.error(`Failed to parse feed with url: ${url}`, baseFeed.error);
