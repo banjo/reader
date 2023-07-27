@@ -45,6 +45,7 @@ npx prisma studio
 -   [ ] Fix why ESM does not work with TSUP in a library?
 -   [x] Fix docker cleanup job
 -   [ ] Fix dockerbuild using turbo
+-   [ ] Change to postgresql
 
 ## License
 
