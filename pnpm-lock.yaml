@@ -42,6 +42,61 @@ importers:
         specifier: ^7.2.3
         version: 7.2.3
 
+  apps/api:
+    dependencies:
+      '@clerk/clerk-sdk-node':
+        specifier: ^4.12.1
+        version: 4.12.1
+      '@hono/node-server':
+        specifier: ^1.1.0
+        version: 1.1.0
+      '@hono/zod-validator':
+        specifier: ^0.1.3
+        version: 0.1.3(hono@3.3.4)(zod@3.21.4)
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      hono:
+        specifier: ^3.3.4
+        version: 3.3.4
+      svix:
+        specifier: ^1.7.0
+        version: 1.7.0
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
+    devDependencies:
+      '@banjoanton/utils':
+        specifier: ^0.1.44
+        version: 0.1.44
+      '@types/express':
+        specifier: ^4.17.17
+        version: 4.17.17
+      '@types/morgan':
+        specifier: ^1.9.4
+        version: 1.9.4
+      db:
+        specifier: workspace:*
+        version: link:../../packages/db
+      esno:
+        specifier: ^0.16.3
+        version: 0.16.3
+      server:
+        specifier: workspace:*
+        version: link:../../packages/server
+      tsconfig:
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      tsup:
+        specifier: ^7.1.0
+        version: 7.1.0(typescript@4.9.5)
+      utils:
+        specifier: workspace:*
+        version: link:../../packages/utils
+      vitest:
+        specifier: ^0.33.0
+        version: 0.33.0
+
   apps/web:
     dependencies:
       '@clerk/clerk-sdk-node':
@@ -1412,6 +1467,21 @@ packages:
       '@floating-ui/dom': 1.4.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@hono/node-server@1.1.0:
+    resolution: {integrity: sha512-1dwun4NkN+SDhKmEcGwjrEwV0rqgCBsb78XvZTHa4JGXCne09bNCv0wDRyQXVj99nYLpANqANZ9ABlTGxS70MQ==}
+    engines: {node: '>=18.0.0'}
+    dev: false
+
+  /@hono/zod-validator@0.1.3(hono@3.3.4)(zod@3.21.4):
+    resolution: {integrity: sha512-g6dnqmkehV6VHjemJoWYwWqD/YwAl8awNJR2fxL8bqvPiYPvShycRZDrdHSpobgX61kaBc4n8mt0YJSHYvKbFQ==}
+    peerDependencies:
+      hono: 3.*
+      zod: ^3.19.1
+    dependencies:
+      hono: 3.3.4
+      zod: 3.21.4
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -5197,6 +5267,11 @@ packages:
       - supports-color
       - typescript
     dev: true
+
+  /hono@3.3.4:
+    resolution: {integrity: sha512-lqvcsQrXS0bSydj/MkOXi3opAwrlauIjZefhXMMRj9prABfBWdrYHSrWk/xfxgxNPs4yuEMh2Z5zV0L2b1Jmdw==}
+    engines: {node: '>=16.0.0'}
+    dev: false
 
   /hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}

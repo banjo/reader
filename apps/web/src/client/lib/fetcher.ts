@@ -1,4 +1,3 @@
-import { getUrl } from "@/shared/lib/url";
 import ky, { HTTPError } from "ky";
 import {
     AsyncResultType,
@@ -59,9 +58,11 @@ const updatePath = (url: string): string => {
  * FETCHER
  **/
 
+const API_URL = process.env.API_URL ?? "http://localhost:3003";
+
 export const fetcher = (userId: string) => {
     const api = ky.create({
-        prefixUrl: `${getUrl()}/api`,
+        prefixUrl: `${API_URL}/api`,
         hooks: {
             beforeRequest: [
                 options => {

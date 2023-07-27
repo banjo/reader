@@ -17,7 +17,8 @@
                 "AUTH_TOKEN",
                 "WORKER_PROD_URL",
                 "AXIOM_DATASET",
-                "AXIOM_TOKEN"
+                "AXIOM_TOKEN",
+                "API_URL"
             ],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },

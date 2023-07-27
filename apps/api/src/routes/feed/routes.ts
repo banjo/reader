@@ -1,0 +1,72 @@
+import { createHonoInstance } from "@app/instance";
+import { zValidator } from "@hono/zod-validator";
+import { FeedService } from "server";
+import { createLogger, Result } from "utils";
+import { z } from "zod";
+
+export const feed = createHonoInstance();
+const logger = createLogger("api:feed");
+
+feed.get("/", async c => {
+    const userId = c.get("userId");
+
+    const feedResponse = await FeedService.getAllFeedsByUserId(userId);
+
+    if (!feedResponse.success) {
+        logger.error(`Could not fetch feeds for user ${userId}`);
+        return c.json(Result.error(feedResponse.message, feedResponse.type));
+    }
+
+    return c.json(feedResponse.data);
+});
+
+const feedPostSchema = z.object({
+    url: z.string().url(),
+});
+
+feed.post("/", zValidator("json", feedPostSchema), async c => {
+    const userId = c.get("userId");
+    const body = c.req.valid("json");
+
+    const item = await FeedService.addFeed(body.url, userId);
+
+    if (!item.success) {
+        logger.error(`Could not fetch feed with url ${body.url} for user ${userId}`);
+        return c.text(item.message, item.status);
+    }
+
+    return c.json(item.data);
+});
+
+feed.get("/:id", async c => {
+    const internalIdentifier = c.req.param("id");
+    const userId = c.get("userId");
+
+    const feedResult = await FeedService.getFeedWithItemsOrContent(internalIdentifier, userId);
+
+    if (!feedResult.success) {
+        logger.error(`Could not find feed with internal identifier ${internalIdentifier}`);
+
+        return c.json(Result.error(feedResult.message, feedResult.type));
+    }
+
+    return c.json(feedResult.data);
+});
+
+const feedSearchQuerySchema = z.object({
+    query: z.string(),
+});
+
+feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {
+    const { query } = c.req.valid("query");
+    const userId = c.get("userId");
+
+    const item = await FeedService.searchFeeds(query, userId);
+
+    if (!item.success) {
+        logger.error(`Could not search for feeds with query ${query} for user ${userId}`);
+        return c.json(Result.error(item.message, item.type));
+    }
+
+    return c.json(item.data);
+});

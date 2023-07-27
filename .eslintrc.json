@@ -2,6 +2,8 @@
     "root": true,
     "extends": ["@banjoanton/eslint-config"],
     "rules": {
-        "n/no-unpublished-import": "off"
+        "n/no-unpublished-import": "off",
+        "import/no-unresolved": "off",
+        "n/no-unsupported-features/node-builtins": "off"
     }
 }

@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "paths": {
+            "@app/*": ["src/*"]
+        },
+        "baseUrl": "./"
+    },
+    "extends": "tsconfig/library.json",
+    "exclude": ["node_modules"]
+}
