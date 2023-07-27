@@ -8,10 +8,10 @@ import { Webhook, WebhookRequiredHeaders } from "svix";
 import { createLogger } from "utils";
 
 const webhookSecret = process.env.WEBHOOK_SECRET ?? raise("WEBHOOK_SECRET is not set");
-const logger = createLogger("publicUserRoute");
+const logger = createLogger("WebhookUserRoute");
 
 async function handler(request: Request) {
-    const payload = await request.json();
+    const payload = await request.text();
     const headersList = headers();
     const svixHeaders = {
         "svix-id": headersList.get("svix-id"),
@@ -24,7 +24,7 @@ async function handler(request: Request) {
 
     try {
         evt = webhook.verify(
-            JSON.stringify(payload),
+            payload,
             svixHeaders as IncomingHttpHeaders & WebhookRequiredHeaders
         ) as WebhookEvent;
     } catch (error) {
