@@ -13,7 +13,9 @@
                 "NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL",
                 "REDIS_HOST",
                 "REDIS_PORT",
-                "REDIS_PASSWORD"
+                "REDIS_PASSWORD",
+                "AUTH_TOKEN",
+                "WORKER_PROD_URL"
             ],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
