@@ -46,6 +46,7 @@ npx prisma studio
 -   [x] Fix docker cleanup job
 -   [ ] Fix dockerbuild using turbo
 -   [ ] Change to postgresql
+-   [ ] Add logging (axiom?)
 
 ## License
 
