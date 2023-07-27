@@ -14,6 +14,22 @@ export const createWorker = <T extends object>(
     const queue = new Queue<T>(QUEUE_NAME, redisConfig);
     const worker = new Worker<T>(QUEUE_NAME, processor, redisConfig);
 
+    logger.info(
+        // @ts-ignore
+        // eslint-disable-next-line max-len
+        `Created ${QUEUE_NAME} and ${JOB_NAME} at host ${redisConfig?.connection?.host}`
+    );
+
+    const stopRepeatable = async () => {
+        const repeatableJobs = await queue.getRepeatableJobs();
+        logger.info(`Stopping ${repeatableJobs.length} repeatable jobs...`);
+        await Promise.all(
+            repeatableJobs.map(async job => {
+                await queue.removeRepeatableByKey(job.key);
+            })
+        );
+    };
+
     const wrapper = {
         start: async () => {
             logger.info("Starting...");
@@ -38,20 +54,22 @@ export const createWorker = <T extends object>(
                 jobId: `${JOB_NAME}-${randomString()}`,
             });
         },
-        stopRepeatable: async () => {
-            const repeatableJobs = await queue.getRepeatableJobs();
-            logger.info(`Stopping ${repeatableJobs.length} repeatable jobs...`);
-            await Promise.all(
-                repeatableJobs.map(async job => {
-                    await queue.removeRepeatableByKey(job.key);
-                })
-            );
-        },
+        stopRepeatable,
         activeCount: async () => {
             logger.info("Getting active count...");
             return await queue.getActiveCount();
         },
         getQueue: () => queue,
+        clear: async () => {
+            logger.info(`Clearing ${QUEUE_NAME} queue...`);
+            await queue.obliterate();
+            logger.info(`Clearing ${JOB_NAME} job...`);
+
+            const ids = await queue.clean(0, 100_000);
+            logger.info(`Cleared ${ids.length} jobs`);
+
+            await stopRepeatable();
+        },
     };
 
     return wrapper;

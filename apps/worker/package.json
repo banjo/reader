@@ -9,7 +9,8 @@
         "dev": "esno src/index.ts",
         "build": "tsup",
         "test": "vitest",
-        "clean": "rimraf node_modules dist"
+        "clean": "rimraf node_modules dist",
+        "clear:db": "esno scripts/clear-redis.ts"
     },
     "keywords": [],
     "author": "",
