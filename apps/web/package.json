@@ -3,7 +3,7 @@
     "version": "0.0.2",
     "private": true,
     "scripts": {
-        "dev": "next dev --port 3002",
+        "dev": "next dev --port 3002 | pino-pretty --colorize",
         "build": "next build",
         "start": "next start",
         "clean": "rimraf .next node_modules",

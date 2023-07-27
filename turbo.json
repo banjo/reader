@@ -15,7 +15,9 @@
                 "REDIS_PORT",
                 "REDIS_PASSWORD",
                 "AUTH_TOKEN",
-                "WORKER_PROD_URL"
+                "WORKER_PROD_URL",
+                "AXIOM_DATASET",
+                "AXIOM_TOKEN"
             ],
             "outputs": [".next/**", "!.next/cache/**", "dist"]
         },
