@@ -33,11 +33,17 @@ const getUsersByFeedId = async (feedId: number) => {
     return users;
 };
 
-const createUser = async (externalId: string, email: string): AsyncResultType<User> => {
+type CreateUserProps = {
+    externalId: string;
+    email: string;
+    name: string;
+};
+const createUser = async ({ name, externalId, email }: CreateUserProps): AsyncResultType<User> => {
     const user = await prisma.user.create({
         data: {
             externalId,
             email,
+            name,
         },
     });
 

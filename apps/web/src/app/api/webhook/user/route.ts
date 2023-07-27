@@ -36,8 +36,13 @@ async function handler(request: Request) {
         return ResponseService.error("Invalid event type", "InternalError");
     }
 
-    const { id, email_addresses } = evt.data as UserJSON;
-    const email = email_addresses[0]?.email_address;
+    const {
+        id,
+        email_addresses: emailAddresses,
+        first_name: firstName,
+        last_name: lastName,
+    } = evt.data as UserJSON;
+    const email = emailAddresses[0]?.email_address;
 
     if (!email) {
         logger.error(`User created without email: ${id}`);
@@ -46,7 +51,13 @@ async function handler(request: Request) {
 
     logger.info(`User created: ${id} ${email}`);
 
-    const res = await UserService.createUser(id, email);
+    const name = firstName && lastName ? `${firstName} ${lastName}` : "";
+
+    const res = await UserService.createUser({
+        externalId: id,
+        email,
+        name: name,
+    });
 
     if (!res.success) {
         logger.error(`Could not create user with externalId: ${id} and email: ${email}`);

@@ -3,10 +3,17 @@ import { UserRepository } from "../repositories/UserRepository";
 
 const logger = createLogger("UserService");
 
-const createUser = async (externalId: string, email: string) => {
+type CreateUserProps = {
+    externalId: string;
+    email: string;
+    name: string;
+};
+
+const createUser = async (props: CreateUserProps) => {
+    const { externalId, email } = props;
     logger.info(`Creating user with externalId: ${externalId} and email: ${email}`);
 
-    const res = await UserRepository.createUser(externalId, email);
+    const res = await UserRepository.createUser(props);
 
     if (!res.success) {
         logger.error(`Could not create user with externalId: ${externalId} and email: ${email}`);
