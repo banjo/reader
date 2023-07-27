@@ -1,5 +1,5 @@
-import { prisma } from "db";
-import { AsyncResultType, Result, createLogger } from "utils";
+import { prisma, User } from "db";
+import { AsyncResultType, createLogger, Result } from "utils";
 
 const logger = createLogger("UserRepository");
 
@@ -33,7 +33,19 @@ const getUsersByFeedId = async (feedId: number) => {
     return users;
 };
 
+const createUser = async (externalId: string, email: string): AsyncResultType<User> => {
+    const user = await prisma.user.create({
+        data: {
+            externalId,
+            email,
+        },
+    });
+
+    return Result.ok(user);
+};
+
 export const UserRepository = {
     getIdByExternalId,
     getUsersByFeedId,
+    createUser,
 };

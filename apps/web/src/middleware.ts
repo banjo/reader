@@ -11,6 +11,10 @@ export default authMiddleware({
             return NextResponse.next();
         }
 
+        if (url.includes("/api/webhook")) {
+            return NextResponse.next();
+        }
+
         if (url.includes("/api")) {
             const externalId = req.headers.get("X-External-User-Id");
 
