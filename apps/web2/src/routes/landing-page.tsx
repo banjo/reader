@@ -1,15 +1,12 @@
-import { buttonVariants } from "@/client/components/ui/button";
-import { auth } from "@clerk/nextjs";
-import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
-export const revalidate = 0;
-
-export default function IndexPage() {
-    const { userId } = auth();
+export function LandingPage() {
+    const userId = false;
     return (
         <section
             className="h-full-with-nav flex flex-col items-start justify-center gap-6 px-16
-                pb-8 pt-6 md:py-10"
+                pb-8 pt-6 md:py-10 font-open"
         >
             <div className="flex max-w-[980px] flex-col items-start gap-2">
                 <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
@@ -22,15 +19,15 @@ export default function IndexPage() {
 
             <div className="flex gap-4">
                 {userId ? (
-                    <Link href="/dashboard" className={buttonVariants()}>
+                    <Link to={"/dashboard"} className={buttonVariants()}>
                         Dashboard
                     </Link>
                 ) : (
                     <>
-                        <Link href="/sign-in" className={buttonVariants()}>
+                        <Link to="/sign-in" className={buttonVariants()}>
                             Sign in
                         </Link>
-                        <Link href="/sign-up" className={buttonVariants({ variant: "outline" })}>
+                        <Link to="/sign-up" className={buttonVariants({ variant: "outline" })}>
                             Sign up
                         </Link>
                     </>
