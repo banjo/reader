@@ -17,7 +17,7 @@ feed.get("/", async c => {
         return c.json(Result.error(feedResponse.message, feedResponse.type));
     }
 
-    return c.json(feedResponse.data);
+    return c.json(Result.ok(feedResponse.data));
 });
 
 const feedPostSchema = z.object({
@@ -35,7 +35,7 @@ feed.post("/", zValidator("json", feedPostSchema), async c => {
         return c.text(item.message, item.status);
     }
 
-    return c.json(item.data);
+    return c.json(Result.ok(item.data));
 });
 
 feed.get("/:id", async c => {
@@ -50,7 +50,7 @@ feed.get("/:id", async c => {
         return c.json(Result.error(feedResult.message, feedResult.type));
     }
 
-    return c.json(feedResult.data);
+    return c.json(Result.ok(feedResult.data));
 });
 
 const feedSearchQuerySchema = z.object({
@@ -68,5 +68,5 @@ feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {
         return c.json(Result.error(item.message, item.type));
     }
 
-    return c.json(item.data);
+    return c.json(Result.ok(item.data));
 });

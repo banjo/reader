@@ -97,46 +97,6 @@ importers:
         specifier: ^0.33.0
         version: 0.33.0
 
-  apps/tjo:
-    dependencies:
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.15
-        version: 18.2.15
-      '@types/react-dom':
-        specifier: ^18.2.7
-        version: 18.2.7
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^6.0.0
-        version: 6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.45.0)(typescript@5.0.2)
-      '@typescript-eslint/parser':
-        specifier: ^6.0.0
-        version: 6.0.0(eslint@8.45.0)(typescript@5.0.2)
-      '@vitejs/plugin-react':
-        specifier: ^4.0.3
-        version: 4.0.3(vite@4.4.5)
-      eslint:
-        specifier: ^8.45.0
-        version: 8.45.0
-      eslint-plugin-react-hooks:
-        specifier: ^4.6.0
-        version: 4.6.0(eslint@8.45.0)
-      eslint-plugin-react-refresh:
-        specifier: ^0.4.3
-        version: 0.4.3(eslint@8.45.0)
-      typescript:
-        specifier: ^5.0.2
-        version: 5.0.2
-      vite:
-        specifier: ^4.4.5
-        version: 4.4.5(@types/node@17.0.45)
-
   apps/web:
     dependencies:
       '@clerk/clerk-sdk-node':
@@ -335,6 +295,9 @@ importers:
       framer-motion:
         specifier: ^10.12.16
         version: 10.12.16(react-dom@18.2.0)(react@18.2.0)
+      ky:
+        specifier: ^0.33.3
+        version: 0.33.3
       lucide-react:
         specifier: 0.105.0-alpha.4
         version: 0.105.0-alpha.4(react@18.2.0)
@@ -353,6 +316,9 @@ importers:
       react-select:
         specifier: ^5.7.3
         version: 5.7.3(@types/react@18.2.15)(react-dom@18.2.0)(react@18.2.0)
+      swr:
+        specifier: ^2.1.5
+        version: 2.1.5(react@18.2.0)
       tailwind-merge:
         specifier: ^1.12.0
         version: 1.12.0
@@ -384,6 +350,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.27)
+      db:
+        specifier: workspace:*
+        version: link:../../packages/db
       eslint:
         specifier: ^8.45.0
         version: 8.45.0
@@ -411,6 +380,9 @@ importers:
       typescript:
         specifier: ^5.0.2
         version: 5.0.2
+      utils:
+        specifier: workspace:*
+        version: link:../../packages/utils
       vite:
         specifier: ^4.4.5
         version: 4.4.5(@types/node@17.0.45)
@@ -5088,7 +5060,7 @@ packages:
       enhanced-resolve: 5.15.0
       eslint: 8.44.0
       eslint-module-utils: 2.8.0(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.5.5)(eslint@8.44.0)
-      eslint-plugin-import: 2.27.5(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-typescript@2.7.1)(eslint@8.44.0)
+      eslint-plugin-import: 2.27.5(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-typescript@3.5.5)(eslint@8.44.0)
       get-tsconfig: 4.6.2
       globby: 13.1.4
       is-core-module: 2.12.1
@@ -5233,7 +5205,7 @@ packages:
       doctrine: 2.1.0
       eslint: 8.44.0
       eslint-import-resolver-node: 0.3.7
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@2.7.1)(eslint@8.44.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@5.59.7)(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.5.5)(eslint@8.44.0)
       has: 1.0.3
       is-core-module: 2.12.1
       is-glob: 4.0.3

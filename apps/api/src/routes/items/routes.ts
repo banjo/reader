@@ -17,7 +17,7 @@ items.get("/", async c => {
         return c.json(Result.error(itemsResponse.message, itemsResponse.type));
     }
 
-    return c.json(itemsResponse.data);
+    return c.json(Result.ok(itemsResponse.data));
 });
 
 const itemsPostReadSchema = z.object({

@@ -1,4 +1,5 @@
-import { SiteHeader } from "@/components/site-header";
+import { SideMenuContainer } from "@/components/nav/sidemenu/side-menu-container";
+import { SiteHeader } from "@/components/nav/site-header";
 import { LandingPage } from "@/routes/landing-page";
 import { raise } from "@banjoanton/utils";
 import {
@@ -20,13 +21,27 @@ function Layout() {
     );
 }
 
+function SignedInLayout() {
+    return (
+        <>
+            <SiteHeader />
+            <section className="flex">
+                <SideMenuContainer prefix="/dashboard" />
+                <main className="flex-1 p-6">
+                    <Outlet />
+                </main>
+            </section>
+        </>
+    );
+}
+
 const router = createBrowserRouter([
     {
         path: "/",
         element: (
             <>
                 <SignedIn>
-                    <Layout />
+                    <SignedInLayout />
                 </SignedIn>
                 <SignedOut>
                     <RedirectToSignIn />
@@ -41,6 +56,26 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard",
                 element: <div>Dashboard</div>,
+            },
+            {
+                path: "/dashboard/bookmarks",
+                element: <div>Bookmarks</div>,
+            },
+            {
+                path: "/dashboard/favorites",
+                element: <div>Favorites</div>,
+            },
+            {
+                path: "/dashboard/all",
+                element: <div>All</div>,
+            },
+            {
+                path: "/dashboard/feed/:slug",
+                element: <div>Dashboard for id</div>,
+            },
+            {
+                path: "*",
+                element: <Navigate to={"/dashboard"} />,
             },
         ],
     },
@@ -73,6 +108,7 @@ const signedOutRouter = createBrowserRouter([
 ]);
 
 const clerkPubKey =
+    // @ts-ignore
     import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY ?? raise("Missing Publishable Key");
 
 export function Root() {

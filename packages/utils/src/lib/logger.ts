@@ -1,5 +1,5 @@
 // import { raise } from "@banjoanton/utils";
-import "dotenv/config";
+// import "dotenv/config";
 import { pino } from "pino";
 // import {TransportTargetOptions} from "pino";
 

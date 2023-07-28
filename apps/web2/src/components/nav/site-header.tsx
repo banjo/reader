@@ -1,4 +1,4 @@
-import { MainNav } from "@/components/main-nav";
+import { MainNav } from "@/components/nav/main-nav";
 import { Icons } from "@/components/shared/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
