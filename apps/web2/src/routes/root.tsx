@@ -1,5 +1,9 @@
 import { SideMenuContainer } from "@/components/nav/sidemenu/side-menu-container";
 import { SiteHeader } from "@/components/nav/site-header";
+import { FeedContainer } from "@/features/feed/containers/feed-container";
+import { AllContainer } from "@/features/items/containers/all-container";
+import { BookmarkContainer } from "@/features/items/containers/bookmark-container";
+import { FavoriteContainer } from "@/features/items/containers/favorite-container";
 import { LandingPage } from "@/routes/landing-page";
 import { raise } from "@banjoanton/utils";
 import {
@@ -59,19 +63,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard/bookmarks",
-                element: <div>Bookmarks</div>,
+                element: <BookmarkContainer />,
             },
             {
                 path: "/dashboard/favorites",
-                element: <div>Favorites</div>,
+                element: <FavoriteContainer />,
             },
             {
                 path: "/dashboard/all",
-                element: <div>All</div>,
+                element: <AllContainer />,
             },
             {
                 path: "/dashboard/feed/:slug",
-                element: <div>Dashboard for id</div>,
+                element: <FeedContainer />,
             },
             {
                 path: "*",

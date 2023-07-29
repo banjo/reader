@@ -1,6 +1,6 @@
-import { UnsubscribeFn } from "@/client/features/feed/hooks/use-feed-fetcher";
-import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
-import { Refetch } from "@/shared/models/swr";
+import { UnsubscribeFn } from "@/features/feed/hooks/use-feed-fetcher";
+import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
+import { Refetch } from "@/models/swr";
 import { CleanFeedWithItems } from "db";
 import { toast } from "react-hot-toast";
 

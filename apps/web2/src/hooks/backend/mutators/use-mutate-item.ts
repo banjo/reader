@@ -1,5 +1,5 @@
-import { useAuthFetcher } from "@/client/hooks/backend/use-auth-fetcher";
-import { Refetch } from "@/shared/models/swr";
+import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
+import { Refetch } from "@/models/swr";
 import { ItemWithContent } from "db";
 import { toast } from "react-hot-toast";
 

@@ -4,6 +4,7 @@ import { FC, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { StylesConfig } from "react-select";
 import Select from "react-select/async";
+// TODO: create own type for this
 import { SearchFeed } from "server";
 
 type Option = {
