@@ -1,7 +1,7 @@
 import { MenuEntries } from "@/components/shared/dropdown";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { Refetch } from "@/models/swr";
-import { ItemWithContent } from "db";
+import { ItemContent, ItemWithContent } from "db";
 
 type Out = {
     menuOptionsItems: MenuEntries<ItemWithContent>[];
