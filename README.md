@@ -1,6 +1,6 @@
 # banjo-rss
 
-A simple RSS reader built with Next.js.
+A simple RSS reader.
 
 ## Database
 
@@ -37,13 +37,15 @@ npx prisma studio
 -   [ ] CleanFeedWithItems currently can return items or content as items, should be consistent and type safe in future.
 -   [x] Do not need worker url in packages that do not use it 
 -   [x] API Urls should be in a separate file
--   [ ] Replace ky with something else where headers work
+-   [x] Replace ky with something else where headers work
 -   [x] Add env example file
 -   [ ] Fix why ESM does not work with TSUP in a library?
 -   [x] Fix docker cleanup job
--   [ ] Fix dockerbuild using turbo
+-   [x] Fix dockerbuild using turbo
 -   [ ] Change to postgresql
 -   [ ] Add logging (axiom?)
+-   [ ] Do not use api for worker in api, use worker directly
+-   [ ] Add request id to logging
 
 ## Build specific app
 
