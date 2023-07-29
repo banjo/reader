@@ -1,11 +1,11 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
+import { SearchFeed } from "@/models/server";
 import { FC, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { StylesConfig } from "react-select";
 import Select from "react-select/async";
 // TODO: create own type for this
-import { SearchFeed } from "server";
 
 type Option = {
     value: string;
