@@ -1,0 +1,45 @@
+FROM node:18-alpine AS base
+
+# Use Node.js LTS version
+FROM base AS builder
+
+WORKDIR /app
+COPY package.json .
+RUN npm add -g turbo
+
+# Create turbo file
+COPY . .
+RUN turbo prune --scope=api --docker
+
+FROM base as installer
+WORKDIR /app
+RUN npm add -g pnpm
+RUN npm add -g turbo
+
+# First install the dependencies (as they change less often)
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install
+
+# Build the project
+COPY --from=builder /app/out/full/ .
+RUN turbo build --filter=api...
+
+# Production Stage
+FROM base AS production
+
+# Create directory for the application
+WORKDIR /app
+
+# Copy the required directories from the installer stage
+COPY --from=installer /app/apps/api ./apps/api
+# COPY --from=installer /app/packages/db ./packages/db
+COPY --from=installer /app/node_modules ./node_modules
+
+# Change workdir to the worker app
+WORKDIR /app/apps/api
+
+EXPOSE 3003
+# Set the command to run your app
+CMD ["node", "dist/index.cjs"]
