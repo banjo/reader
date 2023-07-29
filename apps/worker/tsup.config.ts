@@ -9,4 +9,5 @@ export default defineConfig({
     format: ["cjs"],
     minify: isProduction,
     sourcemap: true,
+    external: ["@prisma/client"],
 });

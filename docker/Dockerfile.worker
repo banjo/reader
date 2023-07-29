@@ -6,21 +6,24 @@ WORKDIR /app
 
 # Copy over the monorepo
 COPY package.json .
+
+# Copy over npmrc file for correct behavior in monorepo
+COPY .npmrc .
+
 RUN npm add -g pnpm
+RUN npm add -g turbo
+RUN npm add -g tsup
 COPY . .
 
+RUN turbo prune --scope=worker
+
+WORKDIR /app/out
+
 # Install Packages and build
-RUN pnpm add tsup -w
-RUN pnpm install --prod --filter db
-RUN pnpm install --prod --filter worker
+RUN pnpm install
 
-# install db
-WORKDIR /app/packages/db
-RUN pnpm run build
-
-# install worker
-WORKDIR /app/apps/worker
-RUN pnpm run build
+# Build db
+RUN turbo build --filter=worker
 
 # Production Stage
 FROM node:18-alpine AS production
@@ -32,11 +35,9 @@ WORKDIR /app
 RUN apk add dumb-init
 
 # Copy the required directories from the builder stage
-## The "." at the end of the directory path maintains the directory structure
-COPY --from=builder /app/packages/db ./packages/db
-COPY --from=builder /app/apps/worker ./apps/worker
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/out/apps/worker ./apps/worker
+COPY --from=builder /app/out/packages/db ./packages/db
+COPY --from=builder /app/out/node_modules ./node_modules
 
 # Change workdir to the worker app
 WORKDIR /app/apps/worker

@@ -4,3 +4,4 @@ build
 .env
 .turbo
 .DS_Store
+out
