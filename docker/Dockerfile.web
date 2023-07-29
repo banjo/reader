@@ -7,43 +7,27 @@ WORKDIR /app
 # Copy over the monorepo
 COPY package.json .
 RUN npm add -g pnpm
+RUN npm add -g turbo
 COPY . .
 
 # Install Packages and build
-RUN pnpm add tsup -w
-RUN pnpm install --prod --filter db
-RUN pnpm install --prod --filter web
-
-# install db
-WORKDIR /app/packages/db
-RUN pnpm run build
-
-# install web
-WORKDIR /app/apps/web
-RUN pnpm run build
+RUN pnpm install
+RUN turbo run build --filter={./apps/web}...
 
 # Production Stage
 FROM node:18-alpine AS production
 
-# Create directory for the application
-WORKDIR /app
+# Install nginx
+RUN apk add --update nginx
 
-# install dumb-init
-RUN apk add dumb-init
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy the required directories from the builder stage
-## The "." at the end of the directory path maintains the directory structure
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/web ./apps/web
+# Copy over the built react app
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 
-# Change workdir to the web app
-WORKDIR /app/apps/web
+# Replace the default nginx.conf
+COPY apps/web/nginx.conf /etc/nginx/nginx.conf
 
-# Defining environment variables
-ENV NODE_ENV=production
-ENV REDIS_HOST=host.docker.internal
-ENV REDIS_PORT=6379
-ENV DATABASE_URL=mysql://root:root@host.docker.internal:3306/banjo-rss
-
-# Set the command to run your app
-CMD ["dumb-init","npm", "start"]
+EXPOSE 80
+CMD ["nginx","-g","daemon off;"]
