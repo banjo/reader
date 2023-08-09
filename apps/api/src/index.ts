@@ -11,14 +11,7 @@ import { feed } from "./routes/feed/routes";
 const app = createHonoInstance().basePath("/api");
 
 app.use("*", logger());
-app.use(
-    "*",
-    cors({
-        origin: "*",
-        allowHeaders: ["Auth-Token", "X-External-User-Id"],
-        credentials: true,
-    })
-);
+app.use("*", cors());
 app.use("*", authMiddleware);
 
 app.route("/feed", feed);
