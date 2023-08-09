@@ -15,6 +15,8 @@ app.use(
     "*",
     cors({
         origin: "*",
+        allowHeaders: ["Auth-Token", "X-External-User-Id"],
+        credentials: true,
     })
 );
 app.use("*", authMiddleware);
