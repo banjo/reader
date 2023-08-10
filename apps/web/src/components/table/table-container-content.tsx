@@ -51,7 +51,6 @@ export const TableContainerContent: FC<TableContainerProps> = ({
                                     type="list"
                                     showFeedName={false}
                                     menuOptions={menuOptions}
-                                    refetch={noop}
                                     isSubscribed={false}
                                     onClick={noop}
                                 />

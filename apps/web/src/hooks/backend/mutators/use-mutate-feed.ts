@@ -1,26 +1,16 @@
-import { UnsubscribeFn } from "@/features/feed/hooks/use-feed-fetcher";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { Refetch } from "@/models/swr";
+import { useQueryClient } from "@tanstack/react-query";
 import { CleanFeedWithItems } from "db";
-import { toast } from "react-hot-toast";
 
-type In<T> = {
-    refetch: Refetch<T>;
-    unsubscribeFn: UnsubscribeFn;
-};
-
-export const useMutateFeed = <T extends CleanFeedWithItems>({ unsubscribeFn }: In<T>) => {
+export const useMutateFeed = <T extends CleanFeedWithItems>() => {
     const api = useAuthFetcher();
+    const queryClient = useQueryClient();
 
     const unsubscribe = async (feed: T) => {
-        const unsubscribeRequest = await api.SWR(
-            `/feed/${feed.internalIdentifier}/unsubscribe`,
-            "POST"
-        );
+        // TODO: add unsubscribe to api server again
+        await api.POST(`/feed/${feed.internalIdentifier}/unsubscribe`, {});
 
-        await unsubscribeFn(unsubscribeRequest, () => {
-            toast.error("Failed to unsubscribe from feed");
-        });
+        queryClient.invalidateQueries({ queryKey: ["feed"] });
     };
 
     return { unsubscribe };

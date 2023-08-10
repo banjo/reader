@@ -1,78 +1,70 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { Refetch } from "@/models/swr";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ItemWithContent } from "db";
-import { toast } from "react-hot-toast";
 
-type In = {
-    refetch: Refetch<ItemWithContent[]>;
-};
-
-export const useMutateItem = ({ refetch }: In) => {
+export const useMutateItem = () => {
     const api = useAuthFetcher();
+    const queryClient = useQueryClient();
+
+    const mutateIsRead = useMutation({
+        mutationFn: async (item: ItemWithContent) => {
+            await api.PUT(`/item/${item.id}`, {
+                ...item,
+                isRead: !item.isRead,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["feed"] });
+        },
+    });
 
     const toggleReadStatus = (item: ItemWithContent) => {
-        const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
-            ...item,
-            isRead: !item.isRead,
-        });
-
-        const updatedItem = {
-            ...item,
-            isRead: !item.isRead,
-        };
-
-        refetch([updatedItem], updateRequest, () => {
-            toast.error("Failed to update item");
-        });
+        mutateIsRead.mutate(item);
     };
+
+    const mutateBookmarkStatus = useMutation({
+        mutationFn: async (item: ItemWithContent) => {
+            await api.PUT(`/item/${item.id}`, {
+                ...item,
+                isBookmarked: !item.isBookmarked,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["feed"] });
+        },
+    });
 
     const toggleBookmarkStatus = (item: ItemWithContent) => {
-        const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
-            ...item,
-            isBookmarked: !item.isBookmarked,
-        });
-
-        const updatedItem = {
-            ...item,
-            isBookmarked: !item.isBookmarked,
-        };
-
-        refetch([updatedItem], updateRequest, () => {
-            toast.error("Failed to update item");
-        });
+        mutateBookmarkStatus.mutate(item);
     };
+
+    const mutateFavoriteStatus = useMutation({
+        mutationFn: async (item: ItemWithContent) =>
+            await api.PUT(`/item/${item.id}`, {
+                ...item,
+                isFavorite: !item.isFavorite,
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["feed"] });
+        },
+    });
 
     const toggleFavoriteStatus = (item: ItemWithContent) => {
-        const updateRequest = api.SWR(`/item/${item.id}`, "PUT", {
-            ...item,
-            isFavorite: !item.isFavorite,
-        });
-
-        const updatedItem = {
-            ...item,
-            isFavorite: !item.isFavorite,
-        };
-
-        refetch([updatedItem], updateRequest, () => {
-            toast.error("Failed to update item");
-        });
+        mutateFavoriteStatus.mutate(item);
     };
 
+    const mutateMulitpleAsRead = useMutation({
+        mutationFn: async (items: ItemWithContent[]) =>
+            await api.POST(`/items/read`, {
+                ids: items.map(i => i.id),
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["feed"] });
+        },
+    });
+
     const markMultipleAsRead = (items: ItemWithContent[]) => {
-        const updateRequest = api.SWR(`/items/read`, "POST", {
-            ids: items.map(i => i.id),
-        });
-
-        const updatedItems = items
-            .filter(i => !i.isRead)
-            .map(i => ({
-                ...i,
-                isRead: true,
-            }));
-
-        refetch(updatedItems, updateRequest, () => {
-            toast.error("Failed to update items");
-        });
+        mutateMulitpleAsRead.mutate(items);
     };
 
     return {

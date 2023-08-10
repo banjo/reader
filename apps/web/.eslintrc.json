@@ -1,0 +1,9 @@
+{
+    "root": true,
+    "extends": ["@banjoanton/eslint-config", "@tanstack/query"],
+    "rules": {
+        "n/no-unpublished-import": "off",
+        "import/no-unresolved": "off",
+        "n/no-unsupported-features/node-builtins": "off"
+    }
+}

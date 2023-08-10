@@ -70,3 +70,35 @@ feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {
 
     return c.json(Result.ok(item.data));
 });
+
+feed.post("/:internalIdentifier/unsubscribe", async c => {
+    const userId = c.get("userId");
+    const internalIdentifier = c.req.param("internalIdentifier");
+
+    const item = await FeedService.unsubscribeFromFeed(internalIdentifier, userId);
+
+    if (!item.success) {
+        logger.error(
+            `Could not unsubscribe from feed with internal identifier ${internalIdentifier} for user ${userId}`
+        );
+        return c.json(Result.error(item.message, item.type));
+    }
+
+    return c.json(Result.ok(item.data));
+});
+
+feed.post("/:internalIdentifier/subscribe", async c => {
+    const userId = c.get("userId");
+    const internalIdentifier = c.req.param("internalIdentifier");
+
+    const item = await FeedService.subscribeToFeed(internalIdentifier, userId);
+
+    if (!item.success) {
+        logger.error(
+            `Could not subscribe to feed with internal identifier ${internalIdentifier} for user ${userId}`
+        );
+        return c.json(Result.error(item.message, item.type));
+    }
+
+    return c.json(Result.ok(item.data));
+});

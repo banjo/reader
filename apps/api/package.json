@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "run": "esno src/index.ts | pino-pretty --colorize",
-        "dev": "esno src/index.ts | pino-pretty --colorize",
+        "dev": "esno watch src/index.ts | pino-pretty --colorize",
         "build": "tsup",
         "clean": "rimraf node_modules dist"
     },

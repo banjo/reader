@@ -1,8 +1,6 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ItemContent } from "db";
-import toast from "react-hot-toast";
-import { useSWRConfig } from "swr";
 
 export type TableFiltersContent = object;
 
@@ -17,21 +15,24 @@ type TableFiltersOut = {
 };
 
 export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => {
-    const { fetchLatestInSidebar } = useUpdateSidebar();
-    const { mutate } = useSWRConfig();
+    // const { fetchLatestInSidebar } = useUpdateSidebar();
     const api = useAuthFetcher();
+    const queryClient = useQueryClient();
+
+    const mutateSubscribe = useMutation({
+        mutationFn: async (internalIdentifier: string) => {
+            await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["feed"] });
+        },
+    });
 
     // ACTIONS
     const subscribe = async (internalIdentifier: string) => {
-        const subscribeResult = await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
+        await mutateSubscribe.mutateAsync(internalIdentifier);
 
-        if (!subscribeResult.success) {
-            toast.error("Failed to subscribe to feed");
-            return;
-        }
-
-        mutate(`/feed/${internalIdentifier}`);
-        fetchLatestInSidebar();
+        // fetchLatestInSidebar();
     };
 
     return {

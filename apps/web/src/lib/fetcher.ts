@@ -80,7 +80,6 @@ export const fetcher = (userId: string) => {
     const SWR_AUTH = async <T>(path: string): Promise<T> => {
         try {
             const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
-            console.log("🪕%c Banjo | fetcher.ts:83 |", "color: #E91E63", res);
             return res.data;
         } catch (error: unknown) {
             console.log(error);
@@ -114,7 +113,6 @@ export const fetcher = (userId: string) => {
     const POST = async <T>(path: string, body: unknown): AsyncResultType<T> => {
         try {
             const res = await api.post(updatePath(path), { json: body }).json<SuccessRequest<T>>();
-
             return Result.ok(res.data);
         } catch (error: unknown) {
             return handleError(error);

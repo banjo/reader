@@ -4,8 +4,6 @@ import { Dropdown, MenuEntries } from "@/components/shared/dropdown";
 import { Icons } from "@/components/shared/icons";
 import { TableType } from "@/components/table/table.types";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
-import { Refetch } from "@/models/swr";
-import { noop } from "@banjoanton/utils";
 import { ItemContent, ItemWithContent } from "db";
 import { motion } from "framer-motion";
 
@@ -15,7 +13,6 @@ type CardPropsItem = {
     showFeedName?: boolean;
     feedName?: string;
     menuOptions?: MenuEntries<ItemWithContent>[];
-    refetch: Refetch<ItemWithContent[]>;
     isSubscribed: true;
     onClick: () => void;
 };
@@ -26,7 +23,6 @@ type CardPropsContent = {
     showFeedName?: boolean;
     feedName?: string;
     menuOptions?: MenuEntries<ItemContent>[];
-    refetch: Refetch<ItemContent[]>;
     isSubscribed: false;
     onClick: () => void;
 };
@@ -37,13 +33,10 @@ export const TableItem = ({
     feedName,
     showFeedName = false,
     menuOptions,
-    refetch,
     isSubscribed,
     onClick,
 }: CardPropsItem | CardPropsContent) => {
-    const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem({
-        refetch: isSubscribed ? refetch : noop,
-    });
+    const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem();
 
     if (type === "card") {
         throw new Error("not implemented");
@@ -52,6 +45,7 @@ export const TableItem = ({
     const content = isSubscribed ? item.content : item;
 
     const toggleBookmark = () => {
+        console.log("🪕%c Banjo | table-item.tsx:48 | ", "color: #E91E63", "töggle");
         if (isSubscribed) toggleBookmarkStatus(item);
     };
 

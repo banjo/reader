@@ -1,6 +1,5 @@
 import { MenuEntries } from "@/components/shared/dropdown";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
-import { Refetch } from "@/models/swr";
 import { ItemContent, ItemWithContent } from "db";
 
 type Out = {
@@ -8,15 +7,8 @@ type Out = {
     menuOptionsContent: MenuEntries<ItemContent>[];
 };
 
-type In = {
-    refetchContentMultiple: Refetch<ItemContent[]>;
-    refetchItemsMultiple: Refetch<ItemWithContent[]>;
-};
-
-export const useTableItemMenu = ({ refetchItemsMultiple }: In): Out => {
-    const { toggleReadStatus } = useMutateItem({
-        refetch: refetchItemsMultiple,
-    });
+export const useTableItemMenu = (): Out => {
+    const { toggleReadStatus } = useMutateItem();
 
     const menuOptionsItems: MenuEntries<ItemWithContent>[] = [
         { label: "Edit", type: "label" },
