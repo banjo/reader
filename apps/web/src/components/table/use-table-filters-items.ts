@@ -1,6 +1,6 @@
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
+import { useInvalidate } from "@/hooks/backend/use-invalidate";
 import { ItemWithContent } from "db";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";

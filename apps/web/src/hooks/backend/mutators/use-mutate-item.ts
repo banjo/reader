@@ -1,11 +1,10 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInvalidate } from "@/hooks/backend/use-invalidate";
+import { useMutation } from "@tanstack/react-query";
 import { ItemWithContent } from "db";
 
 export const useMutateItem = () => {
     const api = useAuthFetcher();
-    const queryClient = useQueryClient();
     const { invalidate } = useInvalidate();
 
     const mutateIsRead = useMutation({

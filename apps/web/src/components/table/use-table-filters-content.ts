@@ -1,6 +1,6 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInvalidate } from "@/hooks/backend/use-invalidate";
+import { useMutation } from "@tanstack/react-query";
 import { ItemContent } from "db";
 
 export type TableFiltersContent = object;
@@ -18,7 +18,6 @@ type TableFiltersOut = {
 export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => {
     const { invalidate } = useInvalidate();
     const api = useAuthFetcher();
-    const queryClient = useQueryClient();
 
     const mutateSubscribe = useMutation({
         mutationFn: async (internalIdentifier: string) => {
@@ -32,7 +31,7 @@ export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => 
     // ACTIONS
     const subscribe = async (internalIdentifier: string) => {
         await mutateSubscribe.mutateAsync(internalIdentifier);
-        refetchSidebarFeed();
+        invalidate();
     };
 
     return {
