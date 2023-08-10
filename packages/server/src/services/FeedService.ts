@@ -1,6 +1,7 @@
 import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { AsyncResultType, Result, createLogger } from "utils";
+import { AsyncResultType } from "model";
+import { Result, createLogger } from "utils";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
 import { FeedMapper, SearchFeed } from "../mappers/FeedMapper";

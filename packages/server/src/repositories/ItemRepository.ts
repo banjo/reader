@@ -1,5 +1,6 @@
 import { Item, ItemContent, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
-import { AsyncResultType, Result, createLogger } from "utils";
+import { AsyncResultType } from "model";
+import { Result, createLogger } from "utils";
 
 const logger = createLogger("ItemRepository");
 

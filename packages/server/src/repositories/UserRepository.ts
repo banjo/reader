@@ -1,5 +1,6 @@
 import { prisma, User } from "db";
-import { AsyncResultType, createLogger, Result } from "utils";
+import { AsyncResultType } from "model";
+import { createLogger, Result } from "utils";
 
 const logger = createLogger("UserRepository");
 

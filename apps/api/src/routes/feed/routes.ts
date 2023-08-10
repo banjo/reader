@@ -10,6 +10,8 @@ const logger = createLogger("api:feed");
 feed.get("/", async c => {
     const userId = c.get("userId");
 
+    logger.info(`Fetching feeds for user ${userId}`);
+
     const feedResponse = await FeedService.getAllFeedsByUserId(userId);
 
     if (!feedResponse.success) {

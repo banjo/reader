@@ -1,8 +1,9 @@
 import { first, sortBy } from "@banjoanton/utils";
 import { ItemContent, Prisma } from "db";
 import { parseHTML } from "linkedom";
+import { AsyncResultType } from "model";
 import RssParser from "rss-parser";
-import { AsyncResultType, Result, createLogger } from "utils";
+import { Result, createLogger } from "utils";
 import { z } from "zod";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { FeedMapper } from "../mappers/FeedMapper";

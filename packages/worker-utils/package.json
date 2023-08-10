@@ -11,7 +11,8 @@
         "tsconfig": "workspace:*",
         "utils": "workspace:*",
         "db": "workspace:*",
-        "server": "workspace:*"
+        "server": "workspace:*",
+        "model": "workspace:*"
     },
     "dependencies": {
         "bullmq": "^4.6.0",

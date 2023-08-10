@@ -1,4 +1,5 @@
 import { raise } from "@banjoanton/utils";
+import {} from "model"; // typescript error
 import { createLogger, Result } from "utils";
 
 const getVariables = () => {

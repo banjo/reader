@@ -1,5 +1,6 @@
+import { Result } from "@/lib/result";
+import { AsyncResultType, SuccessRequest } from "model";
 import { ofetch } from "ofetch";
-import { AsyncResultType, Result, SuccessRequest } from "utils";
 
 /**
  * HELPERS

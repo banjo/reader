@@ -1,6 +1,7 @@
 import { sortBy } from "@banjoanton/utils";
 import { Feed, FeedWithContent, FeedWithItems, FeedWithUsers, Prisma, prisma } from "db";
-import { AsyncResultType, Result, createLogger } from "utils";
+import { AsyncResultType } from "model";
+import { Result, createLogger } from "utils";
 import { sortItems } from "../shared/lib/utils";
 
 const logger = createLogger("FeedRepository");

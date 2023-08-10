@@ -1,5 +1,6 @@
 import { ItemWithContent, ItemWithContentAndFeed } from "db";
-import { AsyncResultType, Result, createLogger } from "utils";
+import { AsyncResultType } from "model";
+import { Result, createLogger } from "utils";
 import { ItemRepository } from "../repositories/ItemRepository";
 import { sortItems } from "../shared/lib/utils";
 
