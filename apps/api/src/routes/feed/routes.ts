@@ -38,21 +38,6 @@ feed.post("/", zValidator("json", feedPostSchema), async c => {
     return c.json(Result.ok(item.data));
 });
 
-feed.get("/:id", async c => {
-    const internalIdentifier = c.req.param("id");
-    const userId = c.get("userId");
-
-    const feedResult = await FeedService.getFeedWithItemsOrContent(internalIdentifier, userId);
-
-    if (!feedResult.success) {
-        logger.error(`Could not find feed with internal identifier ${internalIdentifier}`);
-
-        return c.json(Result.error(feedResult.message, feedResult.type));
-    }
-
-    return c.json(Result.ok(feedResult.data));
-});
-
 const feedSearchQuerySchema = z.object({
     query: z.string(),
 });
@@ -69,6 +54,21 @@ feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {
     }
 
     return c.json(Result.ok(item.data));
+});
+
+feed.get("/:internalIdentifier", async c => {
+    const internalIdentifier = c.req.param("internalIdentifier");
+    const userId = c.get("userId");
+
+    const feedResult = await FeedService.getFeedWithItemsOrContent(internalIdentifier, userId);
+
+    if (!feedResult.success) {
+        logger.error(`Could not find feed with internal identifier ${internalIdentifier}`);
+
+        return c.json(Result.error(feedResult.message, feedResult.type));
+    }
+
+    return c.json(Result.ok(feedResult.data));
 });
 
 feed.post("/:internalIdentifier/unsubscribe", async c => {

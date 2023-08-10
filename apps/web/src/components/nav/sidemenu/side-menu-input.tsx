@@ -20,7 +20,7 @@ export const SideMenuInput: FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const api = useAuthFetcher();
     const fetcher = useAuthFetcher();
-    const { fetchLatestInSidebar } = useUpdateSidebar();
+    const { refetchSidebarFeed } = useUpdateSidebar();
     const ref = useRef<any>(null);
 
     const selectedUrl = useMemo(() => {
@@ -60,7 +60,7 @@ export const SideMenuInput: FC = () => {
         }
 
         setIsLoading(false);
-        fetchLatestInSidebar();
+        refetchSidebarFeed();
     };
 
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {

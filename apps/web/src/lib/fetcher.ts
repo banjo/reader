@@ -1,57 +1,18 @@
-import ky, { HTTPError } from "ky";
-import {
-    AsyncResultType,
-    BadRequestError,
-    ErrorType,
-    RequestError,
-    Result,
-    SuccessRequest,
-} from "utils";
+import { ofetch } from "ofetch";
+import { AsyncResultType, Result, SuccessRequest } from "utils";
 
 /**
  * HELPERS
  */
 
-const isBadRequestError = (body: any): body is BadRequestError => {
-    return body?.error?.errors;
-};
-
-const isRequestError = (body: any): body is RequestError => {
-    return body?.error?.message;
-};
-
 const handleError = async <T>(error: any): AsyncResultType<T> => {
-    if (error?.message?.includes("prefixUrl")) {
-        console.error("You cannot prefix URLs with '/' when using fetcher");
-        return Result.error("You cannot prefix URLs with '/' when using fetcher", "InternalError");
+    if (error instanceof Error) {
+        return Result.error(error.message, "InternalError");
+    } else if (typeof error === "string") {
+        return Result.error(error, "InternalError");
     }
 
-    const errorTyped = error as HTTPError;
-    const body = await errorTyped.response.json();
-
-    if (isBadRequestError(body)) {
-        return Result.error(body.error.message, "BadRequest");
-    } else if (isRequestError(body)) {
-        return Result.error(body.error.message, "InternalError");
-    }
-
-    const errorMessage = await errorTyped.response.text();
-    const type = errorTyped.response.statusText as ErrorType; // TODO: validate this later
-
-    return Result.error(errorMessage, type);
-};
-
-/**
- * Removes the leading '/' from the URL, which is not possible to use with  ky
- * @param path - The path to fix
- * @returns
- */
-const updatePath = (url: string): string => {
-    if (url.startsWith("/")) {
-        return url.slice(1);
-    }
-
-    return url;
+    return Result.error("Something went wrong", "InternalError");
 };
 
 /**
@@ -61,25 +22,31 @@ const updatePath = (url: string): string => {
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3003";
 
 export const fetcher = (userId: string) => {
-    const api = ky.create({
-        prefixUrl: `${API_URL}/api`,
-        hooks: {
-            beforeRequest: [
-                options => {
-                    if (!userId) {
-                        throw new Error("User is not authenticated");
-                    }
-
-                    options.headers.set("X-External-User-Id", userId);
-                    options.headers.set("Content-Type", "application/json");
-                },
-            ],
+    const api = ofetch.create({
+        baseURL: `${API_URL}/api`,
+        headers: {
+            "X-External-User-Id": userId,
+            "Content-Type": "application/json",
         },
     });
 
-    const SWR_AUTH = async <T>(path: string): Promise<T> => {
+    type options = {
+        method: "GET" | "POST" | "PUT" | "DELETE";
+        body?: any;
+    };
+
+    const defaultOptions: options = {
+        method: "GET",
+    };
+
+    const QUERY = async <T>(path: string, options?: options): Promise<T> => {
+        const { method = "GET", body } = { ...defaultOptions, ...options };
         try {
-            const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
+            const res = await api<SuccessRequest<T>>(path, {
+                method,
+                body,
+            });
+
             return res.data;
         } catch (error: unknown) {
             console.log(error);
@@ -87,21 +54,11 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    const SWR = <T>(
-        path: string,
-        method: "GET" | "POST" | "PUT" | "DELETE",
-        body?: T
-    ): (() => Promise<undefined>) => {
-        return () =>
-            api(updatePath(path), {
-                method,
-                body: JSON.stringify(body),
-            }).json();
-    };
-
     const GET = async <T>(path: string): AsyncResultType<T> => {
         try {
-            const res = await api.get(updatePath(path)).json<SuccessRequest<T>>();
+            const res = await api<SuccessRequest<T>>(path, {
+                method: "GET",
+            });
 
             return Result.ok(res.data);
         } catch (error: unknown) {
@@ -110,18 +67,24 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    const POST = async <T>(path: string, body: unknown): AsyncResultType<T> => {
+    const POST = async <T>(path: string, body: Record<string, any>): AsyncResultType<T> => {
         try {
-            const res = await api.post(updatePath(path), { json: body }).json<SuccessRequest<T>>();
+            const res = await api<SuccessRequest<T>>(path, {
+                method: "POST",
+                body,
+            });
             return Result.ok(res.data);
         } catch (error: unknown) {
             return handleError(error);
         }
     };
 
-    const PUT = async <T>(path: string, body: unknown): AsyncResultType<T> => {
+    const PUT = async <T>(path: string, body: Record<string, any>): AsyncResultType<T> => {
         try {
-            const res = await api.put(updatePath(path), { json: body }).json<SuccessRequest<T>>();
+            const res = await api<SuccessRequest<T>>(path, {
+                method: "PUT",
+                body,
+            });
 
             return Result.ok(res.data);
         } catch (error: unknown) {
@@ -131,7 +94,9 @@ export const fetcher = (userId: string) => {
 
     const DELETE = async <T>(path: string): AsyncResultType<T> => {
         try {
-            const res = await api.delete(updatePath(path)).json<SuccessRequest<T>>();
+            const res = await api<SuccessRequest<T>>(path, {
+                method: "DELETE",
+            });
 
             return Result.ok(res.data);
         } catch (error: unknown) {
@@ -139,5 +104,5 @@ export const fetcher = (userId: string) => {
         }
     };
 
-    return { GET, POST, PUT, DELETE, SWR, SWR_AUTH };
+    return { GET, POST, PUT, DELETE, QUERY };
 };

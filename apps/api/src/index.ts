@@ -8,6 +8,8 @@ import { logger } from "hono/logger";
 import { createHonoInstance } from "./instance";
 import { feed } from "./routes/feed/routes";
 
+import "dotenv/config";
+
 const app = createHonoInstance().basePath("/api");
 
 app.use("*", logger());

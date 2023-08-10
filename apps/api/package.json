@@ -5,8 +5,8 @@
     "main": "src/index.ts",
     "type": "module",
     "scripts": {
-        "run": "esno src/index.ts | pino-pretty --colorize",
-        "dev": "esno watch src/index.ts | pino-pretty --colorize",
+        "run": "esno src/index.ts",
+        "dev": "esno src/index.ts | pino-pretty",
         "build": "tsup",
         "clean": "rimraf node_modules dist"
     },

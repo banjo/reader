@@ -1,5 +1,3 @@
-"use client";
-
 import { Category } from "@/components/nav/sidemenu/category";
 import { Divider } from "@/components/nav/sidemenu/divider";
 import { Item } from "@/components/nav/sidemenu/item";
@@ -7,8 +5,9 @@ import { Sidemenu } from "@/components/nav/sidemenu/menu";
 import { SideMenuInput } from "@/components/nav/sidemenu/side-menu-input";
 import { SubMenu } from "@/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/components/shared/icons";
-import { useGet } from "@/hooks/backend/use-get";
+import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { CleanFeedWithItems } from "db";
 import { FC, useMemo } from "react";
 import { useLocation } from "react-router-dom";
@@ -18,12 +17,14 @@ type Props = {
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
-    const { data: fetchedData } = useGet<CleanFeedWithItems[]>({ key: "/feed" });
-    const { pathname } = useLocation();
+    const api = useAuthFetcher();
+    const { data } = useQuery<CleanFeedWithItems[]>({
+        queryKey: ["feed", "all"],
+        queryFn: async () => await api.QUERY("/feed"),
+        initialData: [],
+    });
 
-    const data = useMemo(() => {
-        return fetchedData ?? [];
-    }, [fetchedData]);
+    const { pathname } = useLocation();
 
     const prefixUrl = (url: string) => {
         return prefix ? `${prefix}${url}` : url;

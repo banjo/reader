@@ -4,7 +4,7 @@ import { createLogger, Result } from "utils";
 const getVariables = () => {
     const PROD_URL = process.env.WORKER_PROD_URL ?? raise("Missing WORKER_PROD_URL");
     const AUTH_TOKEN = process.env.AUTH_TOKEN ?? raise("Missing AUTH_TOKEN");
-    const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000";
+    const url = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3001";
 
     return { url, AUTH_TOKEN };
 };
@@ -22,7 +22,7 @@ export const addRepeatableJob = async (feedId: number) => {
         });
         return Result.okEmpty();
     } catch (error: unknown) {
-        logger.error("Could not add repeatable job");
+        logger.error(`Could not add repeatable job: ${error}`);
         let errorMessage = "Internal Server Error";
         if (error instanceof Error) {
             logger.error(error.message);

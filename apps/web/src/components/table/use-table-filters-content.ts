@@ -1,4 +1,5 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
+import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ItemContent } from "db";
 
@@ -15,7 +16,7 @@ type TableFiltersOut = {
 };
 
 export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => {
-    // const { fetchLatestInSidebar } = useUpdateSidebar();
+    const { refetchSidebarFeed } = useUpdateSidebar();
     const api = useAuthFetcher();
     const queryClient = useQueryClient();
 
@@ -31,8 +32,7 @@ export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => 
     // ACTIONS
     const subscribe = async (internalIdentifier: string) => {
         await mutateSubscribe.mutateAsync(internalIdentifier);
-
-        // fetchLatestInSidebar();
+        refetchSidebarFeed();
     };
 
     return {

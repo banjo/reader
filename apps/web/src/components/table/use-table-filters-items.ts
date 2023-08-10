@@ -1,5 +1,6 @@
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
+import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
 import { useQueryClient } from "@tanstack/react-query";
 import { ItemWithContent } from "db";
 import { useMemo, useState } from "react";
@@ -28,8 +29,7 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
     });
     const { markMultipleAsRead } = useMutateItem();
     const queryClient = useQueryClient();
-    // const { fetchLatestInSidebar } = useUpdateSidebar();
-    // const { mutate } = useSWRConfig();
+    const { refetchSidebarFeed } = useUpdateSidebar();
     const api = useAuthFetcher();
 
     // FILTERED DATA
@@ -63,8 +63,6 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
         }
 
         queryClient.invalidateQueries({ queryKey: ["feed", internalIdentifier] });
-        // mutate(`/feed/${internalIdentifier}`);
-        // fetchLatestInSidebar();
     };
 
     return {

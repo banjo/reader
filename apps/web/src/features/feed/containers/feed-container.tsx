@@ -13,7 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 export const FeedContainer = () => {
     const { slug } = useParams();
     const redirect = useNavigate();
-    const { SWR_AUTH: fetcher } = useAuthFetcher();
+    const { QUERY: fetcher } = useAuthFetcher();
 
     if (!slug) {
         redirect("/");
