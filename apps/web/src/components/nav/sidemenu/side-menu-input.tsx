@@ -1,5 +1,5 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
+import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
 import { SearchFeed } from "@/models/server";
 import { FC, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -20,7 +20,7 @@ export const SideMenuInput: FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const api = useAuthFetcher();
     const fetcher = useAuthFetcher();
-    const { refetchSidebarFeed } = useUpdateSidebar();
+    const { refetchSidebarFeed } = useInvalidate();
     const ref = useRef<any>(null);
 
     const selectedUrl = useMemo(() => {

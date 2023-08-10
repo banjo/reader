@@ -1,15 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-export const useUpdateSidebar = () => {
+export const useInvalidate = () => {
     const queryClient = useQueryClient();
 
-    const refetchSidebarFeed = () => {
-        queryClient.invalidateQueries({
-            queryKey: ["feed"],
-        });
+    const invalidate = () => {
+        queryClient.invalidateQueries({ queryKey: ["feed"] });
+        queryClient.invalidateQueries({ queryKey: ["items"] });
     };
 
     return {
-        refetchSidebarFeed,
+        invalidate,
     };
 };

@@ -1,7 +1,6 @@
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
-import { useQueryClient } from "@tanstack/react-query";
+import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
 import { ItemWithContent } from "db";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -28,8 +27,7 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
         return data.some(item => item.isRead === false);
     });
     const { markMultipleAsRead } = useMutateItem();
-    const queryClient = useQueryClient();
-    const { refetchSidebarFeed } = useUpdateSidebar();
+    const { invalidate } = useInvalidate();
     const api = useAuthFetcher();
 
     // FILTERED DATA
@@ -62,7 +60,7 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
             return;
         }
 
-        queryClient.invalidateQueries({ queryKey: ["feed", internalIdentifier] });
+        invalidate();
     };
 
     return {

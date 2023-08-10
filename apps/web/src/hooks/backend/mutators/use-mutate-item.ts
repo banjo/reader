@@ -1,10 +1,12 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
+import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ItemWithContent } from "db";
 
 export const useMutateItem = () => {
     const api = useAuthFetcher();
     const queryClient = useQueryClient();
+    const { invalidate } = useInvalidate();
 
     const mutateIsRead = useMutation({
         mutationFn: async (item: ItemWithContent) => {
@@ -14,7 +16,7 @@ export const useMutateItem = () => {
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["feed"] });
+            invalidate();
         },
     });
 
@@ -30,7 +32,7 @@ export const useMutateItem = () => {
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["feed"] });
+            invalidate();
         },
     });
 
@@ -45,7 +47,7 @@ export const useMutateItem = () => {
                 isFavorite: !item.isFavorite,
             }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["feed"] });
+            invalidate();
         },
     });
 
@@ -59,7 +61,7 @@ export const useMutateItem = () => {
                 ids: items.map(i => i.id),
             }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["feed"] });
+            invalidate();
         },
     });
 

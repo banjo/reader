@@ -1,5 +1,5 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useUpdateSidebar } from "@/hooks/backend/use-update-sidebar";
+import { useInvalidate } from "@/hooks/backend/use-update-sidebar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ItemContent } from "db";
 
@@ -16,7 +16,7 @@ type TableFiltersOut = {
 };
 
 export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => {
-    const { refetchSidebarFeed } = useUpdateSidebar();
+    const { invalidate } = useInvalidate();
     const api = useAuthFetcher();
     const queryClient = useQueryClient();
 
@@ -25,7 +25,7 @@ export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => 
             await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["feed"] });
+            invalidate();
         },
     });
 
