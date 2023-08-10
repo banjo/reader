@@ -8,8 +8,6 @@ export const createLogger = (name: string) => {
         return pino({ name });
     }
 
-    import("dotenv").then(({ default: dotenv }) => dotenv.config()).catch(console.error);
-
     const targets: TransportTargetOptions[] = [
         {
             target: "pino-pretty",

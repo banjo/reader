@@ -9,4 +9,5 @@ export default defineConfig({
     format: ["esm", "cjs"],
     minify: isProduction,
     sourcemap: true,
+    external: ["@prisma/client", "pino"],
 });
