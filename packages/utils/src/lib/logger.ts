@@ -1,37 +1,45 @@
-// import { raise } from "@banjoanton/utils";
-// import "dotenv/config";
-import { pino } from "pino";
-// import {TransportTargetOptions} from "pino";
+import { isBrowser, raise } from "@banjoanton/utils";
+import { TransportTargetOptions, pino } from "pino";
+
+let sharedTransport: any;
 
 export const createLogger = (name: string) => {
-    // const targets: TransportTargetOptions[] = [
-    //     {
-    //         target: "pino-pretty",
-    //         options: {
-    //             colorize: true,
-    //             ignore: "hostname,pid",
-    //         },
-    //         level: "trace",
-    //     },
-    // ];
+    if (isBrowser()) {
+        return pino({ name });
+    }
 
-    // if (process.env.NODE_ENV === "production") {
-    //     const DATASET = process.env.AXIOM_DATASET ?? raise("AXIOM_DATASET is not set");
-    //     const AXIOM_TOKEN = process.env.AXIOM_TOKEN ?? raise("AXIOM_TOKEN is not set");
+    import("dotenv").then(({ default: dotenv }) => dotenv.config()).catch(console.error);
 
-    //     targets.push({
-    //         target: "@axiomhq/pino",
-    //         options: {
-    //             dataset: DATASET,
-    //             token: AXIOM_TOKEN,
-    //         },
-    //         level: "trace",
-    //     });
-    // }
+    const targets: TransportTargetOptions[] = [
+        {
+            target: "pino-pretty",
+            options: {
+                colorize: true,
+                ignore: "hostname,pid",
+            },
+            level: "trace",
+        },
+    ];
 
-    // const transport = pino.transport({
-    //     targets,
-    // });
+    if (process.env.NODE_ENV === "production") {
+        const DATASET = process.env.AXIOM_DATASET ?? raise("AXIOM_DATASET is not set");
+        const AXIOM_TOKEN = process.env.AXIOM_TOKEN ?? raise("AXIOM_TOKEN is not set");
 
-    return pino({ name });
+        targets.push({
+            target: "@axiomhq/pino",
+            options: {
+                dataset: DATASET,
+                token: AXIOM_TOKEN,
+            },
+            level: "trace",
+        });
+    }
+
+    if (!sharedTransport) {
+        sharedTransport = pino.transport({
+            targets,
+        });
+    }
+
+    return pino({ name }, sharedTransport);
 };
