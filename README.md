@@ -54,6 +54,12 @@ npx prisma studio
 turbo run build --filter={./apps/web}...
 ```
 
+## Clean build
+
+```bash 
+nr clean && find . -name '.turbo' | xargs rm -rf && ni && nr build --filter api && node apps/api/dist/index.cjs
+```
+
 ## License
 
 Licensed under the [MIT license](https://github.com/shadcn/ui/blob/main/LICENSE.md).

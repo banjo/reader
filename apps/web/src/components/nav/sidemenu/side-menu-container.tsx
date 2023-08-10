@@ -19,7 +19,7 @@ type Props = {
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     const api = useAuthFetcher();
     const { data } = useQuery<CleanFeedWithItems[]>({
-        queryKey: ["feed", "all"],
+        queryKey: ["items", "feed", "all"],
         queryFn: async () => await api.QUERY("/feed"),
         initialData: [],
     });

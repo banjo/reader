@@ -7,7 +7,7 @@ export const useFeedFetcher = (slug: string) => {
     const { QUERY: fetcher } = useAuthFetcher();
 
     const { data, isLoading } = useQuery<CleanFeedWithContent | CleanFeedWithItems>({
-        queryKey: ["feed", slug],
+        queryKey: ["items", "feed", slug],
         queryFn: async () => await fetcher(`/feed/${slug}`),
         staleTime: toMilliseconds({ hours: 1 }),
     });
