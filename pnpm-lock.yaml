@@ -38,9 +38,15 @@ importers:
       rimraf:
         specifier: ^5.0.1
         version: 5.0.1
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.1.6)
       turbo:
         specifier: ^1.10.12
         version: 1.10.12
+      typescript:
+        specifier: ^5.1.6
+        version: 5.1.6
       zx:
         specifier: ^7.2.3
         version: 7.2.3
@@ -81,21 +87,12 @@ importers:
       db:
         specifier: workspace:*
         version: link:../../packages/db
-      esno:
-        specifier: ^0.16.3
-        version: 0.16.3
-      rimraf:
-        specifier: ^5.0.1
-        version: 5.0.1
       server:
         specifier: workspace:*
         version: link:../../packages/server
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
-      tsup:
-        specifier: ^7.1.0
-        version: 7.1.0(typescript@5.1.6)
       utils:
         specifier: workspace:*
         version: link:../../packages/utils
@@ -217,18 +214,12 @@ importers:
       prettier:
         specifier: ^3.0.0
         version: 3.0.0
-      rimraf:
-        specifier: ^5.0.1
-        version: 5.0.1
       tailwindcss:
         specifier: ^3.3.2
         version: 3.3.2
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
-      typescript:
-        specifier: ^5.0.2
-        version: 5.1.6
       utils:
         specifier: workspace:*
         version: link:../../packages/utils
@@ -272,18 +263,12 @@ importers:
       db:
         specifier: workspace:*
         version: link:../../packages/db
-      esno:
-        specifier: ^0.16.3
-        version: 0.16.3
       server:
         specifier: workspace:*
         version: link:../../packages/server
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
-      tsup:
-        specifier: ^7.1.0
-        version: 7.1.0(typescript@5.1.6)
       utils:
         specifier: workspace:*
         version: link:../../packages/utils
@@ -303,24 +288,12 @@ importers:
       '@types/node':
         specifier: ^18.17.1
         version: 18.17.1
-      esno:
-        specifier: ^0.17.0
-        version: 0.17.0
       prisma:
         specifier: ^5.0.0
         version: 5.0.0
-      rimraf:
-        specifier: ^5.0.1
-        version: 5.0.1
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
-      tsup:
-        specifier: ^7.1.0
-        version: 7.1.0(typescript@5.1.6)
-      typescript:
-        specifier: ^5.1.6
-        version: 5.1.6
 
   packages/server:
     dependencies:
@@ -358,15 +331,6 @@ importers:
       '@types/node':
         specifier: ^17.0.45
         version: 17.0.45
-      esno:
-        specifier: ^0.16.3
-        version: 0.16.3
-      rimraf:
-        specifier: ^5.0.1
-        version: 5.0.1
-      typescript:
-        specifier: ^4.5.5
-        version: 4.9.5
       utils:
         specifier: workspace:*
         version: link:../utils
@@ -403,9 +367,6 @@ importers:
       '@types/node':
         specifier: ^17.0.45
         version: 17.0.45
-      typescript:
-        specifier: ^4.5.5
-        version: 4.9.5
 
   packages/worker-utils:
     dependencies:
@@ -431,9 +392,6 @@ importers:
       server:
         specifier: workspace:*
         version: link:../server
-      typescript:
-        specifier: ^4.5.5
-        version: 4.9.5
       utils:
         specifier: workspace:*
         version: link:../utils
@@ -4286,13 +4244,6 @@ packages:
       tsx: 3.12.7
     dev: true
 
-  /esno@0.17.0:
-    resolution: {integrity: sha512-w78cQGlptQfsBYfootUCitsKS+MD74uR5L6kNsvwVkJsfzEepIafbvWsx2xK4rcFP4IUftt4F6J8EhagUxX+Bg==}
-    hasBin: true
-    dependencies:
-      tsx: 3.12.7
-    dev: true
-
   /espree@9.6.0:
     resolution: {integrity: sha512-1FH/IiruXZ84tpUlm0aCUEwMl2Ho5ilqVh0VvQXw+byAz/4SAciyHLlfmL5WYqsvD38oymdUwBss0LtK8m4s/A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -7364,8 +7315,8 @@ packages:
     engines: {node: '>=16'}
     dev: false
 
-  /tsup@7.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-mazl/GRAk70j8S43/AbSYXGgvRP54oQeX8Un4iZxzATHt0roW0t6HYDVZIXMw0ZQIpvr1nFMniIVnN5186lW7w==}
+  /tsup@7.2.0(typescript@5.1.6):
+    resolution: {integrity: sha512-vDHlczXbgUvY3rWvqFEbSqmC1L7woozbzngMqTtL2PGBODTtWlRwGDDawhvWzr5c1QjKe4OAKqJGfE1xeXUvtQ==}
     engines: {node: '>=16.14'}
     hasBin: true
     peerDependencies:
@@ -7533,12 +7484,6 @@ packages:
       call-bind: 1.0.2
       for-each: 0.3.3
       is-typed-array: 1.1.10
-    dev: true
-
-  /typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
     dev: true
 
   /typescript@5.1.6:
