@@ -43,7 +43,6 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                 feed={feed}
             />
             <Table type="list">
-                {/* <AnimatePresence initial={false}> */}
                 {data.length > 0 &&
                     data.map(item => {
                         return (
@@ -66,7 +65,6 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                         <AlertDescription>No items found</AlertDescription>
                     </Alert>
                 )}
-                {/* </AnimatePresence> */}
             </Table>
         </>
     );
