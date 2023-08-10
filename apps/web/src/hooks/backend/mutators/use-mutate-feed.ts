@@ -7,9 +7,7 @@ export const useMutateFeed = <T extends CleanFeedWithItems>() => {
     const queryClient = useQueryClient();
 
     const unsubscribe = async (feed: T) => {
-        // TODO: add unsubscribe to api server again
         await api.POST(`/feed/${feed.internalIdentifier}/unsubscribe`, {});
-
         queryClient.invalidateQueries({ queryKey: ["feed"] });
     };
 

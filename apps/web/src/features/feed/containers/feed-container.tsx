@@ -2,30 +2,21 @@ import { MenuEntries } from "@/components/shared/dropdown";
 import { TableSkeleton } from "@/components/shared/table-skeleton";
 import { TableContainerContent, TitleMenu } from "@/components/table/table-container-content";
 import { TableContainerItems } from "@/components/table/table-container-items";
+import { useFeedFetcher } from "@/features/feed/hooks/use-feed-fetcher";
 import { useMutateFeed } from "@/hooks/backend/mutators/use-mutate-feed";
-import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useTableItemMenu } from "@/hooks/shared/use-table-item-menu";
-import { toMilliseconds } from "@banjoanton/utils";
-import { useQuery } from "@tanstack/react-query";
-import { CleanFeedWithContent, CleanFeedWithItems } from "db";
 import { useNavigate, useParams } from "react-router-dom";
 
 export const FeedContainer = () => {
     const { slug } = useParams();
     const redirect = useNavigate();
-    const { QUERY: fetcher } = useAuthFetcher();
 
     if (!slug) {
         redirect("/");
         return null;
     }
 
-    const { data, isLoading } = useQuery<CleanFeedWithContent | CleanFeedWithItems>({
-        queryKey: ["feed", slug],
-        queryFn: async () => await fetcher(`/feed/${slug}`),
-        staleTime: toMilliseconds({ hours: 1 }),
-    });
-
+    const { data, isLoading } = useFeedFetcher(slug);
     const { menuOptionsItems } = useTableItemMenu();
     const { unsubscribe } = useMutateFeed();
 
