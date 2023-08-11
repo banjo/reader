@@ -5,6 +5,7 @@ import { FeedContainer } from "@/features/feed/containers/feed-container";
 import { AllContainer } from "@/features/items/containers/all-container";
 import { BookmarkContainer } from "@/features/items/containers/bookmark-container";
 import { FavoriteContainer } from "@/features/items/containers/favorite-container";
+import ErrorPage from "@/routes/error-page";
 import { LandingPage } from "@/routes/landing-page";
 import { raise } from "@banjoanton/utils";
 import {
@@ -43,6 +44,7 @@ function SignedInLayout() {
 const router = createBrowserRouter([
     {
         path: "/",
+        errorElement: <ErrorPage />,
         element: (
             <>
                 <SignedIn>
@@ -91,6 +93,7 @@ const signedOutRouter = createBrowserRouter([
     {
         path: "/",
         element: <Layout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: "/",
