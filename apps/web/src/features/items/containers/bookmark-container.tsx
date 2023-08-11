@@ -9,11 +9,10 @@ import { useMemo } from "react";
 export const BookmarkContainer = () => {
     const { data, isLoading } = useItemsFetcher();
     const { menuOptionsItems } = useTableItemMenu();
+    const filtered = useMemo(() => data.filter(item => item.isBookmarked), [data]);
 
     if (isLoading) return <TableSkeleton />;
     if (!data) return null;
-
-    const filtered = useMemo(() => data.filter(item => item.isBookmarked), [data]);
 
     return (
         <div className="flex flex-col gap-4">
