@@ -1,5 +1,6 @@
 import { SideMenuContainer } from "@/components/nav/sidemenu/side-menu-container";
 import { SiteHeader } from "@/components/nav/site-header";
+import { CenteredContainer } from "@/components/shared/centered-container";
 import { FeedContainer } from "@/features/feed/containers/feed-container";
 import { AllContainer } from "@/features/items/containers/all-container";
 import { BookmarkContainer } from "@/features/items/containers/bookmark-container";
@@ -93,15 +94,27 @@ const signedOutRouter = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <LandingPage />,
+                element: (
+                    <CenteredContainer>
+                        <LandingPage />
+                    </CenteredContainer>
+                ),
             },
             {
                 path: "/sign-in/*",
-                element: <SignIn routing="path" path="/sign-in" />,
+                element: (
+                    <CenteredContainer>
+                        <SignIn routing="path" path="/sign-in" />
+                    </CenteredContainer>
+                ),
             },
             {
                 path: "/sign-up/*",
-                element: <SignUp routing="path" path="/sign-up" />,
+                element: (
+                    <CenteredContainer>
+                        <SignUp routing="path" path="/sign-up" />{" "}
+                    </CenteredContainer>
+                ),
             },
             {
                 path: "*",
