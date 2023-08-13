@@ -1,10 +1,14 @@
 import { Size } from "@/lib/size";
 import {
     Bookmark,
+    Check,
     ChevronDown,
+    Eye,
+    EyeOff,
     Home,
     Info,
     LayoutList,
+    ListChecks,
     LucideProps,
     Moon,
     MoreHorizontal,
@@ -35,6 +39,10 @@ export const Icons = {
     info: Info,
     chevronDown: ChevronDown,
     horizontalMenu: MoreHorizontal,
+    listCheck: ListChecks,
+    check: Check,
+    eye: Eye,
+    eyeOff: EyeOff,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path

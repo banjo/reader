@@ -45,11 +45,17 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
 
     const toggleShowUnreadOnly = () => {
         setShowUnreadOnly(prev => !prev);
+        if (showUnreadOnly) {
+            toast.success("Showing all items");
+        } else {
+            toast.success("Showing unread items");
+        }
     };
 
     // ACTIONS
     const markAllAsRead = () => {
         markMultipleAsRead(filteredData);
+        toast.success("Marked all as read");
     };
 
     const subscribe = async (internalIdentifier: string) => {
