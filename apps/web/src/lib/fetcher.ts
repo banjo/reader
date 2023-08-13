@@ -1,4 +1,5 @@
 import { Result } from "@/lib/result";
+import { jsonDateParser } from "json-date-parser";
 import { AsyncResultType, SuccessRequest } from "model";
 import { ofetch } from "ofetch";
 
@@ -29,6 +30,7 @@ export const fetcher = (userId: string) => {
             "X-External-User-Id": userId,
             "Content-Type": "application/json",
         },
+        parseResponse: async res => JSON.parse(res, jsonDateParser),
     });
 
     type options = {

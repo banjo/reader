@@ -4,8 +4,10 @@ import { Dropdown, MenuEntries } from "@/components/shared/dropdown";
 import { Icons } from "@/components/shared/icons";
 import { TableType } from "@/components/table/table.types";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
+import { formatDistance } from "date-fns";
 import { ItemContent, ItemWithContent } from "db";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 
 type CardPropsItem = {
     item: ItemWithContent;
@@ -43,9 +45,28 @@ export const TableItem = ({
     }
 
     const content = isSubscribed ? item.content : item;
+    const since = useMemo(() => {
+        const LongerThanOneMonth =
+            new Date().getTime() - content.pubDate.getTime() > 1000 * 60 * 60 * 24 * 30 * 1;
+
+        if (LongerThanOneMonth) {
+            return content.pubDate.toLocaleString("default", {
+                month: "short",
+                year: "numeric",
+            });
+        }
+        return formatDistance(content.pubDate, new Date(), { includeSeconds: false })
+            .replace("about", "")
+            .replace(/ seconds?/, "s")
+            .replace(/ minutes?/, "m")
+            .replace(/ hours?/, "h")
+            .replace(/ days?/, "d")
+            .replace(/ weeks?/, "w")
+            .replace(/ months?/, "mo")
+            .replace(/ years?/, "y");
+    }, [content]);
 
     const toggleBookmark = () => {
-        console.log("🪕%c Banjo | table-item.tsx:48 | ", "color: #E91E63", "töggle");
         if (isSubscribed) toggleBookmarkStatus(item);
     };
 
@@ -66,7 +87,7 @@ export const TableItem = ({
             transition={{ type: "spring", bounce: 0 }}
             exit={{ opacity: 0, height: 0, transition: { duration: 0.3 } }}
             className="border-border dark:bg-background relative flex
-                w-full cursor-pointer items-center justify-start gap-1
+                w-full cursor-pointer items-center justify-start gap-2
                 overflow-hidden rounded-md border px-2
                 text-sm transition-colors
                 hover:bg-slate-100 dark:border dark:hover:bg-slate-900"
@@ -90,12 +111,14 @@ export const TableItem = ({
                     {feedName}
                 </span>
             )}
-            <span className="min-w-max font-bold" onClick={onClick}>
+            <span className="font-bold whitespace-nowrap truncate" onClick={onClick}>
                 {content.title}
             </span>
             <span className="w-0 max-w-full shrink grow truncate" onClick={onClick}>
                 {content.description ?? content.content}
             </span>
+
+            <span className="w-20 text-right">{since}</span>
             {menuOptions && isSubscribed && (
                 <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />
