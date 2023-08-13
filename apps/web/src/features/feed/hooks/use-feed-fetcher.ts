@@ -12,9 +12,5 @@ export const useFeedFetcher = (slug: string) => {
         staleTime: toMilliseconds({ hours: 1 }),
     });
 
-    if (data?.isSubscribed) {
-        console.log(typeof data.items[0]?.content.pubDate);
-    }
-
     return { data, isLoading };
 };

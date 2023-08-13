@@ -248,8 +248,6 @@ const searchFeeds = async (searchTerm: string): AsyncResultType<FeedWithUsers[]>
     // TODO: change to search instead of contains when it works with prisma
     // TODO2: Exclude feeds that have connection to user by id here instead of in service
 
-    console.log("🪕%c Banjo | FeedRepository.ts:250 |", "color: #E91E63", searchTerm);
-
     const feeds = await prisma.feed.findMany({
         where: {
             OR: [
