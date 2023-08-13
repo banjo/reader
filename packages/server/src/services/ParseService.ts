@@ -59,20 +59,32 @@ const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
     return Result.ok(baseFeed.data);
 };
 
-const IconSchema = z.object({
-    src: z.string().url(),
-    sizes: z.string(),
-    type: z.string(),
-    origin: z.string(),
-    rank: z.number(),
-});
+const parseImage = async (url: string): AsyncResultType<string> => {
+    try {
+        const html = await fetch(url).then(res => res.text());
+        const doc = parseHTML(html).document;
 
-const WebsiteSchema = z.object({
-    url: z.string().url(),
-    baseUrl: z.string().url(),
-    originUrl: z.string().url(),
-    icons: z.array(IconSchema),
-});
+        const head = doc.querySelector("head");
+
+        if (!head) {
+            return Result.error("Failed to parse image", "NotFound");
+        }
+
+        const meta = head.querySelector("meta[property='og:image']") as HTMLMetaElement;
+
+        if (!meta) {
+            return Result.error("Failed to parse image", "NotFound");
+        }
+
+        const content = meta.content.startsWith("/")
+            ? new URL(meta.content, url).href
+            : meta.content;
+        return Result.ok(content);
+    } catch (error) {
+        logger.error(error);
+        return Result.error("Failed to parse image", "InternalError");
+    }
+};
 
 const parseFavicon = async (url: string): AsyncResultType<string> => {
     try {
@@ -145,5 +157,6 @@ const shouldParseAgain = async (
 export const ParseService = {
     parseRssFeed,
     parseFavicon,
+    parseImage,
     shouldParseAgain,
 };

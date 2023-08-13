@@ -9,7 +9,7 @@ type FetchJobData = {
     feedId: number;
 };
 
-export const processor = async (job: Job<FetchJobData>) => {
+const processor = async (job: Job<FetchJobData>) => {
     const { feedId } = job.data;
     const logger = createWorkerLogger("FetchWorker", job);
 
