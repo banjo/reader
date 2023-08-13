@@ -20,7 +20,11 @@ type Props = {
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     const api = useAuthFetcher();
     const isMenuOpen = useMenuStore(state => state.isOpen);
-    const toggleMenu = useMenuStore(state => state.toggle);
+    const setIsOpen = useMenuStore(state => state.setIsOpen);
+
+    const closeMenu = () => {
+        setIsOpen(false);
+    };
 
     const { data } = useQuery<CleanFeedWithItems[]>({
         queryKey: ["items", "feed", "all"],
@@ -88,7 +92,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
                     notificationTooltip="Unread items"
-                    onClick={toggleMenu}
+                    onClick={closeMenu}
                 />
                 <Item
                     title="Read later"
@@ -98,7 +102,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(bookmarksUnread)}
                     notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
                     notificationTooltip="Unread items"
-                    onClick={toggleMenu}
+                    onClick={closeMenu}
                 />
                 <Item
                     title="Favorites"
@@ -108,7 +112,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(favoritesUnread)}
                     notification={favoritesUnread > 0 ? favoritesUnread : undefined}
                     notificationTooltip="Unread items"
-                    onClick={toggleMenu}
+                    onClick={closeMenu}
                 />
             </SubMenu>
 
@@ -123,7 +127,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
                     notificationTooltip="Unread items"
-                    onClick={toggleMenu}
+                    onClick={closeMenu}
                 />
                 {data.map(feed => {
                     const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
@@ -138,7 +142,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                             notification={unread > 0 ? unread : undefined}
                             highlight={Boolean(unread)}
                             notificationTooltip="Unread items"
-                            onClick={toggleMenu}
+                            onClick={closeMenu}
                         />
                     );
                 })}
