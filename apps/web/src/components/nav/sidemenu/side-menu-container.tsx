@@ -1,12 +1,13 @@
 import { Category } from "@/components/nav/sidemenu/category";
 import { Divider } from "@/components/nav/sidemenu/divider";
 import { Item } from "@/components/nav/sidemenu/item";
-import { Sidemenu } from "@/components/nav/sidemenu/menu";
+import { SideMenu } from "@/components/nav/sidemenu/menu";
 import { SideMenuInput } from "@/components/nav/sidemenu/side-menu-input";
 import { SubMenu } from "@/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/components/shared/icons";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
+import { useMenuStore } from "@/stores/useMenuStore";
 import { useQuery } from "@tanstack/react-query";
 import { CleanFeedWithItems } from "db";
 import { FC, useMemo } from "react";
@@ -18,6 +19,9 @@ type Props = {
 
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     const api = useAuthFetcher();
+    const isMenuOpen = useMenuStore(state => state.isOpen);
+    const toggleMenu = useMenuStore(state => state.toggle);
+
     const { data } = useQuery<CleanFeedWithItems[]>({
         queryKey: ["items", "feed", "all"],
         queryFn: async () => await api.QUERY("/feed"),
@@ -68,7 +72,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     }, [data]);
 
     return (
-        <Sidemenu>
+        <SideMenu isOpen={isMenuOpen}>
             <Divider size="sm" />
             <Category title="Add feed" />
             <Divider size="md" />
@@ -84,6 +88,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
                     notificationTooltip="Unread items"
+                    onClick={toggleMenu}
                 />
                 <Item
                     title="Read later"
@@ -93,6 +98,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(bookmarksUnread)}
                     notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
                     notificationTooltip="Unread items"
+                    onClick={toggleMenu}
                 />
                 <Item
                     title="Favorites"
@@ -102,6 +108,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(favoritesUnread)}
                     notification={favoritesUnread > 0 ? favoritesUnread : undefined}
                     notificationTooltip="Unread items"
+                    onClick={toggleMenu}
                 />
             </SubMenu>
 
@@ -116,6 +123,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                     highlight={Boolean(totalUnread)}
                     notification={totalUnread > 0 ? totalUnread : undefined}
                     notificationTooltip="Unread items"
+                    onClick={toggleMenu}
                 />
                 {data.map(feed => {
                     const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
@@ -130,10 +138,11 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                             notification={unread > 0 ? unread : undefined}
                             highlight={Boolean(unread)}
                             notificationTooltip="Unread items"
+                            onClick={toggleMenu}
                         />
                     );
                 })}
             </SubMenu>
-        </Sidemenu>
+        </SideMenu>
     );
 };

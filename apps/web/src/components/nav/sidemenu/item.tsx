@@ -12,6 +12,7 @@ type ItemProps = {
     highlight?: boolean;
     notification?: ReactNode;
     notificationTooltip: string;
+    onClick?: () => void;
 };
 
 export const Item: FC<ItemProps> = ({
@@ -23,6 +24,7 @@ export const Item: FC<ItemProps> = ({
     image,
     selected = false,
     highlight = false,
+    onClick,
 }) => {
     const selectedClasses = selected
         ? "bg-slate-100 dark:bg-slate-800"
@@ -33,19 +35,24 @@ export const Item: FC<ItemProps> = ({
     return (
         <Link
             to={url}
-            className={`flex h-10 w-72 cursor-pointer items-center justify-between gap-4 rounded
-            px-4 text-foreground
+            onClick={onClick}
+            className={`flex h-16 md:h-10 w-full md:w-72 cursor-pointer items-center justify-between gap-4 rounded
+            px-8 md:px-4 text-foreground
             ${selectedClasses}
             ${highlightClasses}
             `}
         >
             <div className="flex items-center gap-4">
-                {Icon && <Icon className="h-5 w-5" />}
-                {image && <img src={image} className="h-5 w-5 rounded-full" />}
-                <span className="text-md">{title}</span>
+                {Icon && <Icon className="h-8 w-8 md:h-5 md:w-5" />}
+                {image && <img src={image} className="h-8 w-8 md:h-5 md:w-5 rounded-full" />}
+                <span className="text-2xl md:text-sm">{title}</span>
             </div>
 
-            <Badge show={Boolean(notification)} tooltip={notificationTooltip}>
+            <Badge
+                className="transform mr-4 md:mr-0 scale-150 md:scale-100"
+                show={Boolean(notification)}
+                tooltip={notificationTooltip}
+            >
                 {notification}
             </Badge>
         </Link>

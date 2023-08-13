@@ -21,6 +21,7 @@
         "class-variance-authority": "^0.4.0",
         "clsx": "^1.2.1",
         "framer-motion": "^10.12.16",
+        "hamburger-react": "^2.5.0",
         "ky": "^0.33.3",
         "lucide-react": "0.105.0-alpha.4",
         "ofetch": "^1.1.1",
@@ -32,7 +33,8 @@
         "react-select": "^5.7.3",
         "swr": "^2.1.5",
         "tailwind-merge": "^1.12.0",
-        "tailwindcss-animate": "^1.0.5"
+        "tailwindcss-animate": "^1.0.5",
+        "zustand": "^4.4.1"
     },
     "devDependencies": {
         "@banjoanton/utils": "^0.1.44",

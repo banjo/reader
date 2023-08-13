@@ -33,7 +33,7 @@ function SignedInLayout() {
             <SiteHeader />
             <section className="flex">
                 <SideMenuContainer prefix="/dashboard" />
-                <main className="flex-1 p-6">
+                <main className={`flex-1 p-6 overflow-y-scroll h-screen`}>
                     <Outlet />
                 </main>
             </section>
