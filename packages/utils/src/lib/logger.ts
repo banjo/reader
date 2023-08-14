@@ -23,8 +23,6 @@ export const createLogger = (name: string) => {
         const DATASET = process.env.AXIOM_DATASET ?? raise("AXIOM_DATASET is not set");
         const AXIOM_TOKEN = process.env.AXIOM_TOKEN ?? raise("AXIOM_TOKEN is not set");
 
-        console.log("🪵 Initiating production logger, adding Axiom transport");
-
         targets.push({
             target: "@axiomhq/pino",
             options: {
