@@ -15,7 +15,9 @@
         "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
         "db:local:run": "docker compose -f docker/docker-compose.yml up -d --remove-orphans",
         "db:local:stop": "docker compose -f docker/docker-compose.yml down",
-        "db:reset": "pnpm --filter db db:reset"
+        "db:reset": "pnpm --filter db db:reset",
+        "deploy:api": "./scripts/deploy-api.sh",
+        "deploy:worker": "./scripts/deploy-worker.sh"
     },
     "keywords": [],
     "author": "",
