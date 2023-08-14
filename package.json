@@ -17,7 +17,9 @@
         "db:local:stop": "docker compose -f docker/docker-compose.yml down",
         "db:reset": "pnpm --filter db db:reset",
         "deploy:api": "./scripts/deploy-api.sh",
-        "deploy:worker": "./scripts/deploy-worker.sh"
+        "deploy:worker": "./scripts/deploy-worker.sh",
+        "logs:api": "./scripts/logs.sh banjo-rss-api",
+        "logs:worker": "./scripts/logs.sh banjo-rss-worker"
     },
     "keywords": [],
     "author": "",
