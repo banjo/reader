@@ -17,14 +17,15 @@ const processor = async (job: Job<AddImageWorker>) => {
 
     const parseResult = await ParseService.parseImage(url);
 
-    if (!parseResult.success) {
-        logger.error(`Failed to parse image ${url} - ${parseResult.message}`);
-        throw new Error(`Failed to parse image ${url} - ${parseResult.message}`);
+    let imageUrl = "";
+    if (parseResult.success) {
+        logger.info(`Successfully parsed image for ${url}`);
+        imageUrl = parseResult.data;
+    } else {
+        logger.error(`Failed to parse image ${url}, defaulting to empty string - ${parseResult.message}`);
     }
 
-    logger.info(`Successfully parsed image ${url}`);
-
-    const addToDbResult = await ContentRepository.updateContentImage(contentId, parseResult.data);
+    const addToDbResult = await ContentRepository.updateContentImage(contentId, imageUrl);
 
     if (!addToDbResult.success) {
         logger.error(
