@@ -5,7 +5,7 @@ import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
 import { createLogger, Result } from "utils";
-import { addToUsersWorker, fetchWorker } from "worker-utils";
+import { addImageWorker, addToUsersWorker, fetchWorker, imageWorker } from "worker-utils";
 import { start } from "./worker";
 
 const PORT = Number.parseInt(process.env.PORT ?? "3001");
@@ -21,6 +21,8 @@ const run = async () => {
         queues: [
             new BullMQAdapter(fetchWorker.getQueue()),
             new BullMQAdapter(addToUsersWorker.getQueue()),
+            new BullMQAdapter(imageWorker.getQueue()),
+            new BullMQAdapter(addImageWorker.getQueue()),
         ],
         serverAdapter,
     });
