@@ -1,18 +1,23 @@
-import { addImageWorker, addToUsersWorker, fetchWorker, imageWorker } from "server";
+import {
+    addImageWorker,
+    addToUsersWorker,
+    fetchContentWithoutImageWorker,
+    fetchRssFeedWorker,
+} from "server";
 import { addFetchRss } from "./add";
 
 export const start = async () => {
     console.info("Workers started...");
-    await fetchWorker.start();
+    await fetchRssFeedWorker.start();
     await addToUsersWorker.start();
-    await imageWorker.start();
+    await fetchContentWithoutImageWorker.start();
     await addImageWorker.start();
 
-    await fetchWorker.stopRepeatable();
+    await fetchRssFeedWorker.stopRepeatable();
     await addToUsersWorker.stopRepeatable();
-    await imageWorker.stopRepeatable();
+    await fetchContentWithoutImageWorker.stopRepeatable();
 
-    await imageWorker.repeatable({});
+    await fetchContentWithoutImageWorker.repeatable({});
 
     await addFetchRss();
 };

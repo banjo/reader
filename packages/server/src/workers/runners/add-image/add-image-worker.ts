@@ -12,7 +12,7 @@ type AddImageWorker = {
 
 const processor = async (job: Job<AddImageWorker>) => {
     const { contentId, url } = job.data;
-    const logger = createWorkerLogger("AddImageWorker", job);
+    const logger = createWorkerLogger("worker:add-image", job);
 
     logger.info(`Adding image to content with id ${contentId} with image url ${url}`);
 

@@ -13,7 +13,7 @@ type FetchJobData = {
 
 const processor = async (job: Job<FetchJobData>) => {
     const { feedId } = job.data;
-    const logger = createWorkerLogger("FetchWorker", job);
+    const logger = createWorkerLogger("worker:fetch-rss-feed", job);
 
     logger.info(`Fetching feed with id ${feedId}`);
 
@@ -59,4 +59,4 @@ const processor = async (job: Job<FetchJobData>) => {
     return Result.okEmpty();
 };
 
-export const fetchWorker = createWorker<FetchJobData>("fetchWorker", processor);
+export const fetchRssFeedWorker = createWorker<FetchJobData>("fetchRssFeedWorker", processor);

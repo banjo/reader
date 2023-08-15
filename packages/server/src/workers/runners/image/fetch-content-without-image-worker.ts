@@ -6,7 +6,7 @@ import { createWorkerLogger } from "../../logger";
 import { addImageWorker } from "../add-image/add-image-worker";
 
 const processor = async (job: Job) => {
-    const logger = createWorkerLogger("ImageWorker", job);
+    const logger = createWorkerLogger("worker:fetch-content-without-image", job);
 
     logger.info(`Fetching images for all content`);
 
@@ -35,4 +35,7 @@ const processor = async (job: Job) => {
     return Result.okEmpty();
 };
 
-export const imageWorker = createWorker("imageWorker", processor);
+export const fetchContentWithoutImageWorker = createWorker(
+    "fetchContentWithoutImageWorker",
+    processor
+);

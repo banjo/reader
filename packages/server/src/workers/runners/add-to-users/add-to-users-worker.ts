@@ -13,7 +13,7 @@ type AddToUsersJobData = {
 
 const processor = async (job: Job<AddToUsersJobData>) => {
     const { content, feedId } = job.data;
-    const logger = createWorkerLogger("AddToUsers", job);
+    const logger = createWorkerLogger("worker:add-to-users", job);
 
     const users = await UserRepository.getUsersByFeedId(feedId);
 

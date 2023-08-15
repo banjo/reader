@@ -1,6 +1,6 @@
 import { randomString, toMilliseconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
-import { paramCase, pascalCase } from "change-case";
+import { paramCase } from "change-case";
 import { ResultType } from "model";
 import { createLogger } from "utils";
 import { redisConfig } from "./config";
@@ -9,9 +9,10 @@ export const createWorker = <T extends object>(
     name: string,
     processor: (job: Job<T>) => Promise<ResultType<void>>
 ) => {
-    const logger = createLogger(`CreateWorker${pascalCase(name)}`);
-    const QUEUE_NAME = `${paramCase(name)}-queue`;
-    const JOB_NAME = `${paramCase(name)}-job`;
+    const formattedName = paramCase(name);
+    const logger = createLogger(`worker:create:${formattedName}`);
+    const QUEUE_NAME = `${formattedName}-queue`;
+    const JOB_NAME = `${formattedName}-job`;
     const queue = new Queue<T>(QUEUE_NAME, redisConfig);
     const worker = new Worker<T>(QUEUE_NAME, processor, redisConfig);
 
