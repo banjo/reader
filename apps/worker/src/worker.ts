@@ -1,4 +1,4 @@
-import { addImageWorker, addToUsersWorker, fetchWorker, imageWorker } from "worker-utils";
+import { addImageWorker, addToUsersWorker, fetchWorker, imageWorker } from "server";
 import { addFetchRss } from "./add";
 
 export const start = async () => {

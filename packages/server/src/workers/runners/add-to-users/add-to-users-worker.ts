@@ -1,7 +1,8 @@
 import { Job } from "bullmq";
 import { ItemContent } from "db";
-import { ItemRepository, UserRepository } from "server";
 import { Result } from "utils";
+import { ItemRepository } from "../../../repositories/ItemRepository";
+import { UserRepository } from "../../../repositories/UserRepository";
 import { createWorker } from "../../create-worker";
 import { createWorkerLogger } from "../../logger";
 

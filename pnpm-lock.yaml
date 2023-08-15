@@ -290,9 +290,6 @@ importers:
       vitest:
         specifier: ^0.33.0
         version: 0.33.0
-      worker-utils:
-        specifier: workspace:*
-        version: link:../../packages/worker-utils
 
   packages/db:
     dependencies:
@@ -404,37 +401,6 @@ importers:
       model:
         specifier: workspace:*
         version: link:../model
-
-  packages/worker-utils:
-    dependencies:
-      bullmq:
-        specifier: ^4.6.0
-        version: 4.6.0
-      change-case:
-        specifier: ^4.1.2
-        version: 4.1.2
-      tsconfig:
-        specifier: workspace:*
-        version: link:../tsconfig
-    devDependencies:
-      '@banjoanton/utils':
-        specifier: ^0.1.44
-        version: 0.1.44
-      '@types/node':
-        specifier: ^17.0.45
-        version: 17.0.45
-      db:
-        specifier: workspace:*
-        version: link:../db
-      model:
-        specifier: workspace:*
-        version: link:../model
-      server:
-        specifier: workspace:*
-        version: link:../server
-      utils:
-        specifier: workspace:*
-        version: link:../utils
 
 packages:
 

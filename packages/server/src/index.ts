@@ -11,3 +11,4 @@ export * from "./services/ItemService";
 export * from "./services/ParseService";
 export * from "./services/UserService";
 export * from "./shared/lib/utils";
+export * from "./workers";

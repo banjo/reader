@@ -4,12 +4,13 @@ import { ExpressAdapter } from "@bull-board/express";
 import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
-import { createLogger, Result } from "utils";
-import { addImageWorker, addToUsersWorker, fetchWorker, imageWorker } from "worker-utils";
+import { addImageWorker, addToUsersWorker, fetchWorker, imageWorker } from "server";
+import { Result, createLogger } from "utils";
 import { start } from "./worker";
 
 const PORT = Number.parseInt(process.env.PORT ?? "3001");
-const logger = createLogger("Worker");
+const isProd = process.env.NODE_ENV === "production";
+const logger = createLogger("WorkerApp");
 
 const run = async () => {
     const app = express();
@@ -54,52 +55,10 @@ const run = async () => {
 
     app.use("/ui", serverAdapter.getRouter());
 
-    app.use("/api/repeatable", async (req, res) => {
-        const feedId = req.query.feedId;
-
-        if (!feedId) {
-            logger.error("feedId is required");
-            return res.status(400).json(Result.error("feedId is required", "BadRequest"));
-        }
-
-        if (typeof feedId !== "string") {
-            logger.error("feedId must be a number");
-            return res.status(400).json(Result.error("feedId must be a string", "BadRequest"));
-        }
-
-        if (Number.isNaN(Number.parseInt(feedId))) {
-            logger.error("feedId must be a number");
-            return res.status(400).json(Result.error("feedId must be a number", "BadRequest"));
-        }
-
-        const id = Number.parseInt(feedId);
-
-        logger.info(`Adding repeatable job for feedId ${id}`);
-        try {
-            await fetchWorker.repeatable({ feedId: id });
-        } catch (error: unknown) {
-            let e: string;
-            if (error instanceof Error) {
-                logger.error(error.message);
-                e = error.message;
-            } else if (typeof error === "string") {
-                logger.error(error);
-                e = error;
-            } else {
-                e = "Internal Server Error";
-            }
-
-            return res.status(500).json(Result.error(e, "InternalError"));
-        }
-        logger.info(`Added repeatable job for feedId ${id}`);
-
-        res.json(Result.okEmpty());
-    });
-
     await start();
 
     app.listen(PORT, () => {
-        console.log(`Running on ${PORT}...`);
+        console.log(`Running on port ${PORT} in mode ${isProd ? "production" : "development"}...`);
         console.log("For the UI, open https://<url>/ui");
     });
 };

@@ -1,6 +1,6 @@
 import { Job } from "bullmq";
-import { ContentRepository } from "server";
 import { Result } from "utils";
+import { ContentRepository } from "../../../repositories/ContentRepository";
 import { createWorker } from "../../create-worker";
 import { createWorkerLogger } from "../../logger";
 import { addImageWorker } from "../add-image/add-image-worker";
@@ -8,7 +8,7 @@ import { addImageWorker } from "../add-image/add-image-worker";
 const processor = async (job: Job) => {
     const logger = createWorkerLogger("ImageWorker", job);
 
-    logger.info(`Fethcing images for all content`);
+    logger.info(`Fetching images for all content`);
 
     const contentResult = await ContentRepository.getContentWithoutImage();
 

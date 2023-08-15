@@ -1,6 +1,7 @@
 import { Job } from "bullmq";
-import { ContentRepository, ParseService } from "server";
 import { Result } from "utils";
+import { ContentRepository } from "../../../repositories/ContentRepository";
+import { ParseService } from "../../../services/ParseService";
 import { createWorker } from "../../create-worker";
 import { createWorkerLogger } from "../../logger";
 
@@ -22,7 +23,9 @@ const processor = async (job: Job<AddImageWorker>) => {
         logger.info(`Successfully parsed image for ${url}`);
         imageUrl = parseResult.data;
     } else {
-        logger.error(`Failed to parse image ${url}, defaulting to empty string - ${parseResult.message}`);
+        logger.error(
+            `Failed to parse image ${url}, defaulting to empty string - ${parseResult.message}`
+        );
     }
 
     const addToDbResult = await ContentRepository.updateContentImage(contentId, imageUrl);
