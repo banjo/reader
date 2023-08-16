@@ -44,20 +44,21 @@ model Item {
 }
 
 model ItemContent {
-  id          Int      @id @default(autoincrement())
-  items       Item[]
-  feed        Feed     @relation(fields: [feedId], references: [id])
-  feedId      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  imageUrl    String?
-  title       String
-  description String?  @db.Text
-  link        String
-  content     String?  @db.Text
-  htmlContent String?  @db.Text
-  lastFetch   DateTime
-  pubDate     DateTime
+  id              Int      @id @default(autoincrement())
+  items           Item[]
+  feed            Feed     @relation(fields: [feedId], references: [id])
+  feedId          Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  imageUrl        String?
+  hasFetchedImage Boolean  @default(false)
+  title           String
+  description     String?  @db.Text
+  link            String
+  content         String?  @db.Text
+  htmlContent     String?  @db.Text
+  lastFetch       DateTime
+  pubDate         DateTime
 
   @@fulltext([title, description, content, htmlContent])
 }
