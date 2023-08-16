@@ -16,16 +16,16 @@ export const ParseItemSchema = z.object({
     title: z.string(),
     link: z.string().url(),
     pubDate: z.union([z.string(), z.null()]),
-    description: z.union([z.string(), z.null(), z.undefined()]),
-    content: z.union([z.string(), z.null()]),
-    guid: z.union([z.string(), z.null()]),
+    description: z.string().optional(),
+    content: z.string().optional(),
+    guid: z.string().optional(),
     categories: z.string().array().optional(),
-    contentSnippet: z.union([z.string(), z.null()]),
+    contentSnippet: z.string().optional(),
 });
 
 export const ParseFeedSchema = z.object({
     title: z.string(),
-    description: z.union([z.string(), z.null()]),
+    description: z.string().optional(),
     link: z.string().url(),
     items: ParseItemSchema.array(),
 });
@@ -50,7 +50,7 @@ const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
     const baseFeed = ParseFeedSchema.safeParse(preparedResult);
 
     if (!baseFeed.success) {
-        logger.error(`Failed to parse feed with url: ${url}`, baseFeed.error);
+        logger.error(`Failed to parse feed with url: ${url}`, baseFeed.error.issues);
         return Result.error("Failed to parse feed", "InternalError");
     }
 
