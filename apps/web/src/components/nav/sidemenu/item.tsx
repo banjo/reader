@@ -1,5 +1,6 @@
 import { Badge } from "@/components/shared/badge";
 import { IconType } from "@/components/shared/icons";
+import { Tooltip } from "@/components/shared/tooltip";
 import { FC, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
@@ -36,16 +37,18 @@ export const Item: FC<ItemProps> = ({
         <Link
             to={url}
             onClick={onClick}
-            className={`flex h-16 md:h-10 w-full md:w-72 cursor-pointer items-center justify-between gap-4 rounded
-            px-8 md:px-4 text-foreground
+            className={`flex relative h-16 md:h-10 w-full md:w-72 cursor-pointer items-center justify-between gap-4 rounded
+            px-8 md:px-6 text-foreground
             ${selectedClasses}
             ${highlightClasses}
             `}
         >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 relative">
                 {Icon && <Icon className="h-8 w-8 md:h-5 md:w-5" />}
                 {image && <img src={image} className="h-8 w-8 md:h-5 md:w-5 rounded-full" />}
-                <span className="text-2xl md:text-sm">{title}</span>
+                <Tooltip tooltip={title}>
+                    <span className="text-2xl md:text-sm truncate w-80 md:w-36">{title}</span>
+                </Tooltip>
             </div>
 
             <Badge
