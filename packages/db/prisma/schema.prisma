@@ -1,5 +1,5 @@
 datasource db {
-  provider     = "mysql"
+  provider     = "postgres"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
@@ -23,8 +23,6 @@ model Feed {
   items              Item[]
   users              User[]
   contentItems       ItemContent[]
-
-  @@fulltext([name, url, rssUrl, description])
 }
 
 model Item {
@@ -59,8 +57,6 @@ model ItemContent {
   htmlContent     String?  @db.Text
   lastFetch       DateTime
   pubDate         DateTime
-
-  @@fulltext([title, description, content, htmlContent])
 }
 
 model User {
