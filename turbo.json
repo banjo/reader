@@ -15,7 +15,7 @@
                 "AXIOM_TOKEN",
                 "API_URL"
             ],
-            "outputs": ["dist"]
+            "outputs": ["dist", ".vercel/**"]
         },
         "lint": {},
         "dev": {
