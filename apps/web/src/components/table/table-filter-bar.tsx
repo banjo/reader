@@ -62,7 +62,6 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
             <div className="flex mr-auto">
                 {feed && (
                     <img
-                        className="rounded-full"
                         height={40}
                         width={40}
                         alt="feed avatar"

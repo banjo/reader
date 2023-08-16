@@ -43,11 +43,13 @@ export const Item: FC<ItemProps> = ({
             ${highlightClasses}
             `}
         >
-            <div className="flex items-center gap-4 relative">
-                {Icon && <Icon className="h-8 w-8 md:h-5 md:w-5" />}
-                {image && <img src={image} className="h-8 w-8 md:h-5 md:w-5 rounded-full" />}
+            <div className="flex items-center gap-4 relative overflow-hidden">
+                <div className="w-8 h-8 md:h-5 md:w-5">
+                    {Icon && <Icon className="w-8 h-8 md:h-5 md:w-5" />}
+                    {image && <img src={image} className="h-8 w-8 md:h-5 md:w-5" />}
+                </div>
                 <Tooltip tooltip={title}>
-                    <span className="text-2xl md:text-sm truncate w-80 md:w-36">{title}</span>
+                    <span className="text-2xl md:text-sm truncate w-full md:w-36">{title}</span>
                 </Tooltip>
             </div>
 
