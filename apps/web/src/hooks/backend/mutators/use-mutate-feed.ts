@@ -1,6 +1,5 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
-import { useQueryClient } from "@tanstack/react-query";
 import { CleanFeedWithItems } from "db";
 
 export const useMutateFeed = <T extends CleanFeedWithItems>() => {

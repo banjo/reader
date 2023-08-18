@@ -104,3 +104,33 @@ feed.post("/:internalIdentifier/subscribe", async c => {
 
     return c.json(Result.ok(item.data));
 });
+
+const feedAddManyBodySchema = z.object({
+    urls: z.string().array(),
+});
+
+feed.post("/add-many", zValidator("json", feedAddManyBodySchema), async c => {
+    const userId = c.get("userId");
+    const body = c.req.valid("json");
+
+    const results = await Promise.allSettled(
+        body.urls.map(url => FeedService.addFeed(url, userId))
+    );
+
+    const total = results.length;
+    const success = results.filter(result => result.status === "fulfilled").length;
+
+    const errors = results
+        .filter(result => result.status === "rejected")
+        .map(r => {
+            const result = r as PromiseRejectedResult;
+
+            return {
+                url: result.reason.url,
+                message: result.reason.message,
+                type: result.reason.type,
+            };
+        });
+
+    return c.json(Result.ok({ total, success, errors }));
+});

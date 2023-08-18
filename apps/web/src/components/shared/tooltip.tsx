@@ -7,11 +7,14 @@ import {
 import { FC, ReactNode } from "react";
 
 type Props = {
-    tooltip: string;
+    tooltip?: string;
     children: ReactNode;
+    enabled?: boolean;
 };
 
-export const Tooltip: FC<Props> = ({ tooltip, children }) => {
+export const Tooltip: FC<Props> = ({ tooltip, children, enabled = true }) => {
+    if (!enabled) return <>{children}</>;
+
     return (
         <TooltipProvider>
             <TooltipBase>

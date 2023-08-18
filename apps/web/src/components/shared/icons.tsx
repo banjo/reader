@@ -13,6 +13,7 @@ import {
     Moon,
     MoreHorizontal,
     PlusCircle,
+    Settings,
     Star,
     SunMedium,
     Twitter,
@@ -43,6 +44,7 @@ export const Icons = {
     check: Check,
     eye: Eye,
     eyeOff: EyeOff,
+    settings: Settings,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path

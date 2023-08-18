@@ -1,6 +1,6 @@
 import { Dropdown, MenuEntries } from "@/components/shared/dropdown";
 import { Icons } from "@/components/shared/icons";
-import { Tooltip } from "@/components/shared/tooltip";
+import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { TitleMenu } from "@/components/table/table-container-content";
 import {
     TableActionsContent,
@@ -9,7 +9,6 @@ import {
 import { TableActionsItems, TableFiltersItems } from "@/components/table/use-table-filters-items";
 import { Button } from "@/components/ui/button";
 import { avatarUrl } from "@/lib/utils";
-import { noop } from "@banjoanton/utils";
 import { FeedWithContent, FeedWithItems } from "db";
 import { FC } from "react";
 
@@ -29,24 +28,6 @@ type FilterBarPropsContent = {
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     isSubscribed: false;
     feed?: FeedWithContent;
-};
-
-type FilterIconProps = {
-    Icon: FC<{ className: string; onClick: () => void; disabled: boolean }>;
-    tooltip: string;
-    onClick: () => void;
-    disabled?: boolean;
-};
-const FilterIcon: FC<FilterIconProps> = ({ Icon, disabled, onClick, tooltip }) => {
-    return (
-        <Tooltip tooltip={tooltip}>
-            <Icon
-                className={`h-6 w-6 ${disabled ? "opacity-30" : "cursor-pointer hover:opacity-70"}`}
-                onClick={disabled ? noop : onClick}
-                disabled={disabled ?? false}
-            />
-        </Tooltip>
-    );
 };
 
 export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
@@ -93,14 +74,14 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 
             {isSubscribed && (
                 <div className="mr-2 flex items-center gap-4">
-                    <FilterIcon
+                    <ResponsiveIcon
                         Icon={Icons.check}
                         onClick={actions.markAllAsRead}
                         disabled={filters.hasReadAll}
                         tooltip="Mark all as read"
                     />
 
-                    <FilterIcon
+                    <ResponsiveIcon
                         Icon={filters.showUnreadOnly ? Icons.eyeOff : Icons.eye}
                         onClick={filters.toggleShowUnreadOnly}
                         tooltip="Show unread only"
