@@ -118,7 +118,7 @@ export const TableItem = ({
                 {content.description ?? content.content}
             </span>
 
-            <span className="w-20 text-right">{since}</span>
+            <span className="text-right text-gray-500 italic">{since}</span>
             {menuOptions && isSubscribed && (
                 <Dropdown align="start" side="left" menuEntries={menuOptions} item={item}>
                     <Icons.horizontalMenu className="ml-auto h-5 w-5" />
