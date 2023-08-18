@@ -99,7 +99,7 @@ export const SideMenuInput: FC = () => {
         <div className="flex items-center gap-2">
             <Select
                 ref={ref}
-                className="ml-8 flex h-14 md:h-10 text-xl md:text-base"
+                className="ml-4 md:ml-8 flex h-14 md:h-10 text-xl md:text-base"
                 styles={customStyles}
                 onChange={(props: any) => {
                     const result = props as Option;

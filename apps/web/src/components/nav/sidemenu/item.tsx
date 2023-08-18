@@ -37,24 +37,24 @@ export const Item: FC<ItemProps> = ({
         <Link
             to={url}
             onClick={onClick}
-            className={`flex relative h-16 md:h-10 w-full md:w-72 cursor-pointer items-center justify-between gap-4 rounded
-            px-8 md:px-6 text-foreground
+            className={`flex relative h-12 md:h-10 w-full md:w-72 cursor-pointer items-center justify-between gap-4 rounded
+            px-4 md:px-6 text-foreground
             ${selectedClasses}
             ${highlightClasses}
             `}
         >
             <div className="flex items-center gap-4 relative overflow-hidden">
-                <div className="w-8 h-8 md:h-5 md:w-5">
+                <span className="w-8 h-8 md:h-5 md:w-5">
                     {Icon && <Icon className="w-8 h-8 md:h-5 md:w-5" />}
-                    {image && <img src={image} className="h-8 w-8 md:h-5 md:w-5" />}
-                </div>
+                    {image && <img src={image} className="h-8 w-8 md:h-5 md:w-5 max-w-none" />}
+                </span>
                 <Tooltip tooltip={title}>
-                    <span className="text-2xl md:text-sm truncate w-full md:w-36">{title}</span>
+                    <span className="text-lg md:text-sm truncate w-full md:w-36">{title}</span>
                 </Tooltip>
             </div>
 
             <Badge
-                className="transform mr-4 md:mr-0 scale-150 md:scale-100"
+                className="mr-4 md:mr-0 scale-110 md:scale-100"
                 show={Boolean(notification)}
                 tooltip={notificationTooltip}
             >
