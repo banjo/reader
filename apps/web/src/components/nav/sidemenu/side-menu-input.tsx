@@ -79,6 +79,8 @@ export const SideMenuInput: FC = () => {
     const loadOptions = async (query: string) => {
         const res = await api.GET<SearchFeed[]>(`/feed/search?query=${query}`);
 
+        console.log("🪕%c Banjo | side-menu-input.tsx:82 | ", "color: #E91E63", res);
+
         if (!res.success) {
             toast.error("Failed to search for feed");
             return [];
@@ -99,7 +101,7 @@ export const SideMenuInput: FC = () => {
         <div className="flex items-center gap-2">
             <Select
                 ref={ref}
-                className="ml-4 md:ml-8 flex h-10 text-base"
+                className="ml-4 md:ml-8 flex h-10 text-base z-50"
                 styles={customStyles}
                 onChange={(props: any) => {
                     const result = props as Option;

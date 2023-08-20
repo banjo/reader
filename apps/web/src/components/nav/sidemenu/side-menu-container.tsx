@@ -10,12 +10,21 @@ import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
 import { useMenuStore } from "@/stores/useMenuStore";
 import { useQuery } from "@tanstack/react-query";
-import { CleanFeedWithItems } from "db";
 import { FC, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 type Props = {
     prefix?: string;
+};
+
+type FeedReturnObject = {
+    title: string;
+    imageUrl: string;
+    internalIdentifier: string;
+    totalItemsCount: number;
+    unreadItemsCount: number;
+    bookmarkedItemsCount: number;
+    favoriteItemsCount: number;
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
@@ -27,7 +36,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
         setIsOpen(false);
     };
 
-    const { data } = useQuery<CleanFeedWithItems[]>({
+    const { data } = useQuery<FeedReturnObject[]>({
         queryKey: ["items", "feed", "all"],
         queryFn: async () => await api.QUERY("/feed"),
         initialData: [],
@@ -46,33 +55,21 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     const totalUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
-            if (!feed.items) {
-                return acc;
-            }
-
-            return acc + feed.items.filter(item => !item.isRead).length;
+            return acc + feed.unreadItemsCount;
         }, 0);
     }, [data]);
 
     const bookmarksUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
-            if (!feed.items) {
-                return acc;
-            }
-
-            return acc + feed.items.filter(item => !item.isRead && item.isBookmarked).length;
+            return acc + feed.bookmarkedItemsCount;
         }, 0);
     }, [data]);
 
     const favoritesUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
-            if (!feed.items) {
-                return acc;
-            }
-
-            return acc + feed.items.filter(item => !item.isRead && item.isFavorite).length;
+            return acc + feed.favoriteItemsCount;
         }, 0);
     }, [data]);
 
@@ -146,12 +143,12 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                         onClick={closeMenu}
                     />
                     {data.map(feed => {
-                        const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
+                        const unread = feed.unreadItemsCount;
 
                         return (
                             <Item
-                                key={feed.id}
-                                title={feed.name}
+                                key={feed.internalIdentifier}
+                                title={feed.title}
                                 url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
                                 image={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
                                 selected={isSelected(`/feed/${feed.internalIdentifier}`)}

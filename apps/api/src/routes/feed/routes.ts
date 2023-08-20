@@ -19,7 +19,17 @@ feed.get("/", async c => {
         return c.json(Result.error(feedResponse.message, feedResponse.type));
     }
 
-    return c.json(Result.ok(feedResponse.data));
+    const returnObject = feedResponse.data.map(feed => ({
+        title: feed.name,
+        imageUrl: feed.imageUrl,
+        internalIdentifier: feed.internalIdentifier,
+        totalItemsCount: feed.items.length,
+        unreadItemsCount: feed.items.filter(item => !item.isRead).length,
+        bookmarkedItemsCount: feed.items.filter(item => item.isBookmarked).length,
+        favoriteItemsCount: feed.items.filter(item => item.isFavorite).length,
+    }));
+
+    return c.json(Result.ok(returnObject));
 });
 
 const feedPostSchema = z.object({
