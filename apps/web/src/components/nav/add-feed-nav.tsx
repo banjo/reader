@@ -5,8 +5,7 @@ import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
 import { avatarUrl } from "@/lib/utils";
 import { SearchFeed } from "@/models/server";
-import { useDebounce } from "@uidotdev/usehooks";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { toast } from "react-hot-toast";
 
 export const AddFeedNav: FC = () => {
@@ -15,38 +14,11 @@ export const AddFeedNav: FC = () => {
     const [isAddLoading, setIsAddLoading] = useState(false);
     const [results, setResults] = useState<ResultType[]>([]);
     const api = useAuthFetcher();
-    const [searchTerm, setSearchTerm] = useState<string>("");
-    const debouncedSearchTerm = useDebounce(searchTerm, 150);
 
     const { invalidate } = useInvalidate();
 
-    useEffect(() => {
-        let ignore = false;
-
-        const getResults = async () => {
-            setIsCommandBoxLoading(true);
-            const loadedResults = await loadResults(debouncedSearchTerm);
-            // TODO: remove this
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            setIsCommandBoxLoading(false);
-
-            if (!ignore) setResults(loadedResults.splice(0, 5));
-        };
-
-        if (debouncedSearchTerm) {
-            getResults();
-        }
-
-        return () => {
-            ignore = true;
-            setIsCommandBoxLoading(false);
-        };
-    }, [debouncedSearchTerm]);
-
     const toggleOpen = () => {
         setResults([]);
-        setSearchTerm("");
         setIsOpen(!isOpen);
     };
 
@@ -106,12 +78,35 @@ export const AddFeedNav: FC = () => {
     };
 
     const handleInputChange = async (search: string) => {
-        setSearchTerm(search);
-
         if (!search) {
             setResults([]);
             return;
         }
+
+        if (search.startsWith("http") || search.startsWith("www")) {
+            setResults([
+                {
+                    text: search,
+                    value: search,
+                    id: search,
+                    icon: (
+                        <ResponsiveIcon
+                            Icon={Icons.add}
+                            size="sm"
+                            className="mr-4"
+                            enableTooltip={false}
+                        />
+                    ),
+                },
+            ]);
+            return;
+        }
+
+        setIsCommandBoxLoading(true);
+        const loadedResults = await loadResults(search);
+        setIsCommandBoxLoading(false);
+
+        setResults(loadedResults.splice(0, 5));
     };
 
     const handleSelected = async (result: ResultType) => {
