@@ -8,7 +8,7 @@ type FilterIconProps = {
     Icon: FC<{ className: string; onClick: () => void; disabled: boolean }>;
     tooltip?: string;
     className?: string;
-    onClick: () => void;
+    onClick?: () => void;
     disabled?: boolean;
     size?: Size;
     enableTooltip?: boolean;
@@ -23,7 +23,7 @@ const sizeMap: Record<Size, string> = {
 export const ResponsiveIcon: FC<FilterIconProps> = ({
     Icon,
     disabled,
-    onClick,
+    onClick = noop,
     tooltip,
     enableTooltip,
     size = "sm",

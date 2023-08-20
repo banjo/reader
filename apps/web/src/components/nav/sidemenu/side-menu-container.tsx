@@ -89,10 +89,13 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
             }
         >
             <Divider size="sm" />
-            <Category title="Add feed" />
-            <Divider size="md" />
-            <SideMenuInput />
+            <Category title="Add feed">
+                <Divider size="md" />
+                <SideMenuInput />
+            </Category>
+
             <Divider size="lg" />
+
             <Category title="Menu">
                 <SubMenu>
                     <Item
@@ -129,36 +132,38 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
             </Category>
 
             <Divider size="lg" />
-            <Category title="Feeds" />
-            <SubMenu>
-                <Item
-                    title="All"
-                    url={prefixUrl("/all")}
-                    Icon={Icons.layout}
-                    selected={isSelected("/all")}
-                    highlight={Boolean(totalUnread)}
-                    notification={totalUnread > 0 ? totalUnread : undefined}
-                    notificationTooltip="Unread items"
-                    onClick={closeMenu}
-                />
-                {data.map(feed => {
-                    const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
 
-                    return (
-                        <Item
-                            key={feed.id}
-                            title={feed.name}
-                            url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
-                            image={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
-                            selected={isSelected(`/feed/${feed.internalIdentifier}`)}
-                            notification={unread > 0 ? unread : undefined}
-                            highlight={Boolean(unread)}
-                            notificationTooltip="Unread items"
-                            onClick={closeMenu}
-                        />
-                    );
-                })}
-            </SubMenu>
+            <Category title="Feeds">
+                <SubMenu>
+                    <Item
+                        title="All"
+                        url={prefixUrl("/all")}
+                        Icon={Icons.layout}
+                        selected={isSelected("/all")}
+                        highlight={Boolean(totalUnread)}
+                        notification={totalUnread > 0 ? totalUnread : undefined}
+                        notificationTooltip="Unread items"
+                        onClick={closeMenu}
+                    />
+                    {data.map(feed => {
+                        const unread = feed.items?.filter(item => !item.isRead).length ?? 0;
+
+                        return (
+                            <Item
+                                key={feed.id}
+                                title={feed.name}
+                                url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
+                                image={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
+                                selected={isSelected(`/feed/${feed.internalIdentifier}`)}
+                                notification={unread > 0 ? unread : undefined}
+                                highlight={Boolean(unread)}
+                                notificationTooltip="Unread items"
+                                onClick={closeMenu}
+                            />
+                        );
+                    })}
+                </SubMenu>
+            </Category>
         </SideMenu>
     );
 };
