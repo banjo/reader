@@ -3,6 +3,7 @@ import {
     Bookmark,
     Check,
     ChevronDown,
+    X as Close,
     Eye,
     EyeOff,
     Menu as Hamburger,
@@ -47,6 +48,7 @@ export const Icons = {
     eyeOff: EyeOff,
     settings: Settings,
     hamburger: Hamburger,
+    close: Close,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path

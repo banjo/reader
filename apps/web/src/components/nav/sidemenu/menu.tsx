@@ -3,9 +3,10 @@ import { FC, ReactNode, useEffect } from "react";
 type Props = {
     isOpen: boolean;
     children: ReactNode;
+    closeButton?: ReactNode;
 };
 
-export const SideMenu: FC<Props> = ({ children, isOpen }) => {
+export const SideMenu: FC<Props> = ({ children, isOpen, closeButton }) => {
     // Prevent scrolling when the menu is open
     useEffect(() => {
         document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -28,6 +29,7 @@ export const SideMenu: FC<Props> = ({ children, isOpen }) => {
                 
         `}
         >
+            {closeButton}
             <div className="relative">{children}</div>
         </aside>
     );

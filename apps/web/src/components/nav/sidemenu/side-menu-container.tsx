@@ -5,6 +5,7 @@ import { SideMenu } from "@/components/nav/sidemenu/menu";
 import { SideMenuInput } from "@/components/nav/sidemenu/side-menu-input";
 import { SubMenu } from "@/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/components/shared/icons";
+import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
 import { useMenuStore } from "@/stores/useMenuStore";
@@ -76,7 +77,17 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     }, [data]);
 
     return (
-        <SideMenu isOpen={isMenuOpen}>
+        <SideMenu
+            isOpen={isMenuOpen}
+            closeButton={
+                <ResponsiveIcon
+                    Icon={Icons.close}
+                    size="sm"
+                    onClick={closeMenu}
+                    className="absolute top-0 right-0 mr-4 mt-5 md:hidden"
+                />
+            }
+        >
             <Divider size="sm" />
             <Category title="Add feed" />
             <Divider size="md" />
