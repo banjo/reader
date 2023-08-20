@@ -18,7 +18,7 @@ export const SettingsNav: FC = () => {
     return (
         <>
             {userId && (
-                <div className="flex items-center justify-center mr-3">
+                <div className="flex items-center justify-center">
                     <Dropdown
                         align="start"
                         side="bottom"
@@ -65,7 +65,7 @@ export const SettingsNav: FC = () => {
                                 Icon={Icons.settings}
                                 tooltip="Settings"
                                 onClick={noop}
-                                size="md"
+                                size="sm"
                             />
                         </div>
                     </Dropdown>

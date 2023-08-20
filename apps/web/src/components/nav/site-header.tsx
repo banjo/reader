@@ -1,10 +1,11 @@
 import { MainNav } from "@/components/nav/main-nav";
 import { SettingsNav } from "@/components/nav/settings-nav";
+import { Icons } from "@/components/shared/icons";
+import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/hooks/backend/use-auth";
 import { useMenuStore } from "@/stores/useMenuStore";
 import { UserButton } from "@clerk/clerk-react";
-import Hamburger from "hamburger-react";
 
 export function SiteHeader() {
     const isOpen = useMenuStore(state => state.isOpen);
@@ -17,17 +18,21 @@ export function SiteHeader() {
             <div className="flex h-16 items-center px-4 md:px-8 sm:justify-between">
                 <MainNav items={siteConfig.mainNav} />
                 <div className="flex flex-1 items-center justify-end">
-                    <nav className="flex items-center relative justify-center">
-                        {userId && <SettingsNav />}
-
-                        <div className="h-8 w-8 mr-16 md:mr-0">
+                    <nav className="flex items-center relative justify-center gap-3">
+                        <div className="h-8 w-8">
                             <UserButton afterSignOutUrl="/" />
                         </div>
 
                         {userId && (
-                            <div className="pl-4 absolute left-16 z-50 md:hidden">
-                                <Hamburger onToggle={toggleMenu} toggled={isOpen} />
-                            </div>
+                            <>
+                                <SettingsNav />
+                                <ResponsiveIcon
+                                    Icon={Icons.hamburger}
+                                    onClick={toggleMenu}
+                                    size="sm"
+                                    className="md:hidden"
+                                />
+                            </>
                         )}
                     </nav>
                 </div>

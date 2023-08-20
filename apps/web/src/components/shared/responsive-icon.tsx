@@ -1,11 +1,13 @@
 import { Tooltip } from "@/components/shared/tooltip";
 import { Size } from "@/lib/size";
+import { cn } from "@/lib/utils";
 import { noop } from "@banjoanton/utils";
 import { FC } from "react";
 
 type FilterIconProps = {
     Icon: FC<{ className: string; onClick: () => void; disabled: boolean }>;
     tooltip?: string;
+    className?: string;
     onClick: () => void;
     disabled?: boolean;
     size?: Size;
@@ -25,13 +27,17 @@ export const ResponsiveIcon: FC<FilterIconProps> = ({
     tooltip,
     enableTooltip,
     size = "sm",
+    className,
 }) => {
     return (
         <Tooltip tooltip={tooltip} enabled={enableTooltip}>
             <Icon
-                className={`${sizeMap[size]} ${
-                    disabled ? "opacity-30" : "cursor-pointer hover:opacity-70 outline-none"
-                }`}
+                className={cn(
+                    `${sizeMap[size]} ${
+                        disabled ? "opacity-30" : "cursor-pointer hover:opacity-70 outline-none"
+                    }`,
+                    className
+                )}
                 onClick={disabled ? noop : onClick}
                 disabled={disabled ?? false}
             />
