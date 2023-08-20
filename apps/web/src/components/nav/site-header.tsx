@@ -1,3 +1,4 @@
+import { AddFeedNav } from "@/components/nav/add-feed-nav";
 import { MainNav } from "@/components/nav/main-nav";
 import { SettingsNav } from "@/components/nav/settings-nav";
 import { Icons } from "@/components/shared/icons";
@@ -8,7 +9,6 @@ import { useMenuStore } from "@/stores/useMenuStore";
 import { UserButton } from "@clerk/clerk-react";
 
 export function SiteHeader() {
-    const isOpen = useMenuStore(state => state.isOpen);
     const toggleMenu = useMenuStore(state => state.toggle);
 
     const { userId } = useAuth();
@@ -25,6 +25,7 @@ export function SiteHeader() {
 
                         {userId && (
                             <>
+                                <AddFeedNav />
                                 <SettingsNav />
                                 <ResponsiveIcon
                                     Icon={Icons.hamburger}

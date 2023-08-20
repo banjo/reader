@@ -2,7 +2,6 @@ import { Category } from "@/components/nav/sidemenu/category";
 import { Divider } from "@/components/nav/sidemenu/divider";
 import { Item } from "@/components/nav/sidemenu/item";
 import { SideMenu } from "@/components/nav/sidemenu/menu";
-import { SideMenuInput } from "@/components/nav/sidemenu/side-menu-input";
 import { SubMenu } from "@/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
@@ -85,14 +84,6 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                 />
             }
         >
-            <Divider size="sm" />
-            <Category title="Add feed">
-                <Divider size="md" />
-                <SideMenuInput />
-            </Category>
-
-            <Divider size="lg" />
-
             <Category title="Menu">
                 <SubMenu>
                     <Item
