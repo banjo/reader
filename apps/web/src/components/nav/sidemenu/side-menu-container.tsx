@@ -93,39 +93,40 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
             <Divider size="md" />
             <SideMenuInput />
             <Divider size="lg" />
-            <Category title="Menu" />
-            <SubMenu>
-                <Item
-                    title="Home"
-                    url={prefixUrl("")}
-                    Icon={Icons.home}
-                    selected={isSelected("")}
-                    highlight={Boolean(totalUnread)}
-                    notification={totalUnread > 0 ? totalUnread : undefined}
-                    notificationTooltip="Unread items"
-                    onClick={closeMenu}
-                />
-                <Item
-                    title="Read later"
-                    url={prefixUrl("/bookmarks")}
-                    Icon={Icons.bookmark}
-                    selected={isSelected("/bookmarks")}
-                    highlight={Boolean(bookmarksUnread)}
-                    notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
-                    notificationTooltip="Unread items"
-                    onClick={closeMenu}
-                />
-                <Item
-                    title="Favorites"
-                    url={prefixUrl("/favorites")}
-                    Icon={Icons.star}
-                    selected={isSelected("/favorites")}
-                    highlight={Boolean(favoritesUnread)}
-                    notification={favoritesUnread > 0 ? favoritesUnread : undefined}
-                    notificationTooltip="Unread items"
-                    onClick={closeMenu}
-                />
-            </SubMenu>
+            <Category title="Menu">
+                <SubMenu>
+                    <Item
+                        title="Home"
+                        url={prefixUrl("")}
+                        Icon={Icons.home}
+                        selected={isSelected("")}
+                        highlight={Boolean(totalUnread)}
+                        notification={totalUnread > 0 ? totalUnread : undefined}
+                        notificationTooltip="Unread items"
+                        onClick={closeMenu}
+                    />
+                    <Item
+                        title="Read later"
+                        url={prefixUrl("/bookmarks")}
+                        Icon={Icons.bookmark}
+                        selected={isSelected("/bookmarks")}
+                        highlight={Boolean(bookmarksUnread)}
+                        notification={bookmarksUnread > 0 ? bookmarksUnread : undefined}
+                        notificationTooltip="Unread items"
+                        onClick={closeMenu}
+                    />
+                    <Item
+                        title="Favorites"
+                        url={prefixUrl("/favorites")}
+                        Icon={Icons.star}
+                        selected={isSelected("/favorites")}
+                        highlight={Boolean(favoritesUnread)}
+                        notification={favoritesUnread > 0 ? favoritesUnread : undefined}
+                        notificationTooltip="Unread items"
+                        onClick={closeMenu}
+                    />
+                </SubMenu>
+            </Category>
 
             <Divider size="lg" />
             <Category title="Feeds" />
