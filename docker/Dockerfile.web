@@ -1,5 +1,5 @@
 # Use Node.js LTS version
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Create directory for the application
 WORKDIR /app
