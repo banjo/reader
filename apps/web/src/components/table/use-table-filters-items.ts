@@ -14,6 +14,7 @@ export type TableFiltersItems = {
 export type TableActionsItems = {
     markAllAsRead: () => void;
     subscribe: (internalIdentifier: string) => Promise<void>;
+    refresh: () => Promise<void>;
 };
 
 type TableFiltersOut = {
@@ -27,7 +28,7 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
         return data.some(item => item.isRead === false);
     });
     const { markMultipleAsRead } = useMutateItem();
-    const { invalidate } = useInvalidate();
+    const { refetch, invalidate } = useInvalidate();
     const api = useAuthFetcher();
 
     // FILTERED DATA
@@ -69,9 +70,14 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
         invalidate();
     };
 
+    const refresh = async () => {
+        await invalidate();
+        toast.success("Feed refreshed");
+    };
+
     return {
         filters: { showUnreadOnly, toggleShowUnreadOnly, hasReadAll },
         data: filteredData,
-        actions: { markAllAsRead, subscribe },
+        actions: { markAllAsRead, subscribe, refresh },
     };
 };

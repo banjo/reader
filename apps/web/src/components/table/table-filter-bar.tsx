@@ -75,6 +75,12 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
             {isSubscribed && (
                 <div className="mr-2 flex items-center gap-4">
                     <ResponsiveIcon
+                        Icon={Icons.refresh}
+                        onClick={actions.refresh}
+                        tooltip="Refresh"
+                    />
+
+                    <ResponsiveIcon
                         Icon={Icons.check}
                         onClick={actions.markAllAsRead}
                         disabled={filters.hasReadAll}

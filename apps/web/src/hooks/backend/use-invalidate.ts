@@ -11,9 +11,14 @@ export const useInvalidate = () => {
         await queryClient.cancelQueries({ queryKey: ["items"] });
     };
 
+    const refetch = async () => {
+        await queryClient.refetchQueries({ queryKey: ["items"] });
+    };
+
     return {
         invalidate,
         cancelQueries,
+        refetch,
         queryClient,
     };
 };

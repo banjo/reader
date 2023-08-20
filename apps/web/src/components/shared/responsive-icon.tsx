@@ -33,9 +33,9 @@ export const ResponsiveIcon: FC<FilterIconProps> = ({
         <Tooltip tooltip={tooltip} enabled={enableTooltip}>
             <Icon
                 className={cn(
-                    `${sizeMap[size]} ${
-                        disabled ? "opacity-30" : "cursor-pointer hover:opacity-70 outline-none"
-                    }`,
+                    `${sizeMap[size]} 
+                    active:opacity-40 
+                    ${disabled ? "opacity-30" : "cursor-pointer hover:opacity-70 outline-none"}`,
                     className
                 )}
                 onClick={disabled ? noop : onClick}
