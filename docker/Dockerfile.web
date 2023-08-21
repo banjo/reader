@@ -10,6 +10,11 @@ RUN npm add -g pnpm
 RUN npm add -g turbo
 COPY . .
 
+
+# Install build dependencies
+RUN apk add --update python3 make g++\
+    && rm -rf /var/cache/apk/*
+
 # Install Packages and build
 RUN pnpm install
 RUN turbo run build --filter={./apps/web}...

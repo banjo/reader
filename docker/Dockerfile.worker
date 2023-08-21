@@ -12,6 +12,11 @@ COPY . .
 RUN turbo prune --scope=worker --docker
 
 FROM base as installer
+
+# Install build dependencies
+RUN apk add --update python3 make g++\
+    && rm -rf /var/cache/apk/*
+
 WORKDIR /app
 RUN npm add -g pnpm
 RUN npm add -g turbo
