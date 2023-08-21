@@ -7,7 +7,7 @@ echo "Removing docker volumes..."
 docker volume rm local-dev_redis_data
 
 echo "Starting database..."
-nr db:local:run
+nr db:local:start
 
 echo "Reseting database..."
-nr db:reset
+nr db:local:reset

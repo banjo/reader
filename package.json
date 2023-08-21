@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "turbo dev",
         "clean": "pnpm run --parallel clean && rimraf node_modules",
-        "knip": "pnpm dlx knip",
+        "knip": "pnpm dlx",
         "build": "turbo build",
         "web:build": "turbo build --filter web",
         "lint:all": "turbo lint",
@@ -16,6 +16,7 @@
         "db:local:logs": "docker compose -f docker/docker-compose.yml logs --follow",
         "db:local:start": "docker compose -f docker/docker-compose.yml up -d --remove-orphans",
         "db:local:stop": "docker compose -f docker/docker-compose.yml down --remove-orphans",
+        "db:local:reset": "pnpm --filter db db:reset",
         "db:reset": "./scripts/reset-db.sh",
         "deploy:api": "./scripts/deploy.sh banjo-rss-api",
         "deploy:worker": "./scripts/deploy.sh banjo-rss-worker",

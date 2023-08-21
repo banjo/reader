@@ -5,15 +5,16 @@ import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
 import { avatarUrl } from "@/lib/utils";
 import { SearchFeed } from "@/models/server";
+import { useGlobalLoadingStore } from "@/stores/useGlobalLoadingStore";
 import { FC, useState } from "react";
 import { toast } from "react-hot-toast";
 
 export const AddFeedNav: FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isCommandBoxLoading, setIsCommandBoxLoading] = useState(false);
-    const [isAddLoading, setIsAddLoading] = useState(false);
     const [results, setResults] = useState<ResultType[]>([]);
     const api = useAuthFetcher();
+    const setIsGlobalLoading = useGlobalLoadingStore(state => state.setIsLoading);
 
     const { invalidate } = useInvalidate();
 
@@ -34,13 +35,13 @@ export const AddFeedNav: FC = () => {
         }
 
         setIsOpen(false);
-        setIsAddLoading(true);
+        setIsGlobalLoading(true, "Adding feed...");
 
         const data = await api.POST("/feed", {
             url: updatedUrl,
         });
 
-        setIsAddLoading(false);
+        setIsGlobalLoading(false);
 
         if (!data.success) {
             toast.error("Failed to add feed");

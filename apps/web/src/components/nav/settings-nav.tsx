@@ -4,6 +4,7 @@ import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { useAddFeed } from "@/hooks/backend/use-add-feed";
 import { useAuth } from "@/hooks/backend/use-auth";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
+import { useGlobalLoadingStore } from "@/stores/useGlobalLoadingStore";
 import { parseOpmlRssSubscriptions } from "@/utils/opml";
 import { selectFile } from "@/utils/reader";
 import { noop } from "@banjoanton/utils";
@@ -13,6 +14,8 @@ import { toast } from "react-hot-toast";
 export const SettingsNav: FC = () => {
     const { addMany } = useAddFeed();
     const { invalidate } = useInvalidate();
+    const setIsGlobalLoading = useGlobalLoadingStore(state => state.setIsLoading);
+
     const { userId } = useAuth();
 
     return (
@@ -32,7 +35,9 @@ export const SettingsNav: FC = () => {
                                         handleFile: async file => {
                                             const subs = await parseOpmlRssSubscriptions(file);
 
+                                            setIsGlobalLoading(true, "Importing OPML...");
                                             const res = await addMany(subs);
+                                            setIsGlobalLoading(false);
 
                                             if (!res.success) {
                                                 toast.error("Failed to import OPML");

@@ -1,4 +1,5 @@
 import { ErrorPage } from "@/components/shared/error";
+import { GlobalLoading } from "@/components/shared/global-loading";
 import { Root } from "@/routes/root";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
@@ -14,6 +15,7 @@ ReactDOM.createRoot(document.querySelector("#root")!).render(
         <ErrorBoundary fallback={<ErrorPage />}>
             <QueryClientProvider client={queryClient}>
                 <Toaster />
+                <GlobalLoading />
                 <Root />
             </QueryClientProvider>
         </ErrorBoundary>
