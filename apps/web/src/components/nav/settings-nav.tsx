@@ -13,11 +13,16 @@ import { toast } from "react-hot-toast";
 
 export const SettingsNav: FC = () => {
     const { addMany } = useAddFeed();
-    const { invalidate } = useInvalidate();
+    const { invalidate, clear } = useInvalidate();
     const { logout } = useAuth();
     const setIsGlobalLoading = useGlobalLoadingStore(state => state.setIsLoading);
 
     const { userId } = useAuth();
+
+    const signOut = async () => {
+        await logout();
+        clear();
+    };
 
     return (
         <>
@@ -67,7 +72,7 @@ export const SettingsNav: FC = () => {
                             {
                                 content: "Sign out",
                                 type: "select",
-                                onSelect: logout,
+                                onSelect: signOut,
                             },
                         ]}
                     >

@@ -10,14 +10,6 @@ const users: User[] = [
         externalId: "Y3Qls16qV7dRWrsqRxyLu4ra8wl1",
         name: "Anton Ödman",
     },
-    {
-        id: 2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        email: "anton.odman@layer10.se",
-        externalId: "user_2Qy7IIYAUZW4r4X45dGGOkl4RlC",
-        name: "Anton Ödman",
-    },
 ];
 
 // const feeds: Feed[] = [

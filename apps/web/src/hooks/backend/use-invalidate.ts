@@ -15,10 +15,15 @@ export const useInvalidate = () => {
         await queryClient.refetchQueries({ queryKey: ["items"] });
     };
 
+    const clear = () => {
+        queryClient.removeQueries();
+    };
+
     return {
         invalidate,
         cancelQueries,
         refetch,
+        clear,
         queryClient,
     };
 };
