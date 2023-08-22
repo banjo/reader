@@ -6,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
 export type MenuEntries<T> =
@@ -30,6 +31,7 @@ type Props<T> = {
     menuEntries: MenuEntries<T>[];
     item: T;
     buttonClasses?: string;
+    containerClasses?: string;
 };
 
 export const Dropdown = <T,>({
@@ -39,11 +41,12 @@ export const Dropdown = <T,>({
     menuEntries,
     item,
     buttonClasses,
+    containerClasses,
 }: Props<T>) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className={buttonClasses}>{children}</DropdownMenuTrigger>
-            <DropdownMenuContent side={side} align={align}>
+            <DropdownMenuContent side={side} align={align} className={cn("w-32", containerClasses)}>
                 {menuEntries.map((entry, index) => {
                     switch (entry.type) {
                         case "select": {

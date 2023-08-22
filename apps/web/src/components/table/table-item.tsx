@@ -98,8 +98,16 @@ export const TableItem = ({
 
             {isSubscribed && (
                 <>
-                    <Favorite size="md" active={item.isFavorite} onClick={toggleFavorite} />
-                    <Bookmark size="md" active={item.isBookmarked} onClick={toggleBookmark} />
+                    <Favorite
+                        className="w-5 h-5"
+                        active={item.isFavorite}
+                        onClick={toggleFavorite}
+                    />
+                    <Bookmark
+                        className="w-5 h-5"
+                        active={item.isBookmarked}
+                        onClick={toggleBookmark}
+                    />
                 </>
             )}
 

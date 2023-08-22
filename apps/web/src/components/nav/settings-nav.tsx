@@ -1,4 +1,5 @@
 import { Dropdown } from "@/components/shared/dropdown";
+import { DropdownRow } from "@/components/shared/dropdown-row";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { useAuth } from "@/contexts/auth-context";
@@ -24,6 +25,29 @@ export const SettingsNav: FC = () => {
         clear();
     };
 
+    const handleFile = async (file: File) => {
+        const subs = await parseOpmlRssSubscriptions(file);
+
+        setIsGlobalLoading(true, "Importing OPML...");
+        const res = await addMany(subs);
+        setIsGlobalLoading(false);
+
+        if (!res.success) {
+            toast.error("Failed to import OPML");
+            return;
+        }
+
+        if (res.data.errors.length > 0) {
+            const failedAmount = res.data.errors.length;
+            toast.error(`Failed to import ${failedAmount} OPML feeds`);
+            return;
+        }
+
+        await invalidate();
+
+        toast.success(`Successfully imported ${subs.length} OPML feeds`);
+    };
+
     return (
         <>
             {userId && (
@@ -32,45 +56,28 @@ export const SettingsNav: FC = () => {
                         align="start"
                         side="bottom"
                         item={{}}
+                        containerClasses="w-36"
                         menuEntries={[
+                            {
+                                type: "label",
+                                label: "Settings",
+                            },
+                            {
+                                type: "separator",
+                            },
                             {
                                 onSelect: () => {
                                     selectFile({
                                         accept: ".opml",
                                         multiple: false,
-                                        handleFile: async file => {
-                                            const subs = await parseOpmlRssSubscriptions(file);
-
-                                            setIsGlobalLoading(true, "Importing OPML...");
-                                            const res = await addMany(subs);
-                                            setIsGlobalLoading(false);
-
-                                            if (!res.success) {
-                                                toast.error("Failed to import OPML");
-                                                return;
-                                            }
-
-                                            if (res.data.errors.length > 0) {
-                                                const failedAmount = res.data.errors.length;
-                                                toast.error(
-                                                    `Failed to import ${failedAmount} OPML feeds`
-                                                );
-                                                return;
-                                            }
-
-                                            await invalidate();
-
-                                            toast.success(
-                                                `Successfully imported ${subs.length} OPML feeds`
-                                            );
-                                        },
+                                        handleFile,
                                     });
                                 },
                                 type: "select",
-                                content: "Import OPML",
+                                content: <DropdownRow icon={Icons.fileUp} text="Import" />,
                             },
                             {
-                                content: "Sign out",
+                                content: <DropdownRow icon={Icons.signOut} text="Sign out" />,
                                 type: "select",
                                 onSelect: signOut,
                             },

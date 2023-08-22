@@ -1,15 +1,14 @@
 import { IconBase } from "@/components/icons/icon-base";
-import { Icons, iconSizeMapper } from "@/components/shared/icons";
-import { Size } from "@/lib/size";
+import { Icons } from "@/components/shared/icons";
 import { FC } from "react";
 
 type Props = {
     active: boolean;
     onClick: () => void;
-    size?: Size;
+    className?: string;
 };
 
-export const Bookmark: FC<Props> = ({ active, onClick, size = "md" }) => {
+export const Bookmark: FC<Props> = ({ active, onClick, className }) => {
     const filled = active ? "fill-current" : "";
     const tooltip = active ? "Remove from read later" : "Read later";
 
@@ -19,7 +18,7 @@ export const Bookmark: FC<Props> = ({ active, onClick, size = "md" }) => {
 
     return (
         <IconBase tooltip={tooltip}>
-            <Icons.bookmark className={`${iconSizeMapper[size]} ${filled}`} onClick={handleClick} />
+            <Icons.bookmark className={`${className} ${filled}`} onClick={handleClick} />
         </IconBase>
     );
 };

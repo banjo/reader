@@ -1,8 +1,9 @@
 import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth-context";
 import { Link } from "react-router-dom";
 
 export function LandingPage() {
-    const userId = false;
+    const { userId, signInWithGoogle } = useAuth();
     return (
         <section
             className="h-full-with-nav flex flex-col items-start justify-center gap-6 px-16
@@ -24,12 +25,15 @@ export function LandingPage() {
                     </Link>
                 ) : (
                     <>
-                        <Link to="/sign-in" className={buttonVariants()}>
+                        <button className={buttonVariants()} onClick={signInWithGoogle}>
                             Sign in
-                        </Link>
-                        <Link to="/sign-up" className={buttonVariants({ variant: "outline" })}>
+                        </button>
+                        <button
+                            className={buttonVariants({ variant: "outline" })}
+                            onClick={signInWithGoogle}
+                        >
                             Sign up
-                        </Link>
+                        </button>
                     </>
                 )}
             </div>

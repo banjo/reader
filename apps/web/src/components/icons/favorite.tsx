@@ -1,15 +1,14 @@
 import { IconBase } from "@/components/icons/icon-base";
-import { Icons, iconSizeMapper } from "@/components/shared/icons";
-import { Size } from "@/lib/size";
+import { Icons } from "@/components/shared/icons";
 import { FC } from "react";
 
 type Props = {
     active: boolean;
     onClick: () => void;
-    size?: Size;
+    className?: string;
 };
 
-export const Favorite: FC<Props> = ({ active, onClick, size = "md" }) => {
+export const Favorite: FC<Props> = ({ active, onClick, className }) => {
     const color = active ? "text-yellow-400 fill-current" : "";
     const tooltip = active ? "Remove from favorites" : "Mark as favorite";
 
@@ -29,7 +28,7 @@ export const Favorite: FC<Props> = ({ active, onClick, size = "md" }) => {
             }}
             tooltip={tooltip}
         >
-            <Icons.star className={`${iconSizeMapper[size]} ${color}`} onClick={handleClick} />
+            <Icons.star className={`${className} ${color}`} onClick={handleClick} />
         </IconBase>
     );
 };

@@ -6,11 +6,13 @@ import {
     X as Close,
     Eye,
     EyeOff,
+    FileUp,
     Menu as Hamburger,
     Home,
     Info,
     LayoutList,
     ListChecks,
+    LogOut,
     LucideProps,
     Moon,
     MoreHorizontal,
@@ -26,9 +28,10 @@ import {
 export type IconType = LucideIcon;
 
 export const iconSizeMapper: Record<Size, string> = {
-    sm: "h-4 w-4",
-    md: "h-5 w-5",
-    lg: "h-6 w-6",
+    xs: "h-4 w-4",
+    sm: "h-6 w-6",
+    md: "h-8 w-8",
+    lg: "h-10 w-10",
 };
 
 export const Icons = {
@@ -51,6 +54,8 @@ export const Icons = {
     hamburger: Hamburger,
     close: Close,
     refresh: Refresh,
+    fileUp: FileUp,
+    signOut: LogOut,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path

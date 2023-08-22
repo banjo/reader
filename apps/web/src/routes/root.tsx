@@ -8,7 +8,6 @@ import { BookmarkContainer } from "@/features/items/containers/bookmark-containe
 import { FavoriteContainer } from "@/features/items/containers/favorite-container";
 import ErrorPage from "@/routes/error-page";
 import { LandingPage } from "@/routes/landing-page";
-import { SignInPage } from "@/routes/sign-in-page";
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 
 function Layout() {
@@ -91,14 +90,10 @@ const signedOutRouter = createBrowserRouter([
                     </CenteredContainer>
                 ),
             },
-            {
-                path: "/sign-in/*",
-                element: <SignInPage />,
-            },
-            {
-                path: "/sign-up/*",
-                element: <CenteredContainer>Sign up</CenteredContainer>,
-            },
+            // {
+            //     path: "/sign-in/*",
+            //     element: <SignInPage />,
+            // },
             {
                 path: "*",
                 element: <Navigate to={"/"} />,
