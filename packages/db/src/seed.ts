@@ -7,7 +7,7 @@ const users: User[] = [
         createdAt: new Date(),
         updatedAt: new Date(),
         email: "anton.odman@gmail.com",
-        externalId: "user_2QfHIyurHwaBLIyGO2H0Q4icCr8",
+        externalId: "Y3Qls16qV7dRWrsqRxyLu4ra8wl1",
         name: "Anton Ödman",
     },
     {

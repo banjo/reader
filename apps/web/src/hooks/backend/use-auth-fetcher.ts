@@ -1,14 +1,14 @@
-import { useAuth } from "@/hooks/backend/use-auth";
+import { useAuth } from "@/contexts/auth-context";
 import { fetcher } from "@/lib/fetcher";
 
 export const useAuthFetcher = () => {
-    const { userId } = useAuth();
+    const { userId, token } = useAuth();
 
     if (!userId) {
         throw new Error("User is not authenticated");
     }
 
-    const api = fetcher(userId);
+    const api = fetcher(token);
 
     return api;
 };

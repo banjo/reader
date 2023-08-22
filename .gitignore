@@ -5,3 +5,4 @@ build
 .turbo
 .DS_Store
 out
+apps/api/banjo-rss-service-key.json

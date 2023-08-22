@@ -4,9 +4,8 @@ import { SettingsNav } from "@/components/nav/settings-nav";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { siteConfig } from "@/config/site";
-import { useAuth } from "@/hooks/backend/use-auth";
+import { useAuth } from "@/contexts/auth-context";
 import { useMenuStore } from "@/stores/useMenuStore";
-import { UserButton } from "@clerk/clerk-react";
 
 export function SiteHeader() {
     const toggleMenu = useMenuStore(state => state.toggle);
@@ -19,10 +18,6 @@ export function SiteHeader() {
                 <MainNav items={siteConfig.mainNav} />
                 <div className="flex flex-1 items-center justify-end">
                     <nav className="flex items-center relative justify-center gap-3">
-                        <div className="h-8 w-8">
-                            <UserButton afterSignOutUrl="/" />
-                        </div>
-
                         {userId && (
                             <>
                                 <AddFeedNav />

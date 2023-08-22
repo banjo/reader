@@ -1,21 +1,14 @@
 import { SideMenuContainer } from "@/components/nav/sidemenu/side-menu-container";
 import { SiteHeader } from "@/components/nav/site-header";
 import { CenteredContainer } from "@/components/shared/centered-container";
+import { useAuth } from "@/contexts/auth-context";
 import { FeedContainer } from "@/features/feed/containers/feed-container";
 import { AllContainer } from "@/features/items/containers/all-container";
 import { BookmarkContainer } from "@/features/items/containers/bookmark-container";
 import { FavoriteContainer } from "@/features/items/containers/favorite-container";
 import ErrorPage from "@/routes/error-page";
 import { LandingPage } from "@/routes/landing-page";
-import { raise } from "@banjoanton/utils";
-import {
-    ClerkProvider,
-    RedirectToSignIn,
-    SignedIn,
-    SignedOut,
-    SignIn,
-    SignUp,
-} from "@clerk/clerk-react";
+import { SignInPage } from "@/routes/sign-in-page";
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 
 function Layout() {
@@ -47,12 +40,7 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         element: (
             <>
-                <SignedIn>
-                    <SignedInLayout />
-                </SignedIn>
-                <SignedOut>
-                    <RedirectToSignIn />
-                </SignedOut>
+                <SignedInLayout />
             </>
         ),
         children: [
@@ -88,7 +76,7 @@ const router = createBrowserRouter([
     },
 ]);
 
-// Need two routers due to Clerk not supporting React Router Dom 6.4 correctly yet
+// TODO: use one router instead as firebase support that
 const signedOutRouter = createBrowserRouter([
     {
         path: "/",
@@ -105,19 +93,11 @@ const signedOutRouter = createBrowserRouter([
             },
             {
                 path: "/sign-in/*",
-                element: (
-                    <CenteredContainer>
-                        <SignIn routing="path" path="/sign-in" />
-                    </CenteredContainer>
-                ),
+                element: <SignInPage />,
             },
             {
                 path: "/sign-up/*",
-                element: (
-                    <CenteredContainer>
-                        <SignUp routing="path" path="/sign-up" />{" "}
-                    </CenteredContainer>
-                ),
+                element: <CenteredContainer>Sign up</CenteredContainer>,
             },
             {
                 path: "*",
@@ -127,19 +107,12 @@ const signedOutRouter = createBrowserRouter([
     },
 ]);
 
-const clerkPubKey =
-    // @ts-ignore
-    import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY ?? raise("Missing Publishable Key");
-
 export function Root() {
-    return (
-        <ClerkProvider publishableKey={clerkPubKey}>
-            <SignedIn>
-                <RouterProvider router={router} />
-            </SignedIn>
-            <SignedOut>
-                <RouterProvider router={signedOutRouter} />
-            </SignedOut>
-        </ClerkProvider>
-    );
+    const { userId } = useAuth();
+
+    if (!userId) {
+        return <RouterProvider router={signedOutRouter} />;
+    }
+
+    return <RouterProvider router={router} />;
 }

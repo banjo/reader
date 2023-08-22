@@ -1,8 +1,8 @@
 import { Dropdown } from "@/components/shared/dropdown";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
+import { useAuth } from "@/contexts/auth-context";
 import { useAddFeed } from "@/hooks/backend/use-add-feed";
-import { useAuth } from "@/hooks/backend/use-auth";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
 import { useGlobalLoadingStore } from "@/stores/useGlobalLoadingStore";
 import { parseOpmlRssSubscriptions } from "@/utils/opml";
@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 export const SettingsNav: FC = () => {
     const { addMany } = useAddFeed();
     const { invalidate } = useInvalidate();
+    const { logout } = useAuth();
     const setIsGlobalLoading = useGlobalLoadingStore(state => state.setIsLoading);
 
     const { userId } = useAuth();
@@ -63,11 +64,16 @@ export const SettingsNav: FC = () => {
                                 type: "select",
                                 content: "Import OPML",
                             },
+                            {
+                                content: "Sign out",
+                                type: "select",
+                                onSelect: logout,
+                            },
                         ]}
                     >
                         <div className="flex cursor-pointer items-center justify-center">
                             <ResponsiveIcon
-                                Icon={Icons.settings}
+                                Icon={Icons.horizontalMenu}
                                 tooltip="Settings"
                                 onClick={noop}
                                 size="sm"

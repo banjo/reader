@@ -23,11 +23,11 @@ const handleError = async <T>(error: any): AsyncResultType<T> => {
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3003";
 
-export const fetcher = (userId: string) => {
+export const fetcher = (token: string | undefined) => {
     const api = ofetch.create({
         baseURL: `${API_URL}/api`,
         headers: {
-            "X-External-User-Id": userId,
+            Authorization: token ? `Bearer ${token}` : "",
             "Content-Type": "application/json",
         },
         parseResponse: async res => JSON.parse(res, jsonDateParser),

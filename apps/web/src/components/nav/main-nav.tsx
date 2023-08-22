@@ -1,6 +1,6 @@
 import { siteConfig } from "@/config/site";
+import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/clerk-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
