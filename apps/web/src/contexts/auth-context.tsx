@@ -32,7 +32,7 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | undefined>(undefined);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
@@ -45,9 +45,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
+            setLoading(true);
             setCurrentUser(user);
             setToken(undefined);
-            user?.getIdToken().then(token => {
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+
+            user.getIdToken().then(token => {
                 setToken(token);
                 setLoading(false);
             });
@@ -94,6 +100,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userId,
         token,
     };
+
+    console.log("🪕%c Banjo | auth-context.tsx:99 | ", "color: #E91E63", loading);
 
     return <AuthContext.Provider value={value}> {!loading && children}</AuthContext.Provider>;
 }
