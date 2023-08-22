@@ -1,4 +1,4 @@
-import { auth } from "@app/library/firebase";
+import { auth } from "firebase-server";
 import { Context, Next } from "hono";
 import { UserRepository } from "server";
 import { createLogger } from "utils";

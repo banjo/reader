@@ -90,6 +90,9 @@ importers:
       db:
         specifier: workspace:*
         version: link:../../packages/db
+      firebase-server:
+        specifier: workspace:*
+        version: link:../../packages/firebase-server
       server:
         specifier: workspace:*
         version: link:../../packages/server
@@ -309,6 +312,25 @@ importers:
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
+
+  packages/firebase-server:
+    dependencies:
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      firebase-admin:
+        specifier: ^11.10.1
+        version: 11.10.1
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+    devDependencies:
+      '@banjoanton/utils':
+        specifier: ^0.1.44
+        version: 0.1.44
+      '@types/node':
+        specifier: ^17.0.45
+        version: 17.0.45
 
   packages/model:
     dependencies:
