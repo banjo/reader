@@ -32,7 +32,7 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | undefined>(undefined);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
