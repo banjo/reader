@@ -42,14 +42,14 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                 isSubscribed={feed?.isSubscribed ?? true}
                 feed={feed}
             />
-            <Table type="list">
+            <Table type={filters.currentTableType}>
                 {data.length > 0 &&
                     data.map(item => {
                         return (
                             <TableItem
                                 key={item.id}
                                 item={item}
-                                type="list"
+                                type={filters.currentTableType}
                                 feedName={feed?.name}
                                 showFeedName={false}
                                 menuOptions={menuOptions}

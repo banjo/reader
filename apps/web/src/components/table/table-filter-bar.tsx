@@ -1,7 +1,9 @@
 import { Dropdown, MenuEntries } from "@/components/shared/dropdown";
+import { DropdownRow } from "@/components/shared/dropdown-row";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { TitleMenu } from "@/components/table/table-container-content";
+import { tableTypeIconMapper, tableTypes } from "@/components/table/table.types";
 import {
     TableActionsContent,
     TableFiltersContent,
@@ -9,6 +11,7 @@ import {
 import { TableActionsItems, TableFiltersItems } from "@/components/table/use-table-filters-items";
 import { Button } from "@/components/ui/button";
 import { avatarUrl } from "@/lib/utils";
+import { capitalize } from "@banjoanton/utils";
 import { FeedWithContent, FeedWithItems } from "db";
 import { FC } from "react";
 
@@ -72,6 +75,25 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
 
             {isSubscribed && (
                 <div className="mr-2 flex items-center gap-4">
+                    <Dropdown
+                        align="start"
+                        side="bottom"
+                        menuEntries={tableTypes.map(type => ({
+                            content: (
+                                <DropdownRow
+                                    icon={tableTypeIconMapper[type]}
+                                    text={capitalize(type)}
+                                />
+                            ),
+                            onSelect: () => actions.selectTableType(type),
+                            type: "select",
+                        }))}
+                        item={{}}
+                        buttonClasses="mr-auto"
+                    >
+                        <ResponsiveIcon Icon={Icons.layout} tooltip="Layout" size="sm" />
+                    </Dropdown>
+
                     <ResponsiveIcon
                         Icon={Icons.refresh}
                         onClick={actions.refresh}

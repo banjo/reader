@@ -5,7 +5,7 @@ import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
 import { avatarUrl } from "@/lib/utils";
 import { SearchFeed } from "@/models/server";
-import { useGlobalLoadingStore } from "@/stores/useGlobalLoadingStore";
+import { useGlobalLoadingStore } from "@/stores/use-global-loading-store";
 import { FC, useState } from "react";
 import { toast } from "react-hot-toast";
 

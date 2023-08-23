@@ -7,7 +7,7 @@ import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
-import { useMenuStore } from "@/stores/useMenuStore";
+import { useMenuStore } from "@/stores/use-menu-store";
 import { useQuery } from "@tanstack/react-query";
 import { FC, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";

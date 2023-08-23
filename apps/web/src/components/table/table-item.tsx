@@ -3,6 +3,7 @@ import { Favorite } from "@/components/icons/favorite";
 import { Dropdown, MenuEntries } from "@/components/shared/dropdown";
 import { Icons } from "@/components/shared/icons";
 import { TableType } from "@/components/table/table.types";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { formatDistance } from "date-fns";
 import { ItemContent, ItemWithContent } from "db";
@@ -40,10 +41,6 @@ export const TableItem = ({
 }: CardPropsItem | CardPropsContent) => {
     const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem();
 
-    if (type === "card") {
-        throw new Error("not implemented");
-    }
-
     const content = isSubscribed ? item.content : item;
     const since = useMemo(() => {
         const LongerThanOneMonth =
@@ -73,6 +70,52 @@ export const TableItem = ({
     const toggleFavorite = () => {
         if (isSubscribed) toggleFavoriteStatus(item);
     };
+
+    if (type === "card") {
+        return (
+            <Card className="overflow-hidden relative flex flex-col">
+                {content.imageUrl && (
+                    <img
+                        className="w-full h-44 object-cover cursor-pointer"
+                        onClick={onClick}
+                        src={content.imageUrl}
+                        alt="item image"
+                    />
+                )}
+
+                <CardHeader className="cursor-pointer" onClick={onClick}>
+                    <CardTitle className="line-clamp-2">{content.title}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                        {content.description ?? content.content}
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex items-center justify-end gap-2 mt-auto">
+                    <CardDescription className="mr-auto">{since}</CardDescription>
+
+                    {isSubscribed && (
+                        <>
+                            <Favorite
+                                className="w-5 h-5 cursor-pointer"
+                                active={item.isFavorite}
+                                onClick={toggleFavorite}
+                            />
+                            <Bookmark
+                                className="w-5 h-5 cursor-pointer"
+                                active={item.isBookmarked}
+                                onClick={toggleBookmark}
+                            />
+                        </>
+                    )}
+
+                    {menuOptions && isSubscribed && (
+                        <Dropdown align="start" side="bottom" menuEntries={menuOptions} item={item}>
+                            <Icons.horizontalMenu className="ml-auto h-5 w-5" />
+                        </Dropdown>
+                    )}
+                </CardFooter>
+            </Card>
+        );
+    }
 
     return (
         <motion.div

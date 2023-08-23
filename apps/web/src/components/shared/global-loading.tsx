@@ -1,4 +1,4 @@
-import { useGlobalLoadingStore } from "@/stores/useGlobalLoadingStore";
+import { useGlobalLoadingStore } from "@/stores/use-global-loading-store";
 import { FC } from "react";
 
 export const GlobalLoading: FC = () => {

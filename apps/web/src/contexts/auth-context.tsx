@@ -101,7 +101,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
         token,
     };
 
-    console.log("🪕%c Banjo | auth-context.tsx:99 | ", "color: #E91E63", loading);
-
     return <AuthContext.Provider value={value}> {!loading && children}</AuthContext.Provider>;
 }

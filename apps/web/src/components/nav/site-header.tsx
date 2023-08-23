@@ -5,7 +5,7 @@ import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/contexts/auth-context";
-import { useMenuStore } from "@/stores/useMenuStore";
+import { useMenuStore } from "@/stores/use-menu-store";
 
 export function SiteHeader() {
     const toggleMenu = useMenuStore(state => state.toggle);

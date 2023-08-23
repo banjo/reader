@@ -1,3 +1,5 @@
+import { TableType } from "@/components/table/table.types";
+import { useTableTypeStore } from "@/components/table/use-table-type-store";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
@@ -9,12 +11,14 @@ export type TableFiltersItems = {
     showUnreadOnly: boolean;
     hasReadAll: boolean;
     toggleShowUnreadOnly: () => void;
+    currentTableType: TableType;
 };
 
 export type TableActionsItems = {
     markAllAsRead: () => void;
     subscribe: (internalIdentifier: string) => Promise<void>;
     refresh: () => Promise<void>;
+    selectTableType: (tableType: TableType) => void;
 };
 
 type TableFiltersOut = {
@@ -30,6 +34,7 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
     const { markMultipleAsRead } = useMutateItem();
     const { refetch, invalidate } = useInvalidate();
     const api = useAuthFetcher();
+    const { setCurrent, current } = useTableTypeStore();
 
     // FILTERED DATA
     const filteredData = useMemo(() => {
@@ -43,6 +48,8 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
     const hasReadAll = useMemo(() => {
         return filteredData.every(item => item.isRead === true);
     }, [filteredData]);
+
+    const currentTableType = useMemo(() => current, [current]);
 
     const toggleShowUnreadOnly = () => {
         setShowUnreadOnly(prev => !prev);
@@ -75,9 +82,13 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
         toast.success("Feed refreshed");
     };
 
+    const selectTableType = async (tableType: TableType) => {
+        setCurrent(tableType);
+    };
+
     return {
-        filters: { showUnreadOnly, toggleShowUnreadOnly, hasReadAll },
+        filters: { showUnreadOnly, toggleShowUnreadOnly, hasReadAll, currentTableType },
         data: filteredData,
-        actions: { markAllAsRead, subscribe, refresh },
+        actions: { markAllAsRead, subscribe, refresh, selectTableType },
     };
 };

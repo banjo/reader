@@ -8,7 +8,9 @@ type TableProps = {
 
 export const Table: FC<TableProps> = ({ type = "list", children }) => {
     if (type === "card") {
-        throw new Error("Card table type not implemented");
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{children}</div>
+        );
     }
 
     return <div className="flex flex-col gap-2">{children}</div>;

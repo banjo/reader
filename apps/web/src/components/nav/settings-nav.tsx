@@ -5,7 +5,7 @@ import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { useAuth } from "@/contexts/auth-context";
 import { useAddFeed } from "@/hooks/backend/use-add-feed";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
-import { useGlobalLoadingStore } from "@/stores/useGlobalLoadingStore";
+import { useGlobalLoadingStore } from "@/stores/use-global-loading-store";
 import { parseOpmlRssSubscriptions } from "@/utils/opml";
 import { selectFile } from "@/utils/reader";
 import { noop } from "@banjoanton/utils";

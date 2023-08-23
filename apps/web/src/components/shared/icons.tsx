@@ -1,6 +1,7 @@
 import { Size } from "@/lib/size";
 import {
     Bookmark,
+    LayoutGrid as CardLayout,
     Check,
     ChevronDown,
     X as Close,
@@ -10,8 +11,10 @@ import {
     Menu as Hamburger,
     Home,
     Info,
+    LayoutDashboard as Layout,
     LayoutList,
     ListChecks,
+    StretchHorizontal as ListLayout,
     LogOut,
     LucideProps,
     Moon,
@@ -56,6 +59,9 @@ export const Icons = {
     refresh: Refresh,
     fileUp: FileUp,
     signOut: LogOut,
+    layoutDashboard: Layout,
+    layoutCard: CardLayout,
+    layoutList: ListLayout,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path
