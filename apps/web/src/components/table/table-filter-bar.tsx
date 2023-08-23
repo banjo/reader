@@ -66,9 +66,7 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                         </Dropdown>
                     </>
                 ) : (
-                    <span className="mr-auto text-lg font-medium flex items-center ml-4">
-                        {title}
-                    </span>
+                    <span className="mr-auto text-lg font-medium flex items-center">{title}</span>
                 )}
             </div>
 
