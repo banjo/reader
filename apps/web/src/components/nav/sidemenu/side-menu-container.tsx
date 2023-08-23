@@ -86,11 +86,21 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
         >
             <Category title="Menu">
                 <SubMenu>
-                    <Item
+                    {/* <Item
                         title="Home"
                         url={prefixUrl("")}
                         Icon={Icons.home}
                         selected={isSelected("")}
+                        highlight={Boolean(totalUnread)}
+                        notification={totalUnread > 0 ? totalUnread : undefined}
+                        notificationTooltip="Unread items"
+                        onClick={closeMenu}
+                    /> */}
+                    <Item
+                        title="All"
+                        url={prefixUrl("/all")}
+                        Icon={Icons.layout}
+                        selected={isSelected("/all")}
                         highlight={Boolean(totalUnread)}
                         notification={totalUnread > 0 ? totalUnread : undefined}
                         notificationTooltip="Unread items"
@@ -123,16 +133,6 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
 
             <Category title="Feeds">
                 <SubMenu>
-                    <Item
-                        title="All"
-                        url={prefixUrl("/all")}
-                        Icon={Icons.layout}
-                        selected={isSelected("/all")}
-                        highlight={Boolean(totalUnread)}
-                        notification={totalUnread > 0 ? totalUnread : undefined}
-                        notificationTooltip="Unread items"
-                        onClick={closeMenu}
-                    />
                     {data.map(feed => {
                         const unread = feed.unreadItemsCount;
 
