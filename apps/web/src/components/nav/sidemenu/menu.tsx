@@ -17,8 +17,8 @@ export const SideMenu: FC<Props> = ({ children, isOpen, closeButton }) => {
 
     return (
         <aside
-            className={`md:relative md:h-screen md:w-80 md:border-r bg-background dark:bg-background
-                w-full h-full fixed inset-0 z-40 md:z-0
+            className={`md:relative md:h-full-with-nav md:w-80 md:border-r bg-background dark:bg-background
+                w-full h-screen fixed inset-0 z-40 md:z-0
                 px-4 md:px-0
                 py-8 md:py-4
                 pt-16
