@@ -9,7 +9,7 @@ import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
 import { useMenuStore } from "@/stores/useMenuStore";
 import { useQuery } from "@tanstack/react-query";
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 type Props = {
@@ -71,6 +71,16 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
             return acc + feed.favoriteItemsCount;
         }, 0);
     }, [data]);
+
+    useEffect(() => {
+        const currentTitle = document.title.replace(/\([0-9]+\)/, "");
+
+        if (totalUnread > 0) {
+            document.title = `(${totalUnread}) ${currentTitle}`;
+        } else {
+            document.title = currentTitle;
+        }
+    }, [totalUnread]);
 
     return (
         <SideMenu
