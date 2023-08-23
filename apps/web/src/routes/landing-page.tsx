@@ -11,7 +11,7 @@ export function LandingPage() {
         >
             <div className="flex max-w-[980px] flex-col items-start gap-2">
                 <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
-                    Banjo RSS
+                    Banjo Reader
                 </h1>
                 <p className="text-muted-foreground max-w-[700px] text-lg">
                     A super simple RSS feed reader. Not much more than that actually.
