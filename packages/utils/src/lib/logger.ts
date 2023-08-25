@@ -41,3 +41,5 @@ export const createLogger = (name: string) => {
 
     return pino({ name }, sharedTransport);
 };
+
+export { type Logger } from "pino";

@@ -1,9 +1,9 @@
 import { Job } from "bullmq";
 import { Result } from "utils";
 import { ContentRepository } from "../../../repositories/ContentRepository";
-import { createWorker } from "../../create-worker";
+import { createQueue, createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
-import { addImageWorker } from "../add-image/add-image-worker";
+import { addImageQueue } from "../add-image/add-image-worker";
 
 const processor = async (job: Job) => {
     const logger = createWorkerLogger("worker:fetch-content-without-image", job);
@@ -23,7 +23,7 @@ const processor = async (job: Job) => {
 
     await Promise.all(
         content.map(async item => {
-            await addImageWorker.add({
+            await addImageQueue.add({
                 contentId: item.id,
                 url: item.link,
             });
@@ -39,3 +39,4 @@ export const fetchContentWithoutImageWorker = createWorker(
     "fetchContentWithoutImageWorker",
     processor
 );
+export const fetchContentWithoutImageQueue = createQueue("fetchContentWithoutImageWorker");

@@ -1,5 +1,5 @@
 import { Feed, prisma } from "db";
-import { fetchRssFeedWorker } from "server";
+import { fetchRssFeedQueue } from "server";
 import { createLogger } from "utils";
 
 const logger = createLogger("AddFetchRss");
@@ -12,7 +12,7 @@ export const addFetchRss = async () => {
 
     for (const feed of feeds) {
         logger.info(`Adding ${feed.url} to fetch rss...`);
-        await fetchRssFeedWorker.repeatable({ feedId: feed.id });
+        await fetchRssFeedQueue.repeatable({ feedId: feed.id });
     }
 
     logger.info("Done");

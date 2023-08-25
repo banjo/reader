@@ -3,9 +3,9 @@ import { Result } from "utils";
 import { FeedRepository } from "../../../repositories/FeedRepository";
 import { ItemRepository } from "../../../repositories/ItemRepository";
 import { ParseService } from "../../../services/ParseService";
-import { createWorker } from "../../create-worker";
+import { createQueue, createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
-import { addToUsersWorker } from "../add-to-users/add-to-users-worker";
+import { addToUsersQueue } from "../add-to-users/add-to-users-worker";
 
 type FetchJobData = {
     feedId: number;
@@ -51,7 +51,7 @@ const processor = async (job: Job<FetchJobData>) => {
         return Result.okEmpty();
     }
 
-    await addToUsersWorker.add({
+    await addToUsersQueue.add({
         content: updateContentResult.data,
         feedId: feed.id,
     });
@@ -60,3 +60,4 @@ const processor = async (job: Job<FetchJobData>) => {
 };
 
 export const fetchRssFeedWorker = createWorker<FetchJobData>("fetchRssFeedWorker", processor);
+export const fetchRssFeedQueue = createQueue<FetchJobData>("fetchRssFeedWorker");

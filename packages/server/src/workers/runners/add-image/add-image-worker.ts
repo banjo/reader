@@ -2,7 +2,7 @@ import { Job } from "bullmq";
 import { Result } from "utils";
 import { ContentRepository } from "../../../repositories/ContentRepository";
 import { ParseService } from "../../../services/ParseService";
-import { createWorker } from "../../create-worker";
+import { createQueue, createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
 
 type AddImageWorker = {
@@ -40,3 +40,4 @@ const processor = async (job: Job<AddImageWorker>) => {
 };
 
 export const addImageWorker = createWorker<AddImageWorker>("addImage", processor);
+export const addImageQueue = createQueue<AddImageWorker>("addImage");

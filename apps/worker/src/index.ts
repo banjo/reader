@@ -5,10 +5,10 @@ import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
 import {
-    addImageWorker,
-    addToUsersWorker,
-    fetchContentWithoutImageWorker,
-    fetchRssFeedWorker,
+    addImageQueue,
+    addToUsersQueue,
+    fetchContentWithoutImageQueue,
+    fetchRssFeedQueue,
 } from "server";
 import { Result, createLogger } from "utils";
 import { start } from "./worker";
@@ -25,10 +25,10 @@ const run = async () => {
 
     createBullBoard({
         queues: [
-            new BullMQAdapter(fetchRssFeedWorker.getQueue()),
-            new BullMQAdapter(addToUsersWorker.getQueue()),
-            new BullMQAdapter(fetchContentWithoutImageWorker.getQueue()),
-            new BullMQAdapter(addImageWorker.getQueue()),
+            new BullMQAdapter(fetchRssFeedQueue.getQueue()),
+            new BullMQAdapter(addToUsersQueue.getQueue()),
+            new BullMQAdapter(fetchContentWithoutImageQueue.getQueue()),
+            new BullMQAdapter(addImageQueue.getQueue()),
         ],
         serverAdapter,
     });
