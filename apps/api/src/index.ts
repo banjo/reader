@@ -32,4 +32,5 @@ console.log(`🚀 Server ready at port ${PORT} - Mode: ${isProd ? "production" :
 serve({
     fetch: app.fetch,
     port: PORT,
+    hostname: "0.0.0.0",
 });
