@@ -14,7 +14,7 @@ export const createWorker = <T extends object>(
     const QUEUE_NAME = `${formattedName}-queue`;
     const JOB_NAME = `${formattedName}-job`;
     const queue = new Queue<T>(QUEUE_NAME, redisConfig);
-    const worker = new Worker<T>(QUEUE_NAME, processor, redisConfig);
+    const worker = new Worker<T>(QUEUE_NAME, processor, { ...redisConfig, autorun: false });
 
     logger.info(
         // @ts-ignore
