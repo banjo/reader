@@ -12,7 +12,12 @@ import "dotenv/config";
 const app = createHonoInstance().basePath("/api");
 
 app.use("*", logger());
-app.use("*", cors());
+app.use(
+    "*",
+    cors({
+        origin: "*",
+    })
+);
 app.use("*", authMiddleware);
 
 app.route("/feed", feed);
