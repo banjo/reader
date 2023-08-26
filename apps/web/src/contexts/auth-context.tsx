@@ -1,4 +1,6 @@
 import { auth } from "@/lib/firebase";
+import { isDev } from "@/utils/runtime";
+import { raise } from "@banjoanton/utils";
 import { GoogleAuthProvider, User, signInWithPopup } from "firebase/auth";
 import jwt_decode from "jwt-decode";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -44,6 +46,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const userId = currentUser?.uid;
 
     useEffect(() => {
+        if (isDev()) {
+            const uid =
+                import.meta.env.VITE_DEVELOPMENT_UID ?? raise("VITE_DEVELOPMENT_UID not specified");
+
+            setCurrentUser({
+                uid,
+            } as User);
+            setToken("development");
+            setLoading(false);
+            return;
+        }
+
         const unsubscribe = auth.onAuthStateChanged(user => {
             setLoading(true);
             setCurrentUser(user);
@@ -63,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, []);
 
     useEffect(() => {
-        if (!currentUser) return;
+        if (!currentUser || isDev()) return;
 
         let timeout: NodeJS.Timeout;
         let isCancelled = false;

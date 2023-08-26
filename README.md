@@ -46,6 +46,9 @@ npx prisma studio
 -   [x] Add logging (axiom?)
 -   [x] Do not use api for worker in api, use worker directly
 -   [ ] Add request id to logging
+-   [ ] Add error handling to repositories
+-   [ ] Why does not the image worker run?
+-   [ ] Fix local development without internet
 
 ## Build specific app
 

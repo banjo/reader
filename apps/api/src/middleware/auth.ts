@@ -1,3 +1,5 @@
+import { isDev } from "@app/utils";
+import { raise } from "@banjoanton/utils";
 import { auth } from "firebase-server";
 import { Context, Next } from "hono";
 import { UserRepository } from "server";
@@ -11,6 +13,13 @@ export const authMiddleware = async (c: Context, next: Next) => {
     const url = new URL(c.req.url);
 
     if (allowedPaths.some(path => url.pathname.startsWith(path))) {
+        await next();
+        return;
+    }
+
+    if (isDev()) {
+        const uid = process.env.DEVELOPMENT_UID ?? raise("DEVELOPMENT_UID is not set");
+        c.set("userId", Number(uid));
         await next();
         return;
     }
