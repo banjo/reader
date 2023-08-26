@@ -41,9 +41,9 @@ export const createWorker = <T extends object>(
     };
 
     const wrapper = {
-        start: async () => {
+        start: () => {
             logger.info("Starting...");
-            await worker.run();
+            setTimeout(() => worker.run());
         },
         add: async (data: T) => {
             logger.info("Adding job...");
