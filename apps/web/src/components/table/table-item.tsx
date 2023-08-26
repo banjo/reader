@@ -8,6 +8,7 @@ import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { formatDistance } from "date-fns";
 import { ItemContent, ItemWithContent } from "db";
 import { motion } from "framer-motion";
+import Image from "rc-image";
 import { useMemo } from "react";
 
 type CardPropsItem = {
@@ -75,11 +76,12 @@ export const TableItem = ({
         return (
             <Card className="overflow-hidden relative flex flex-col">
                 {content.imageUrl && (
-                    <img
-                        className="w-full h-44 object-cover cursor-pointer"
-                        onClick={onClick}
+                    <Image
                         src={content.imageUrl}
-                        alt="item image"
+                        onClick={onClick}
+                        className="w-full h-44 object-cover cursor-pointer"
+                        preview={true}
+                        loading="lazy"
                     />
                 )}
 
