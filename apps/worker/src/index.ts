@@ -4,13 +4,14 @@ import { ExpressAdapter } from "@bull-board/express";
 import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
+
 import {
-    addImageQueue,
-    addToUsersQueue,
-    fetchContentWithoutImageQueue,
-    fetchRssFeedQueue,
+    addImageWorker,
+    addToUsersWorker,
+    fetchContentWithoutImageWorker,
+    fetchRssFeedWorker,
 } from "server";
-import { Result, createLogger } from "utils";
+import { createLogger, Result } from "utils";
 import { start } from "./worker";
 
 const PORT = Number.parseInt(process.env.PORT ?? "3001");
@@ -25,10 +26,10 @@ const run = async () => {
 
     createBullBoard({
         queues: [
-            new BullMQAdapter(fetchRssFeedQueue.getQueue()),
-            new BullMQAdapter(addToUsersQueue.getQueue()),
-            new BullMQAdapter(fetchContentWithoutImageQueue.getQueue()),
-            new BullMQAdapter(addImageQueue.getQueue()),
+            new BullMQAdapter(fetchRssFeedWorker.getQueue()),
+            new BullMQAdapter(addToUsersWorker.getQueue()),
+            new BullMQAdapter(fetchContentWithoutImageWorker.getQueue()),
+            new BullMQAdapter(addImageWorker.getQueue()),
         ],
         serverAdapter,
     });

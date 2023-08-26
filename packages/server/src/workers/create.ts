@@ -2,7 +2,7 @@ import { randomString, toMilliseconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
 import { paramCase } from "change-case";
 import { ResultType } from "model";
-import { Logger, createLogger } from "utils";
+import { createLogger } from "utils";
 import { redisConfig } from "./config";
 
 type WorkerType = "queue" | "worker";
@@ -14,60 +14,6 @@ const createMisc = (name: string, type: WorkerType) => {
     const JOB_NAME = `${formattedName}-job`;
 
     return { logger, QUEUE_NAME, JOB_NAME };
-};
-
-type RepeatableSettings<T> = {
-    logger: Logger;
-    timeInMs: number;
-    queue: Queue;
-    jobName: string;
-    data: T;
-};
-
-const handleRepeatable = async <T>({
-    jobName,
-    logger,
-    queue,
-    timeInMs,
-    data,
-}: RepeatableSettings<T>) => {
-    logger.info(`Adding repeatable job every ${timeInMs / 1000 / 60} minutes...`);
-    // TODO: add try catch with Result return type
-    await queue.add(jobName, data, {
-        repeat: {
-            every: timeInMs,
-            immediately: true,
-        },
-        jobId: `${jobName}-${randomString()}`,
-    });
-};
-
-export const createQueue = <T extends object>(name: string) => {
-    const { JOB_NAME, QUEUE_NAME, logger } = createMisc(name, "queue");
-    const queue = new Queue<T>(QUEUE_NAME, { ...redisConfig, sharedConnection: true });
-
-    logger.info(
-        // @ts-ignore
-        // eslint-disable-next-line max-len
-        `Created queue ${QUEUE_NAME} at host ${redisConfig?.connection?.host}`
-    );
-
-    const wrapper = {
-        add: async (data: T) => {
-            logger.info("Adding job...");
-            await queue.add(JOB_NAME, data);
-        },
-        repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 5 })) => {
-            await handleRepeatable<T>({ logger, queue, timeInMs, data, jobName: JOB_NAME });
-        },
-        getQueue: () => queue,
-        clear: async () => {
-            logger.info(`Clearing ${QUEUE_NAME} queue...`);
-            await queue.obliterate();
-        },
-    };
-
-    return wrapper;
 };
 
 export const createWorker = <T extends object>(
@@ -97,14 +43,22 @@ export const createWorker = <T extends object>(
     const wrapper = {
         start: async () => {
             logger.info("Starting...");
-            await worker.waitUntilReady();
+            await worker.run();
         },
         add: async (data: T) => {
             logger.info("Adding job...");
             await queue.add(JOB_NAME, data);
         },
         repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 5 })) => {
-            await handleRepeatable<T>({ logger, queue, timeInMs, data, jobName: JOB_NAME });
+            logger.info(`Adding repeatable job every ${timeInMs / 1000 / 60} minutes...`);
+            // TODO: add try catch with Result return type
+            await queue.add(JOB_NAME, data, {
+                repeat: {
+                    every: timeInMs,
+                    immediately: true,
+                },
+                jobId: `${JOB_NAME}-${randomString()}`,
+            });
         },
         stopRepeatable,
         activeCount: async () => {

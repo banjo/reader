@@ -20,7 +20,7 @@ npx prisma studio
 
 ## TODO:
 
--   [ ] Create user in database on sign up
+-   [x] Create user in database on sign up
 -   [x] Fix problem with externalId and local id, auth() only contains externalId
 -   [x] Add createdAt and updatedAt to all models
 -   [x] Add validation and workflow with zod
@@ -42,9 +42,9 @@ npx prisma studio
 -   [ ] Fix why ESM does not work with TSUP in a library?
 -   [x] Fix docker cleanup job
 -   [x] Fix dockerbuild using turbo
--   [ ] Change to postgresql
--   [ ] Add logging (axiom?)
--   [ ] Do not use api for worker in api, use worker directly
+-   [x] Change to postgresql
+-   [x] Add logging (axiom?)
+-   [x] Do not use api for worker in api, use worker directly
 -   [ ] Add request id to logging
 
 ## Build specific app

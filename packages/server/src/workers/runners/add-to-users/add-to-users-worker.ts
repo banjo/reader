@@ -3,7 +3,7 @@ import { ItemContent } from "db";
 import { Result } from "utils";
 import { ItemRepository } from "../../../repositories/ItemRepository";
 import { UserRepository } from "../../../repositories/UserRepository";
-import { createQueue, createWorker } from "../../create";
+import { createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
 
 type AddToUsersJobData = {
@@ -43,4 +43,3 @@ const processor = async (job: Job<AddToUsersJobData>) => {
 };
 
 export const addToUsersWorker = createWorker<AddToUsersJobData>("addToUsers", processor);
-export const addToUsersQueue = createQueue<AddToUsersJobData>("addToUsers");
