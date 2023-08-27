@@ -6,6 +6,7 @@ export type Paginate = {
     setPageSize: (pageSize: number) => void;
     hasNextPage: () => boolean;
     hasPrevPage: () => boolean;
+    setPage: (page: number) => void;
     current: () => number;
     pageSize: () => number;
     isLastPage: () => boolean;
@@ -39,6 +40,7 @@ export const usePagination = () => {
             },
             hasNextPage: () => !isLastPage(),
             hasPrevPage: () => page > 1,
+            setPage: (page: number) => setPage(page),
             current: () => page,
             pageSize: () => pageSize,
             total: () => total,

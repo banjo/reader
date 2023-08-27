@@ -17,6 +17,10 @@ export const useFeedFetcher = (slug: string) => {
         keys: paginationKeys,
     } = usePagination();
 
+    useEffect(() => {
+        paginate.setPage(1);
+    }, [slug]);
+
     const { paramString: filterString, filter, keys: filterKeys } = useFilters();
 
     const url = useMemo(
