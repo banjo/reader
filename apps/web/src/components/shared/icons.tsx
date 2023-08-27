@@ -4,6 +4,8 @@ import {
     LayoutGrid as CardLayout,
     Check,
     ChevronDown,
+    ChevronRight,
+    ChevronLeft,
     X as Close,
     Eye,
     EyeOff,
@@ -25,6 +27,8 @@ import {
     Star,
     SunMedium,
     Twitter,
+    ArrowRight,
+    ArrowLeft,
     type Icon as LucideIcon,
 } from "lucide-react";
 
@@ -48,6 +52,8 @@ export const Icons = {
     star: Star,
     info: Info,
     chevronDown: ChevronDown,
+    chevronRight: ChevronRight,
+    chevronLeft: ChevronLeft,
     horizontalMenu: MoreHorizontal,
     listCheck: ListChecks,
     check: Check,
@@ -62,6 +68,8 @@ export const Icons = {
     layoutDashboard: Layout,
     layoutCard: CardLayout,
     layoutList: ListLayout,
+    arrowRight: ArrowRight,
+    arrowLeft: ArrowLeft,
     logo: (props: LucideProps) => (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
             <path

@@ -1,8 +1,16 @@
 import { Item, ItemContent, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
-import { AsyncResultType } from "model";
+import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
 
 const logger = createLogger("ItemRepository");
+
+const getFilterWhere = (filter: Filter): Prisma.ItemWhereInput => {
+    return {
+        isRead: filter.isRead === undefined ? undefined : filter.isRead,
+        isBookmarked: filter.isBookmarked === undefined ? undefined : filter.isBookmarked,
+        isFavorite: filter.isFavorite === undefined ? undefined : filter.isFavorite,
+    };
+};
 
 const getAllItemsByFeed = async (feedId: number): AsyncResultType<ItemWithContent[]> => {
     let items: ItemWithContent[];
@@ -23,16 +31,29 @@ const getAllItemsByFeed = async (feedId: number): AsyncResultType<ItemWithConten
     return Result.ok(items);
 };
 
-const getAllItemsByUserId = async (userId: number): AsyncResultType<ItemWithContentAndFeed[]> => {
+const getAllItemsByUserId = async (
+    userId: number,
+    pagination: Pagination,
+    filter: Filter
+): AsyncResultType<ItemWithContentAndFeed[]> => {
     let items: ItemWithContentAndFeed[];
+
     try {
         items = await prisma.item.findMany({
             where: {
                 userId: userId,
+                ...getFilterWhere(filter),
             },
             include: {
                 content: true,
                 feed: true,
+            },
+            take: pagination.pageSize,
+            skip: (pagination.page - 1) * pagination.pageSize,
+            orderBy: {
+                content: {
+                    pubDate: "desc",
+                },
             },
         });
     } catch (error: unknown) {
@@ -231,6 +252,24 @@ const removeFeedItemsForUser = async (feedId: number, userId: number): AsyncResu
     }
 };
 
+const getItemCount = async (userId: number, filter: Filter): AsyncResultType<number> => {
+    let count: number;
+
+    try {
+        count = await prisma.item.count({
+            where: {
+                userId: userId,
+                ...getFilterWhere(filter),
+            },
+        });
+    } catch (error: unknown) {
+        logger.error(`Could not count items for user with id ${userId} - ${error}`);
+        return Result.error(`Could not count items for user with id ${userId}`, "InternalError");
+    }
+
+    return Result.ok(count);
+};
+
 export const ItemRepository = {
     getAllItemsByFeed,
     getItemById,
@@ -242,4 +281,5 @@ export const ItemRepository = {
     removeFeedItemsForUser,
     getAllItemsByUserId,
     createContent,
+    getItemCount,
 };

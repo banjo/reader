@@ -10,6 +10,7 @@ import {
 } from "@/components/table/use-table-filters-content";
 import { TableActionsItems, TableFiltersItems } from "@/components/table/use-table-filters-items";
 import { Button } from "@/components/ui/button";
+import { Paginate } from "@/hooks/shared/use-pagination";
 import { avatarUrl } from "@/lib/utils";
 import { capitalize } from "@banjoanton/utils";
 import { FeedWithContent, FeedWithItems } from "db";
@@ -22,6 +23,7 @@ type FilterBarProps = {
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     isSubscribed: boolean;
     feed?: FeedWithItems;
+    paginate?: Paginate;
 };
 
 type FilterBarPropsContent = {
@@ -31,6 +33,7 @@ type FilterBarPropsContent = {
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     isSubscribed: false;
     feed?: FeedWithContent;
+    paginate?: Paginate;
 };
 
 export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
@@ -40,6 +43,7 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     titleMenuOptions,
     isSubscribed,
     feed,
+    paginate,
 }) => {
     return (
         <div className="flex h-16 w-full items-center justify-end gap-4 rounded-md border border-border p-4">
@@ -112,6 +116,26 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                         onClick={filters.toggleShowUnreadOnly}
                         tooltip="Show unread only"
                     />
+
+                    {paginate && (
+                        <>
+                            <div className="ml-6 flex gap-2">
+                                <ResponsiveIcon
+                                    Icon={Icons.chevronLeft}
+                                    onClick={() => paginate.prevPage()}
+                                    disabled={!paginate.hasPrevPage()}
+                                    tooltip="Previous"
+                                />
+
+                                <ResponsiveIcon
+                                    Icon={Icons.chevronRight}
+                                    onClick={() => paginate.nextPage()}
+                                    disabled={!paginate.hasNextPage()}
+                                    tooltip="Next"
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
 

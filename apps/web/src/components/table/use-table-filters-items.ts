@@ -3,15 +3,16 @@ import { useTableTypeStore } from "@/components/table/use-table-type-store";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
+import { Filter } from "@/hooks/shared/use-filters";
 import { ItemWithContent } from "db";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import toast from "react-hot-toast";
 
 export type TableFiltersItems = {
-    showUnreadOnly: boolean;
-    hasReadAll: boolean;
     toggleShowUnreadOnly: () => void;
+    showUnreadOnly: boolean;
     currentTableType: TableType;
+    hasReadAll: boolean;
 };
 
 export type TableActionsItems = {
@@ -23,46 +24,47 @@ export type TableActionsItems = {
 
 type TableFiltersOut = {
     filters: TableFiltersItems;
-    data: ItemWithContent[];
     actions: TableActionsItems;
 };
 
-export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut => {
-    const [showUnreadOnly, setShowUnreadOnly] = useState<boolean>(() => {
-        return data.some(item => item.isRead === false);
-    });
+export const useTableFiltersItems = (data: ItemWithContent[], filter?: Filter): TableFiltersOut => {
     const { markMultipleAsRead } = useMutateItem();
     const { refetch, invalidate } = useInvalidate();
     const api = useAuthFetcher();
     const { setCurrent, current } = useTableTypeStore();
 
-    // FILTERED DATA
-    const filteredData = useMemo(() => {
-        if (showUnreadOnly) {
-            return data.filter(item => item.isRead === false);
-        }
-        return data;
-    }, [data, showUnreadOnly]);
-
     // FILTERS
     const hasReadAll = useMemo(() => {
-        return filteredData.every(item => item.isRead === true);
-    }, [filteredData]);
+        return data.every(item => item.isRead === true);
+    }, [data]);
+
+    const showUnreadOnly = useMemo(() => {
+        if (!filter) {
+            return false;
+        }
+
+        return filter.isRead() === false;
+    }, [filter?.isRead()]);
 
     const currentTableType = useMemo(() => current, [current]);
 
     const toggleShowUnreadOnly = () => {
-        setShowUnreadOnly(prev => !prev);
-        if (showUnreadOnly) {
-            toast.success("Showing all items");
-        } else {
-            toast.success("Showing unread items");
+        if (!filter) {
+            return;
         }
+
+        if (filter.isRead()) {
+            toast.success("Showing unread items");
+        } else {
+            toast.success("Showing all items");
+        }
+
+        filter.toggleIsRead();
     };
 
     // ACTIONS
     const markAllAsRead = () => {
-        markMultipleAsRead(filteredData);
+        markMultipleAsRead(data);
         toast.success("Marked all as read");
     };
 
@@ -87,8 +89,7 @@ export const useTableFiltersItems = (data: ItemWithContent[]): TableFiltersOut =
     };
 
     return {
-        filters: { showUnreadOnly, toggleShowUnreadOnly, hasReadAll, currentTableType },
-        data: filteredData,
+        filters: { toggleShowUnreadOnly, currentTableType, showUnreadOnly, hasReadAll },
         actions: { markAllAsRead, subscribe, refresh, selectTableType },
     };
 };

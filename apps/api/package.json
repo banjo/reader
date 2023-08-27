@@ -5,8 +5,8 @@
     "main": "src/index.ts",
     "type": "module",
     "scripts": {
-        "run": "esno src/index.ts",
-        "dev": "esno src/index.ts",
+        "run": "tsx src/index.ts",
+        "dev": "tsx watch src/index.ts",
         "build": "tsup",
         "clean": "rimraf node_modules dist"
     },
@@ -18,10 +18,12 @@
         "@types/express": "^4.17.17",
         "@types/morgan": "^1.9.4",
         "db": "workspace:*",
+        "firebase-server": "workspace:*",
+        "model": "workspace:*",
         "server": "workspace:*",
         "tsconfig": "workspace:*",
+        "tsx": "^3.12.7",
         "utils": "workspace:*",
-        "firebase-server": "workspace:*",
         "vitest": "^0.33.0"
     },
     "dependencies": {

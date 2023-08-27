@@ -6,6 +6,8 @@ import { TableItem } from "@/components/table/table-item";
 import { useTableFiltersItems } from "@/components/table/use-table-filters-items";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
+import { Filter } from "@/hooks/shared/use-filters";
+import { Paginate } from "@/hooks/shared/use-pagination";
 import { CleanFeedWithItems, ItemWithContent } from "db";
 import { FC } from "react";
 
@@ -15,6 +17,8 @@ type TableContainerProps = {
     menuOptions?: MenuEntries<ItemWithContent>[];
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     title: string;
+    paginate?: Paginate;
+    filter?: Filter;
 };
 
 export const TableContainerItems: FC<TableContainerProps> = ({
@@ -23,8 +27,10 @@ export const TableContainerItems: FC<TableContainerProps> = ({
     title,
     titleMenuOptions,
     feed,
+    paginate,
+    filter,
 }) => {
-    const { data, filters, actions } = useTableFiltersItems(items);
+    const { filters, actions } = useTableFiltersItems(items, filter);
     const { toggleReadStatus } = useMutateItem();
 
     const onClick = (item: ItemWithContent) => {
@@ -41,10 +47,11 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                 titleMenuOptions={titleMenuOptions}
                 isSubscribed={feed?.isSubscribed ?? true}
                 feed={feed}
+                paginate={paginate}
             />
             <Table type={filters.currentTableType}>
-                {data.length > 0 &&
-                    data.map(item => {
+                {items.length > 0 &&
+                    items.map(item => {
                         return (
                             <TableItem
                                 key={item.id}
@@ -59,7 +66,7 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                         );
                     })}
 
-                {data.length === 0 && (
+                {items.length === 0 && (
                     <Alert>
                         <AlertTitle>Ops!</AlertTitle>
                         <AlertDescription>No items found</AlertDescription>

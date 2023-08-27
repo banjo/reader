@@ -1,13 +1,13 @@
 import { ItemWithContent, ItemWithContentAndFeed } from "db";
-import { AsyncResultType } from "model";
+import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
 import { ItemRepository } from "../repositories/ItemRepository";
 import { sortItems } from "../shared/lib/utils";
 
 const logger = createLogger("ItemService");
 
-const getAllItemsByUserId = async (userId: number): AsyncResultType<ItemWithContentAndFeed[]> => {
-    const items = await ItemRepository.getAllItemsByUserId(userId);
+const getAllItemsByUserId = async (userId: number, pagination: Pagination, filter: Filter): AsyncResultType<ItemWithContentAndFeed[]> => {
+    const items = await ItemRepository.getAllItemsByUserId(userId, pagination, filter);
 
     if (!items.success) {
         logger.error(`Could not find items for user with id ${userId}`);
@@ -80,10 +80,22 @@ const markItemsAsRead = async (ids: number[]) => {
     return Result.okEmpty();
 };
 
+const getItemCount = async (userId: number, filter: Filter): AsyncResultType<number> => {
+    const count = await ItemRepository.getItemCount(userId, filter);
+
+    if (!count.success) {
+        logger.error(`Could not get item count`);
+        return Result.error(`Could not get item count`, "InternalError");
+    }
+
+    return Result.ok(count.data);
+};
+
 export const ItemService = {
     markAsRead,
     getItemById,
     updateItem,
     markItemsAsRead,
     getAllItemsByUserId,
+    getItemCount
 };

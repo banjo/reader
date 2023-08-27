@@ -4,7 +4,7 @@ import { useItemsFetcher } from "@/features/items/hooks/use-items-fetcher";
 import { useTableItemMenu } from "@/hooks/shared/use-table-item-menu";
 
 export const AllContainer = () => {
-    const { data, isLoading } = useItemsFetcher();
+    const { data, isLoading, paginate, filter } = useItemsFetcher();
     const { menuOptionsItems } = useTableItemMenu();
 
     if (isLoading) return <TableSkeleton />;
@@ -12,7 +12,13 @@ export const AllContainer = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <TableContainerItems items={data} menuOptions={menuOptionsItems} title={"All"} />
+            <TableContainerItems
+                items={data.data}
+                menuOptions={menuOptionsItems}
+                title="All"
+                paginate={paginate}
+                filter={filter}
+            />
         </div>
     );
 };
