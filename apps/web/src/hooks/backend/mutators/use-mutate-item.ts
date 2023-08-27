@@ -115,6 +115,35 @@ export const useMutateItem = () => {
         mutateIsRead.mutate({ item });
     };
 
+    const mutateItem = useMutation({
+        mutationFn: async ({ item }: MutateContext) => {
+            await api.PUT(`/item/${item.id}`, {
+                ...item,
+            });
+        },
+        onMutate: async (c: MutateContext) => {
+            cancelQueries();
+
+            const previousItems = optimisticUpdateItemWithContent(c, (item: ItemWithContent) => {
+                return {
+                    ...item,
+                };
+            });
+
+            return { previousItems };
+        },
+        onError: (err, c, context) => {
+            queryClient.setQueryData(["items"], context?.previousItems);
+        },
+        onSettled: () => {
+            refetch();
+        },
+    });
+
+    const updateItem = (item: ItemWithContent) => {
+        mutateItem.mutate({ item });
+    };
+
     const mutateBookmarkStatus = useMutation({
         mutationFn: async ({ item }: MutateContext) => {
             await api.PUT(`/item/${item.id}`, {
@@ -253,5 +282,6 @@ export const useMutateItem = () => {
         toggleBookmarkStatus,
         toggleFavoriteStatus,
         markMultipleAsRead,
+        updateItem,
     };
 };

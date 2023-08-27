@@ -31,10 +31,13 @@ export const TableContainerItems: FC<TableContainerProps> = ({
     filter,
 }) => {
     const { filters, actions } = useTableFiltersItems(items, filter);
-    const { toggleReadStatus } = useMutateItem();
+    const { updateItem } = useMutateItem();
 
     const onClick = (item: ItemWithContent) => {
-        toggleReadStatus(item);
+        if (!item.isRead) {
+            updateItem({ ...item, isRead: true });
+        }
+
         window.open(item.content.link, "_blank");
     };
 
