@@ -4,7 +4,7 @@ import { useItemsFetcher } from "@/features/items/hooks/use-items-fetcher";
 import { useTableItemMenu } from "@/hooks/shared/use-table-item-menu";
 
 export const BookmarkContainer = () => {
-    const { data, isLoading, filter, paginate } = useItemsFetcher({ isFavorite: true });
+    const { data, isLoading, filter, paginate } = useItemsFetcher({ isBookmarked: true });
     const { menuOptionsItems } = useTableItemMenu();
 
     if (isLoading) return <TableSkeleton />;

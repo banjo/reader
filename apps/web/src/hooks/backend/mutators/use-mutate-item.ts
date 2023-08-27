@@ -25,7 +25,7 @@ const isCleanFeedWithItemsArray = (data: any): data is CleanFeedWithItems[] => {
 
 export const useMutateItem = () => {
     const api = useAuthFetcher();
-    const { invalidate, cancelQueries, queryClient } = useInvalidate();
+    const { cancelQueries, queryClient, refetch } = useInvalidate();
 
     const optimisticUpdateItemWithContent = (
         c: MutateContext,
@@ -107,7 +107,7 @@ export const useMutateItem = () => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
         onSettled: () => {
-            invalidate();
+            refetch();
         },
     });
 
@@ -138,7 +138,7 @@ export const useMutateItem = () => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
         onSettled: () => {
-            invalidate();
+            refetch();
         },
     });
 
@@ -168,7 +168,7 @@ export const useMutateItem = () => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
         onSettled: () => {
-            invalidate();
+            refetch();
         },
     });
 
@@ -240,7 +240,7 @@ export const useMutateItem = () => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
         onSettled: () => {
-            invalidate();
+            refetch();
         },
     });
 

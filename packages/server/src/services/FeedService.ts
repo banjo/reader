@@ -361,9 +361,9 @@ const getFeedWithItemsOrContent = async ({
         return Result.error("Could not fetch user feed", "NotFound");
     }
 
-    const hasNoItems = feedWithItemsResponse.data.items.length === 0;
+    const isSubscribed = feedWithItemsResponse.data.isSubscribed;
 
-    if (hasNoItems) {
+    if (!isSubscribed) {
         const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
             internalIdentifier
         );

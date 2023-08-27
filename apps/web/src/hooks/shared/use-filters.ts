@@ -17,7 +17,7 @@ export const useFilters = (initialFilter?: InitialFilter) => {
             return initialFilter.isRead;
         }
 
-        return false;
+        return true;
     });
 
     const [isBookmarked, setIsBookmarked] = useState(() => {

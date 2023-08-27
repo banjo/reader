@@ -26,9 +26,10 @@ feed.get("/", async c => {
         imageUrl: feed.imageUrl,
         internalIdentifier: feed.internalIdentifier,
         totalItemsCount: feed.items.length,
-        unreadItemsCount: feed.items.filter(item => !item.isRead).length,
-        bookmarkedItemsCount: feed.items.filter(item => item.isBookmarked).length,
-        favoriteItemsCount: feed.items.filter(item => item.isFavorite).length,
+        totalItemsUnreadCount: feed.items.filter(item => !item.isRead).length,
+        bookmarkedItemsUnreadCount: feed.items.filter(item => item.isBookmarked && !item.isRead)
+            .length,
+        favoriteItemsUnreadCount: feed.items.filter(item => item.isFavorite && !item.isRead).length,
     }));
 
     return c.json(Result.ok(returnObject));

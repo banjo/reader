@@ -21,9 +21,9 @@ type FeedReturnObject = {
     imageUrl: string;
     internalIdentifier: string;
     totalItemsCount: number;
-    unreadItemsCount: number;
-    bookmarkedItemsCount: number;
-    favoriteItemsCount: number;
+    totalItemsUnreadCount: number;
+    bookmarkedItemsUnreadCount: number;
+    favoriteItemsUnreadCount: number;
 };
 
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
@@ -54,21 +54,21 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     const totalUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
-            return acc + feed.unreadItemsCount;
+            return acc + feed.totalItemsUnreadCount;
         }, 0);
     }, [data]);
 
     const bookmarksUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
-            return acc + feed.bookmarkedItemsCount;
+            return acc + feed.bookmarkedItemsUnreadCount;
         }, 0);
     }, [data]);
 
     const favoritesUnread = useMemo(() => {
         // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
-            return acc + feed.favoriteItemsCount;
+            return acc + feed.favoriteItemsUnreadCount;
         }, 0);
     }, [data]);
 
@@ -144,7 +144,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
             <Category title="Feeds">
                 <SubMenu>
                     {data.map(feed => {
-                        const unread = feed.unreadItemsCount;
+                        const unread = feed.totalItemsUnreadCount;
 
                         return (
                             <Item
