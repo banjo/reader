@@ -1,5 +1,5 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
-import { useFilters } from "@/hooks/shared/use-filters";
+import { InitialFilter, useFilters } from "@/hooks/shared/use-filters";
 import { usePagination } from "@/hooks/shared/use-pagination";
 import { toMilliseconds } from "@banjoanton/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -7,7 +7,7 @@ import { ItemWithContent } from "db";
 import { PaginationResponse } from "model";
 import { useEffect, useMemo } from "react";
 
-export const useItemsFetcher = () => {
+export const useItemsFetcher = (initialFilter?: InitialFilter) => {
     const { QUERY: fetcher } = useAuthFetcher();
     const {
         paramString: paginationString,
@@ -18,7 +18,7 @@ export const useItemsFetcher = () => {
         keys: paginationKeys,
     } = usePagination();
 
-    const { paramString: filterString, filter, keys: filterKeys } = useFilters();
+    const { paramString: filterString, filter, keys: filterKeys } = useFilters(initialFilter);
 
     const url = useMemo(
         () => `/items?${paginationString}&${filterString}`,

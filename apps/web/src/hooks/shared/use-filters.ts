@@ -1,12 +1,40 @@
 import { useMemo, useState } from "react";
 
+export type InitialFilter = {
+    isRead?: boolean;
+    isBookmarked?: boolean;
+    isFavorite?: boolean;
+};
+
 export type Filter = {
     toggleIsRead: () => void;
     isRead: () => boolean;
 };
 
-export const useFilters = () => {
-    const [isRead, setIsRead] = useState(false);
+export const useFilters = (initialFilter?: InitialFilter) => {
+    const [isRead, setIsRead] = useState(() => {
+        if (initialFilter?.isRead !== undefined) {
+            return initialFilter.isRead;
+        }
+
+        return false;
+    });
+
+    const [isBookmarked, setIsBookmarked] = useState(() => {
+        if (initialFilter?.isBookmarked !== undefined) {
+            return initialFilter.isBookmarked;
+        }
+
+        return false;
+    });
+
+    const [isFavorite, setIsFavorite] = useState(() => {
+        if (initialFilter?.isFavorite !== undefined) {
+            return initialFilter.isFavorite;
+        }
+
+        return false;
+    });
 
     const paramString = useMemo(() => {
         const params = new URLSearchParams();
@@ -16,10 +44,21 @@ export const useFilters = () => {
             params.append("isRead", isRead.toString());
         }
 
-        return params.toString();
-    }, [isRead]);
+        if (isBookmarked) {
+            params.append("isBookmarked", isBookmarked.toString());
+        }
 
-    const keys = useMemo(() => [isRead] as const, [isRead]);
+        if (isFavorite) {
+            params.append("isFavorite", isFavorite.toString());
+        }
+
+        return params.toString();
+    }, [isRead, isBookmarked, isFavorite]);
+
+    const keys = useMemo(
+        () => [isRead, isBookmarked, isFavorite] as const,
+        [isRead, isBookmarked, isFavorite]
+    );
 
     const filter: Filter = useMemo(() => {
         return {

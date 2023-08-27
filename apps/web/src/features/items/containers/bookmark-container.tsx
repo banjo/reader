@@ -1,15 +1,11 @@
-"use client";
-
 import { TableSkeleton } from "@/components/shared/table-skeleton";
 import { TableContainerItems } from "@/components/table/table-container-items";
 import { useItemsFetcher } from "@/features/items/hooks/use-items-fetcher";
 import { useTableItemMenu } from "@/hooks/shared/use-table-item-menu";
-import { useMemo } from "react";
 
 export const BookmarkContainer = () => {
-    const { data, isLoading } = useItemsFetcher();
+    const { data, isLoading, filter, paginate } = useItemsFetcher({ isFavorite: true });
     const { menuOptionsItems } = useTableItemMenu();
-    const filtered = useMemo(() => data.filter(item => item.isBookmarked), [data]);
 
     if (isLoading) return <TableSkeleton />;
     if (!data) return null;
@@ -17,9 +13,11 @@ export const BookmarkContainer = () => {
     return (
         <div className="flex flex-col gap-4">
             <TableContainerItems
-                items={filtered}
+                items={data}
                 menuOptions={menuOptionsItems}
                 title="Bookmarks"
+                filter={filter}
+                paginate={paginate}
             />
         </div>
     );
