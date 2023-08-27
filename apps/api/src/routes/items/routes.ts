@@ -1,6 +1,7 @@
 import { createHonoInstance } from "@app/instance";
+import { parseFilters, parsePagination } from "@app/utils";
 import { zValidator } from "@hono/zod-validator";
-import { Filter, Pagination, PaginationResponse } from "model";
+import { PaginationResponse } from "model";
 import { ItemService } from "server";
 import { Result, createLogger } from "utils";
 import { z } from "zod";
@@ -10,18 +11,8 @@ const logger = createLogger("api:items");
 
 items.get("/", async c => {
     const userId = c.get("userId");
-    const queryParams = c.req.query();
-
-    const pagination: Pagination = {
-        page: queryParams.page ? Number.parseInt(queryParams.page as string) : 1,
-        pageSize: queryParams.pageSize ? Number.parseInt(queryParams.pageSize as string) : 12,
-    };
-
-    const filters: Filter = {
-        isRead: queryParams.isRead ? queryParams.isRead === "true" : undefined,
-        isBookmarked: queryParams.isBookmarked ? queryParams.isBookmarked === "true" : undefined,
-        isFavorite: queryParams.isFavorite ? queryParams.isFavorite === "true" : undefined,
-    };
+    const pagination = parsePagination(c);
+    const filters = parseFilters(c);
 
     // TODO: add promise.all here
     const itemsResponse = await ItemService.getAllItemsByUserId(userId, pagination, filters);
