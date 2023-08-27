@@ -17,7 +17,7 @@ export type PaginationResponse<T> = {
 };
 
 export const PaginationResponse = {
-    from: <T>(pagination: Pagination, total: number, data: T[]): PaginationResponse<T> => {
+    from: <T>(pagination: Pagination, total: number, data: T): PaginationResponse<T> => {
         return {
             pagination: {
                 page: pagination.page,

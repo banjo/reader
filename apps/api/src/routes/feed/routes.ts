@@ -1,7 +1,9 @@
 import { createHonoInstance } from "@app/instance";
+import { parseFilters, parsePagination } from "@app/utils";
 import { zValidator } from "@hono/zod-validator";
+import { PaginationResponse } from "model";
 import { FeedService } from "server";
-import { createLogger, Result } from "utils";
+import { Result, createLogger } from "utils";
 import { z } from "zod";
 
 export const feed = createHonoInstance();
@@ -71,16 +73,38 @@ feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {
 feed.get("/:internalIdentifier", async c => {
     const internalIdentifier = c.req.param("internalIdentifier");
     const userId = c.get("userId");
+    const pagination = parsePagination(c);
+    const filter = parseFilters(c);
 
-    const feedResult = await FeedService.getFeedWithItemsOrContent(internalIdentifier, userId);
+    // TODO: promise.all for feed and item count
+    const feedResult = await FeedService.getFeedWithItemsOrContent({
+        internalIdentifier,
+        userId,
+        pagination,
+        filter,
+    });
 
     if (!feedResult.success) {
         logger.error(`Could not find feed with internal identifier ${internalIdentifier}`);
-
         return c.json(Result.error(feedResult.message, feedResult.type));
     }
 
-    return c.json(Result.ok(feedResult.data));
+    const totalItemsCount = await FeedService.getFeedItemsCount(internalIdentifier, filter);
+
+    if (!totalItemsCount.success) {
+        logger.error(
+            `Could not fetch items count for feed with internal identifier ${internalIdentifier}`
+        );
+        return c.json(Result.error(totalItemsCount.message, totalItemsCount.type));
+    }
+
+    const paginationResponse = PaginationResponse.from(
+        pagination,
+        totalItemsCount.data,
+        feedResult.data
+    );
+
+    return c.json(Result.ok(paginationResponse));
 });
 
 feed.post("/:internalIdentifier/unsubscribe", async c => {
@@ -123,6 +147,7 @@ feed.post("/add-many", zValidator("json", feedAddManyBodySchema), async c => {
     const userId = c.get("userId");
     const body = c.req.valid("json");
 
+    // eslint-disable-next-line n/no-unsupported-features/es-builtins
     const results = await Promise.allSettled(
         body.urls.map(url => FeedService.addFeed(url, userId))
     );

@@ -19,6 +19,8 @@ export const useFilters = () => {
         return params.toString();
     }, [isRead]);
 
+    const keys = useMemo(() => [isRead] as const, [isRead]);
+
     const filter: Filter = useMemo(() => {
         return {
             isRead: () => isRead,
@@ -26,5 +28,5 @@ export const useFilters = () => {
         };
     }, [isRead]);
 
-    return { paramString, filter, isRead };
+    return { paramString, filter, isRead, keys };
 };

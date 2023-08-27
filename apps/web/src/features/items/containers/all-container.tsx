@@ -13,7 +13,7 @@ export const AllContainer = () => {
     return (
         <div className="flex flex-col gap-4">
             <TableContainerItems
-                items={data.data}
+                items={data}
                 menuOptions={menuOptionsItems}
                 title="All"
                 paginate={paginate}

@@ -1,16 +1,9 @@
 import { Item, ItemContent, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
 import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
+import { getFilterWhere, getPagination } from "../shared/lib/utils";
 
 const logger = createLogger("ItemRepository");
-
-const getFilterWhere = (filter: Filter): Prisma.ItemWhereInput => {
-    return {
-        isRead: filter.isRead === undefined ? undefined : filter.isRead,
-        isBookmarked: filter.isBookmarked === undefined ? undefined : filter.isBookmarked,
-        isFavorite: filter.isFavorite === undefined ? undefined : filter.isFavorite,
-    };
-};
 
 const getAllItemsByFeed = async (feedId: number): AsyncResultType<ItemWithContent[]> => {
     let items: ItemWithContent[];
@@ -48,13 +41,12 @@ const getAllItemsByUserId = async (
                 content: true,
                 feed: true,
             },
-            take: pagination.pageSize,
-            skip: (pagination.page - 1) * pagination.pageSize,
             orderBy: {
                 content: {
                     pubDate: "desc",
                 },
             },
+            ...getPagination(pagination),
         });
     } catch (error: unknown) {
         logger.error(`Could not find items for user with id ${userId} - ${error}`);

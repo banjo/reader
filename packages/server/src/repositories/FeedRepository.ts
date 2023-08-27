@@ -1,8 +1,8 @@
 import { sortBy } from "@banjoanton/utils";
 import { Feed, FeedWithContent, FeedWithItems, FeedWithUsers, Prisma, prisma } from "db";
-import { AsyncResultType } from "model";
+import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
-import { sortItems } from "../shared/lib/utils";
+import { getFilterWhere, getPagination, sortItems } from "../shared/lib/utils";
 
 const logger = createLogger("FeedRepository");
 
@@ -143,10 +143,17 @@ const getFeedByInternalIdentifier = async (
     return Result.ok(feed);
 };
 
-const getUserFeedByInternalIdentifier = async (
-    feedInternalIdentifier: string,
-    userId: number
-): AsyncResultType<FeedWithItems> => {
+const getUserFeedByInternalIdentifier = async ({
+    feedInternalIdentifier,
+    userId,
+    pagination,
+    filter,
+}: {
+    feedInternalIdentifier: string;
+    userId: number;
+    pagination?: Pagination;
+    filter?: Filter;
+}): AsyncResultType<FeedWithItems> => {
     const feed = await prisma.feed.findUnique({
         where: {
             internalIdentifier: feedInternalIdentifier,
@@ -158,7 +165,14 @@ const getUserFeedByInternalIdentifier = async (
                 },
                 where: {
                     userId: userId,
+                    ...getFilterWhere(filter),
                 },
+                orderBy: {
+                    content: {
+                        pubDate: "desc",
+                    },
+                },
+                ...getPagination(pagination),
             },
         },
     });
@@ -336,6 +350,31 @@ const isSubscribedToFeed = async (
     return Result.ok(feed.users.length > 0);
 };
 
+const getFeedItemsCount = async (
+    internalIdentifier: string,
+    filter: Filter
+): AsyncResultType<number> => {
+    const feed = await prisma.feed.findUnique({
+        where: {
+            internalIdentifier: internalIdentifier,
+        },
+        include: {
+            items: {
+                where: {
+                    ...getFilterWhere(filter),
+                },
+            },
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Feed not found with id: ${internalIdentifier}`);
+        return Result.error("Feed not found", "NotFound");
+    }
+
+    return Result.ok(feed.items.length);
+};
+
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
@@ -350,4 +389,5 @@ export const FeedRepository = {
     checkIfFeedIsAssignedToUser,
     removeFeedFromUser,
     isSubscribedToFeed,
+    getFeedItemsCount,
 };

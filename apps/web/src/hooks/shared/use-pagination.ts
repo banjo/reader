@@ -25,6 +25,8 @@ export const usePagination = () => {
         return params.toString();
     }, [page, pageSize]);
 
+    const keys = useMemo(() => [page, pageSize] as const, [page, pageSize]);
+
     const paginate: Paginate = useMemo(() => {
         const isLastPage = () => page * pageSize >= total;
 
@@ -44,5 +46,5 @@ export const usePagination = () => {
         };
     }, [page, pageSize, total]);
 
-    return { paramString, paginate, page, pageSize, setTotal };
+    return { paramString, paginate, page, pageSize, setTotal, keys };
 };

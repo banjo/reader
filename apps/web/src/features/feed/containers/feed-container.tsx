@@ -16,7 +16,7 @@ export const FeedContainer = () => {
         return null;
     }
 
-    const { data, isLoading } = useFeedFetcher(slug);
+    const { data, isLoading, filter, paginate } = useFeedFetcher(slug);
     const { menuOptionsItems } = useTableItemMenu();
     const { unsubscribe } = useMutateFeed();
 
@@ -51,6 +51,8 @@ export const FeedContainer = () => {
                     title={data.name}
                     titleMenuOptions={titleMenuOptions}
                     feed={data}
+                    filter={filter}
+                    paginate={paginate}
                 />
             ) : (
                 <TableContainerContent content={data.contentItems} feed={data} title={data.name} />

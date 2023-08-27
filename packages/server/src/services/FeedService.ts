@@ -1,6 +1,6 @@
 import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { AsyncResultType } from "model";
+import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
@@ -114,14 +114,23 @@ const fetchAndUpdateRssFeed = async (
     return Result.okEmpty();
 };
 
-const getUserFeedByInternalIdentifier = async (
-    feedInternalIdentifier: string,
-    userId: number
-): AsyncResultType<CleanFeedWithItems> => {
-    const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier(
+const getUserFeedByInternalIdentifier = async ({
+    feedInternalIdentifier,
+    userId,
+    pagination,
+    filter,
+}: {
+    feedInternalIdentifier: string;
+    userId: number;
+    pagination: Pagination;
+    filter: Filter;
+}): AsyncResultType<CleanFeedWithItems> => {
+    const feedResponse = await FeedRepository.getUserFeedByInternalIdentifier({
         feedInternalIdentifier,
-        userId
-    );
+        userId,
+        pagination,
+        filter,
+    });
 
     if (!feedResponse.success) {
         logger.error(`no feed found in db with public url ${feedInternalIdentifier}`);
@@ -294,10 +303,10 @@ const unsubscribeFromFeed = async (
     internalIdentifier: string,
     userId: number
 ): AsyncResultType<void> => {
-    const feedResult = await FeedRepository.getUserFeedByInternalIdentifier(
-        internalIdentifier,
-        userId
-    );
+    const feedResult = await FeedRepository.getUserFeedByInternalIdentifier({
+        feedInternalIdentifier: internalIdentifier,
+        userId,
+    });
 
     if (!feedResult.success) {
         if (feedResult.type === "NotFound") {
@@ -330,11 +339,23 @@ const unsubscribeFromFeed = async (
     return Result.okEmpty();
 };
 
-const getFeedWithItemsOrContent = async (
-    internalIdentifier: string,
-    userId: number
-): AsyncResultType<CleanFeedWithItems | CleanFeedWithContent> => {
-    const feedWithItemsResponse = await getUserFeedByInternalIdentifier(internalIdentifier, userId);
+const getFeedWithItemsOrContent = async ({
+    internalIdentifier,
+    userId,
+    pagination,
+    filter,
+}: {
+    internalIdentifier: string;
+    userId: number;
+    pagination: Pagination;
+    filter: Filter;
+}): AsyncResultType<CleanFeedWithItems | CleanFeedWithContent> => {
+    const feedWithItemsResponse = await getUserFeedByInternalIdentifier({
+        feedInternalIdentifier: internalIdentifier,
+        userId,
+        pagination,
+        filter,
+    });
 
     if (!feedWithItemsResponse.success) {
         return Result.error("Could not fetch user feed", "NotFound");
@@ -388,6 +409,20 @@ const subscribeToFeed = async (
     return Result.okEmpty();
 };
 
+const getFeedItemsCount = async (
+    feedInternalIdentifier: string,
+    filter: Filter
+): AsyncResultType<number> => {
+    const count = await FeedRepository.getFeedItemsCount(feedInternalIdentifier, filter);
+
+    if (!count.success) {
+        logger.error(`Could not get count for feed with identifier ${feedInternalIdentifier}`);
+        return Result.error("Could not get count for feed", "InternalError");
+    }
+
+    return Result.ok(count.data);
+};
+
 export const FeedService = {
     addFeed,
     getUserFeedByInternalIdentifier,
@@ -397,4 +432,5 @@ export const FeedService = {
     getFeedWithItemsOrContent,
     subscribeToFeed,
     fetchAndUpdateRssFeed,
+    getFeedItemsCount,
 };

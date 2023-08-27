@@ -9,8 +9,16 @@ import { useEffect, useMemo } from "react";
 
 export const useItemsFetcher = () => {
     const { QUERY: fetcher } = useAuthFetcher();
-    const { paramString: paginationString, paginate, page, pageSize, setTotal } = usePagination();
-    const { paramString: filterString, filter, isRead } = useFilters();
+    const {
+        paramString: paginationString,
+        paginate,
+        page,
+        pageSize,
+        setTotal,
+        keys: paginationKeys,
+    } = usePagination();
+
+    const { paramString: filterString, filter, keys: filterKeys } = useFilters();
 
     const url = useMemo(
         () => `/items?${paginationString}&${filterString}`,
@@ -30,7 +38,7 @@ export const useItemsFetcher = () => {
     );
 
     const { data, isLoading } = useQuery<PaginationResponse<ItemWithContent[]>>({
-        queryKey: ["items", page, pageSize, isRead],
+        queryKey: ["items", ...paginationKeys, ...filterKeys],
         queryFn: async () => await fetcher(url),
         staleTime: toMilliseconds({ hours: 1 }),
         initialData: initialData,
@@ -43,5 +51,5 @@ export const useItemsFetcher = () => {
         }
     }, [data]);
 
-    return { data, isLoading, paginate, filter };
+    return { data: data.data, isLoading, paginate, filter };
 };
