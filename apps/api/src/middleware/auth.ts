@@ -1,5 +1,6 @@
 import { isDev } from "@app/utils";
 import { raise } from "@banjoanton/utils";
+import { DecodedIdToken } from "firebase-admin/auth";
 import { auth } from "firebase-server";
 import { Context, Next } from "hono";
 import { UserRepository } from "server";
@@ -43,7 +44,13 @@ export const authMiddleware = async (c: Context, next: Next) => {
         return new Response("Unauthorized", { status: 401 });
     }
 
-    const decodedToken = await auth.verifyIdToken(idToken);
+    let decodedToken: DecodedIdToken;
+    try {
+        decodedToken = await auth.verifyIdToken(idToken);
+    } catch (error) {
+        console.log(error);
+        return new Response("Unauthorized", { status: 401 });
+    }
 
     if (!decodedToken) {
         logger.info("No decoded token");
