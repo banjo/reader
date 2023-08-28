@@ -49,8 +49,12 @@ process.on("unhandledRejection", e => {
     process.exit(1);
 });
 
-serve({
-    fetch: app.fetch,
-    port: PORT,
-    hostname: "0.0.0.0",
-});
+try {
+    serve({
+        fetch: app.fetch,
+        port: PORT,
+    });
+} catch (error) {
+    console.log("Exiting by error", error);
+    process.exit(1);
+}
