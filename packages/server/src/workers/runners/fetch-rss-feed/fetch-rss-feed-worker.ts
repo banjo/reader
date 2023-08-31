@@ -51,7 +51,7 @@ const processor = async (job: Job<FetchJobData>) => {
         return Result.okEmpty();
     }
 
-    await addToUsersWorker.add({
+    await addToUsersWorker().add({
         content: updateContentResult.data,
         feedId: feed.id,
     });
@@ -59,4 +59,4 @@ const processor = async (job: Job<FetchJobData>) => {
     return Result.okEmpty();
 };
 
-export const fetchRssFeedWorker = createWorker<FetchJobData>("fetchRssFeedWorker", processor);
+export const fetchRssFeedWorker = () => createWorker<FetchJobData>("fetchRssFeedWorker", processor);

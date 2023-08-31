@@ -11,7 +11,7 @@ import {
     fetchContentWithoutImageWorker,
     fetchRssFeedWorker,
 } from "server";
-import { createLogger, Result } from "utils";
+import { Result, createLogger } from "utils";
 import { start } from "./worker";
 
 const PORT = Number.parseInt(process.env.PORT ?? "3001");
@@ -26,10 +26,10 @@ const run = async () => {
 
     createBullBoard({
         queues: [
-            new BullMQAdapter(fetchRssFeedWorker.getQueue()),
-            new BullMQAdapter(addToUsersWorker.getQueue()),
-            new BullMQAdapter(fetchContentWithoutImageWorker.getQueue()),
-            new BullMQAdapter(addImageWorker.getQueue()),
+            new BullMQAdapter(fetchRssFeedWorker().getQueue()),
+            new BullMQAdapter(addToUsersWorker().getQueue()),
+            new BullMQAdapter(fetchContentWithoutImageWorker().getQueue()),
+            new BullMQAdapter(addImageWorker().getQueue()),
         ],
         serverAdapter,
     });

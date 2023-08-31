@@ -39,4 +39,4 @@ const processor = async (job: Job<AddImageWorker>) => {
     return Result.okEmpty();
 };
 
-export const addImageWorker = createWorker<AddImageWorker>("addImage", processor);
+export const addImageWorker = () => createWorker<AddImageWorker>("addImage", processor);

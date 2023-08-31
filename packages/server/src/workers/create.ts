@@ -16,13 +16,35 @@ const createMisc = (name: string, type: WorkerType) => {
     return { logger, QUEUE_NAME, JOB_NAME };
 };
 
+const singleton = {
+    queues: [] as Queue<any>[],
+    workers: [] as Worker<any>[],
+};
+
 export const createWorker = <T extends object>(
     name: string,
     processor: (job: Job<T>) => Promise<ResultType<void>>
 ) => {
     const { JOB_NAME, QUEUE_NAME, logger } = createMisc(name, "worker");
-    const queue = new Queue<T>(QUEUE_NAME, { ...redisConfig, sharedConnection: true });
-    const worker = new Worker<T>(QUEUE_NAME, processor, { ...redisConfig, autorun: false });
+
+    const hasQueue = singleton.queues.find(q => q.name === QUEUE_NAME);
+
+    let queue: Queue<T>;
+    if (hasQueue) {
+        queue = hasQueue;
+    } else {
+        queue = new Queue<T>(QUEUE_NAME, { ...redisConfig, sharedConnection: true });
+        singleton.queues.push(queue);
+    }
+
+    const hasWorker = singleton.workers.find(w => w.name === QUEUE_NAME);
+    let worker: Worker<T>;
+    if (hasWorker) {
+        worker = hasWorker;
+    } else {
+        worker = new Worker<T>(QUEUE_NAME, processor, { ...redisConfig, autorun: false });
+        singleton.workers.push(worker);
+    }
 
     logger.info(
         // @ts-ignore

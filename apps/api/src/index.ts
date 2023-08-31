@@ -29,32 +29,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 console.log(`🚀 Server ready at port ${PORT} - Mode: ${isProd ? "production" : "development"}`);
 
-process.on("SIGINT", e => {
-    console.log(`Exiting by SIGINT: ${e}`);
-    process.exit(0);
+serve({
+    fetch: app.fetch,
+    port: PORT,
 });
-
-process.on("SIGTERM", e => {
-    console.log(`Exiting by SIGTERM: ${e}`);
-    process.exit(0);
-});
-
-process.on("uncaughtException", e => {
-    console.log(`Exiting by uncaughtException: ${e}`);
-    process.exit(1);
-});
-
-process.on("unhandledRejection", e => {
-    console.log(`Exiting by unhandledRejection: ${e}`);
-    process.exit(1);
-});
-
-try {
-    serve({
-        fetch: app.fetch,
-        port: PORT,
-    });
-} catch (error) {
-    console.log("Exiting by error", error);
-    process.exit(1);
-}

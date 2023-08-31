@@ -8,16 +8,16 @@ import { addFetchRss } from "./add";
 
 export const start = async () => {
     console.info("Workers started...");
-    fetchRssFeedWorker.start();
-    addToUsersWorker.start();
-    fetchContentWithoutImageWorker.start();
-    addImageWorker.start();
+    fetchRssFeedWorker().start();
+    addToUsersWorker().start();
+    fetchContentWithoutImageWorker().start();
+    addImageWorker().start();
 
-    await fetchRssFeedWorker.stopRepeatable();
-    await addToUsersWorker.stopRepeatable();
-    await fetchContentWithoutImageWorker.stopRepeatable();
+    await fetchRssFeedWorker().stopRepeatable();
+    await addToUsersWorker().stopRepeatable();
+    await fetchContentWithoutImageWorker().stopRepeatable();
 
-    await fetchContentWithoutImageWorker.repeatable({});
+    await fetchContentWithoutImageWorker().repeatable({});
 
     await addFetchRss();
 };

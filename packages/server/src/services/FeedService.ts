@@ -9,6 +9,7 @@ import { ItemMapper } from "../mappers/ItemMapper";
 import { ContentRepository } from "../repositories/ContentRepository";
 import { FeedRepository } from "../repositories/FeedRepository";
 import { ItemRepository } from "../repositories/ItemRepository";
+import { fetchContentWithoutImageWorker, fetchRssFeedWorker } from "../workers";
 import { ParseService } from "./ParseService";
 
 const logger = createLogger("FeedService");
@@ -274,12 +275,11 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         return Result.error("Failed to create items", "InternalError");
     }
 
-    // TODO: remove to test if it crashes
-    // await fetchRssFeedWorker.repeatable({
-    //     feedId: createFeedResult.data.id,
-    // });
+    await fetchRssFeedWorker().repeatable({
+        feedId: createFeedResult.data.id,
+    });
 
-    // await fetchContentWithoutImageWorker.add({});
+    await fetchContentWithoutImageWorker().add({});
 
     return Result.ok({ feedId: createFeedResult.data.id });
 };

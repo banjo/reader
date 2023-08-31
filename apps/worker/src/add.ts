@@ -14,7 +14,7 @@ export const addFetchRss = async () => {
 
     for (const feed of feeds) {
         logger.info(`Adding ${feed.url} to fetch rss...`);
-        await fetchRssFeedWorker.repeatable({ feedId: feed.id });
+        await fetchRssFeedWorker().repeatable({ feedId: feed.id });
     }
 
     logger.info("Done");

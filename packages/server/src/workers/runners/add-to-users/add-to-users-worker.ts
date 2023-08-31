@@ -42,4 +42,4 @@ const processor = async (job: Job<AddToUsersJobData>) => {
     return Result.okEmpty();
 };
 
-export const addToUsersWorker = createWorker<AddToUsersJobData>("addToUsers", processor);
+export const addToUsersWorker = () => createWorker<AddToUsersJobData>("addToUsers", processor);

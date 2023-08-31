@@ -1,5 +1,5 @@
-import { isBrowser, raise } from "@banjoanton/utils";
-import { TransportTargetOptions, pino } from "pino";
+import { isBrowser } from "@banjoanton/utils";
+import { pino, TransportTargetOptions } from "pino";
 
 let sharedTransport: any;
 

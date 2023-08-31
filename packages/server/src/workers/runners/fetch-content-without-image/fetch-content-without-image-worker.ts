@@ -23,7 +23,7 @@ const processor = async (job: Job) => {
 
     await Promise.all(
         content.map(async item => {
-            await addImageWorker.add({
+            await addImageWorker().add({
                 contentId: item.id,
                 url: item.link,
             });
@@ -35,7 +35,5 @@ const processor = async (job: Job) => {
     return Result.okEmpty();
 };
 
-export const fetchContentWithoutImageWorker = createWorker(
-    "fetchContentWithoutImageWorker",
-    processor
-);
+export const fetchContentWithoutImageWorker = () =>
+    createWorker("fetchContentWithoutImageWorker", processor);
