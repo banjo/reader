@@ -47,8 +47,15 @@ npx prisma studio
 -   [x] Do not use api for worker in api, use worker directly
 -   [ ] Add request id to logging
 -   [ ] Add error handling to repositories
--   [ ] Why does not the image worker run?
--   [ ] Fix local development without internet
+-   [x] Why does not the image worker run?
+-   [x] Fix local development without internet
+-   [ ] Fix bug with import large rss file request takes 60 seconds and time outs
+-   [ ] Fix auth 401 things, how to keep it up to date?
+-   [ ] Mark all as read, not only the ones that are visible
+-   [ ] Whe on subscribe, go to start page
+-   [ ] Card, no image placeholder
+-   [ ] Pagination, current page or amount of pages or something
+-   [ ] Fix optimistic updates on favorite and bookmark?
 
 ## Build specific app
 
