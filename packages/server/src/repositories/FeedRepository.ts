@@ -375,6 +375,33 @@ const getFeedItemsCount = async (
     return Result.ok(feed.items.length);
 };
 
+const markAllAsRead = async (feedId: number, userId: number): AsyncResultType<void> => {
+    const feed = await prisma.feed.update({
+        where: {
+            id: feedId,
+        },
+        data: {
+            items: {
+                updateMany: {
+                    where: {
+                        userId: userId,
+                    },
+                    data: {
+                        isRead: true,
+                    },
+                },
+            },
+        },
+    });
+
+    if (!feed) {
+        logger.error(`Could not mark all as read for feed ${feedId} for user ${userId}`);
+        return Result.error("Could not mark all as read", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
@@ -390,4 +417,5 @@ export const FeedRepository = {
     removeFeedFromUser,
     isSubscribedToFeed,
     getFeedItemsCount,
+    markAllAsRead,
 };

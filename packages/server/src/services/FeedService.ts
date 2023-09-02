@@ -436,6 +436,17 @@ const getFeedItemsCount = async (
     return Result.ok(count.data);
 };
 
+const markAllAsRead = async (feedId: number, userId: number): AsyncResultType<void> => {
+    const markResult = await FeedRepository.markAllAsRead(feedId, userId);
+
+    if (!markResult.success) {
+        logger.error(`Could not mark all as read for feed with id ${feedId}`);
+        return Result.error("Could not mark all as read", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
 export const FeedService = {
     addFeed,
     getUserFeedByInternalIdentifier,
@@ -446,4 +457,5 @@ export const FeedService = {
     subscribeToFeed,
     fetchAndUpdateRssFeed,
     getFeedItemsCount,
+    markAllAsRead,
 };

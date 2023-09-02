@@ -277,11 +277,84 @@ export const useMutateItem = () => {
         mutateMultipleAsRead.mutate(items);
     };
 
+    const mutateMarkAllAsRead = useMutation({
+        mutationFn: async (feedId: number) =>
+            await api.POST(`/feed/mark-all-as-read`, {
+                feedId,
+            }),
+        onMutate: async () => {
+            cancelQueries();
+
+            const previousItems = queryClient.getQueryData(["items"]);
+
+            queryClient.setQueriesData(["items"], (old: any) => {
+                const oldContent:
+                    | ItemWithContent[]
+                    | CleanFeedWithItems[]
+                    | CleanFeedWithItems
+                    | CleanFeedWithContent = old;
+
+                if (isCleanFeedWithContent(oldContent)) {
+                    // feed with content cannot update read status, bookmark status, etc.
+                    return oldContent;
+                }
+
+                if (isItemWithContentArray(oldContent)) {
+                    return oldContent.map((i: ItemWithContent) => {
+                        return {
+                            ...i,
+                            isRead: true,
+                        };
+                    });
+                }
+
+                if (isCleanFeedWithItemsArray(oldContent)) {
+                    return oldContent.map((feed: CleanFeedWithItems) => {
+                        return {
+                            ...feed,
+                            items: feed.items.map((i: ItemWithContent) => {
+                                return {
+                                    ...i,
+                                    isRead: true,
+                                };
+                            }),
+                        };
+                    });
+                }
+
+                if (isCleanFeedWithItems(oldContent)) {
+                    return {
+                        ...oldContent,
+                        items: oldContent.items.map((i: ItemWithContent) => {
+                            return {
+                                ...i,
+                                isRead: true,
+                            };
+                        }),
+                    };
+                }
+            });
+
+            return { previousItems };
+        },
+        onError: (err, c, context) => {
+            queryClient.setQueryData(["items"], context?.previousItems);
+        },
+        onSettled: () => {
+            refetch();
+        },
+    });
+
+    const markAllAsRead = (feedId: number) => {
+        mutateMarkAllAsRead.mutate(feedId);
+    };
+
     return {
         toggleReadStatus,
         toggleBookmarkStatus,
         toggleFavoriteStatus,
         markMultipleAsRead,
+        markAllAsRead,
         updateItem,
     };
 };

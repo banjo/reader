@@ -52,8 +52,8 @@ npx prisma studio
 -   [ ] Fix bug with pagination on prod with josh w comaeu double?
 -   [ ] Fix bug with import large rss file request takes 60 seconds and time outs
 -   [ ] Fix auth 401 things, how to keep it up to date?
--   [ ] Mark all as read, not only the ones that are visible
--   [ ] When on subscribe, go to start page
+-   [x] Mark all as read, not only the ones that are visible
+-   [x] When on subscribe, go to start page
 -   [ ] Card, no image placeholder
 -   [ ] Pagination, current page or amount of pages or something
 -   [ ] Fix optimistic updates on favorite and bookmark?

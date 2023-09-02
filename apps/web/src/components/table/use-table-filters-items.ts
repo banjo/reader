@@ -16,7 +16,7 @@ export type TableFiltersItems = {
 };
 
 export type TableActionsItems = {
-    markAllAsRead: () => void;
+    markAllAsRead: (feedId: number) => void;
     subscribe: (internalIdentifier: string) => Promise<void>;
     refresh: () => Promise<void>;
     selectTableType: (tableType: TableType) => void;
@@ -28,7 +28,7 @@ type TableFiltersOut = {
 };
 
 export const useTableFiltersItems = (data: ItemWithContent[], filter?: Filter): TableFiltersOut => {
-    const { markMultipleAsRead } = useMutateItem();
+    const { markMultipleAsRead, markAllAsRead: markAsRead } = useMutateItem();
     const { refetch, invalidate } = useInvalidate();
     const api = useAuthFetcher();
     const { setCurrent, current } = useTableTypeStore();
@@ -64,7 +64,14 @@ export const useTableFiltersItems = (data: ItemWithContent[], filter?: Filter): 
 
     // ACTIONS
     const markAllAsRead = () => {
-        markMultipleAsRead(data);
+        const feedId = data[0]?.feedId;
+
+        if (!feedId) {
+            console.error("Could not mark all as read");
+            return;
+        }
+
+        markAsRead(feedId);
         toast.success("Marked all as read");
     };
 

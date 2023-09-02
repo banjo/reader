@@ -53,6 +53,25 @@ feed.post("/", zValidator("json", feedPostSchema), async c => {
     return c.json(Result.ok(item.data));
 });
 
+const feedMarkAllAsReadSchema = z.object({
+    feedId: z.number(),
+});
+
+feed.post("/mark-all-as-read", zValidator("json", feedMarkAllAsReadSchema), async c => {
+    const userId = c.get("userId");
+    const body = c.req.valid("json");
+    const id = body.feedId;
+
+    const response = await FeedService.markAllAsRead(id, userId);
+
+    if (!response.success) {
+        logger.error(`Could not mark all as read for feed ${id} for user ${userId}`);
+        return c.json(Result.error(response.message, response.type));
+    }
+
+    return c.json(Result.okEmpty());
+});
+
 const feedSearchQuerySchema = z.object({
     query: z.string(),
 });
