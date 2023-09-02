@@ -350,35 +350,48 @@ const getFeedWithItemsOrContent = async ({
     pagination: Pagination;
     filter: Filter;
 }): AsyncResultType<CleanFeedWithItems | CleanFeedWithContent> => {
-    const feedWithItemsResponse = await getUserFeedByInternalIdentifier({
-        feedInternalIdentifier: internalIdentifier,
-        userId,
-        pagination,
-        filter,
-    });
+    const isSubscribedResponse = await FeedRepository.isSubscribedToFeed(
+        internalIdentifier,
+        userId
+    );
 
-    if (!feedWithItemsResponse.success) {
-        return Result.error("Could not fetch user feed", "NotFound");
+    if (!isSubscribedResponse.success) {
+        logger.error(
+            `user is not subscribed to feed with internal identifier ${internalIdentifier}`
+        );
+        return Result.error("User is not subscribed to feed", "NotFound");
     }
 
-    const isSubscribed = feedWithItemsResponse.data.isSubscribed;
+    const isSubscribed = isSubscribedResponse.data;
 
-    if (!isSubscribed) {
-        const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
-            internalIdentifier
-        );
+    if (isSubscribed) {
+        const feedWithItemsResponse = await getUserFeedByInternalIdentifier({
+            feedInternalIdentifier: internalIdentifier,
+            userId,
+            pagination,
+            filter,
+        });
 
-        if (!feedWithContentResponse.success) {
-            return Result.error("Could not get content feed by identifier", "InternalError");
+        if (!feedWithItemsResponse.success) {
+            return Result.error("Could not fetch user feed", "NotFound");
         }
 
-        return Result.ok({
-            ...feedWithContentResponse.data,
-            isSubscribed: false,
-        });
+        return Result.ok(feedWithItemsResponse.data);
     }
 
-    return Result.ok({ ...feedWithItemsResponse.data, isSubscribed: true });
+    // not subscribed
+    const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
+        internalIdentifier
+    );
+
+    if (!feedWithContentResponse.success) {
+        return Result.error("Could not get content feed by identifier", "InternalError");
+    }
+
+    return Result.ok({
+        ...feedWithContentResponse.data,
+        isSubscribed: false,
+    });
 };
 
 const subscribeToFeed = async (

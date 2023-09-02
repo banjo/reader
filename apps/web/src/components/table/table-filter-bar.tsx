@@ -66,14 +66,16 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                             item={{ title }}
                             buttonClasses="mr-auto"
                         >
-                            <div className="mr-auto flex cursor-pointer items-center gap-1">
+                            <div className="mr-auto flex cursor-pointer items-center gap-1 ml-2">
                                 {/* <span className="text-lg font-medium">{title}</span> */}
                                 <Icons.chevronDown className="h-5 w-5" />
                             </div>
                         </Dropdown>
                     </>
                 ) : (
-                    <span className="mr-auto text-lg font-medium flex items-center">{title}</span>
+                    <span className="mr-auto text-lg font-medium flex items-center ml-2">
+                        {title}
+                    </span>
                 )}
             </div>
 
