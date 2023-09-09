@@ -14,6 +14,8 @@ const serviceAccount = {
 const firebaseBuffer = Buffer.from(serviceAccount.key, "base64");
 const firebaseKey = firebaseBuffer.toString("utf8");
 
+console.log("🪕%c Banjo | firebase.ts:17 |", "color: #E91E63", firebaseKey);
+
 const app = initializeApp({
     credential: cert(JSON.parse(firebaseKey)),
 });
