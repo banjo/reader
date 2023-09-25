@@ -2,6 +2,7 @@ import { Bookmark } from "@/components/icons/bookmark";
 import { Favorite } from "@/components/icons/favorite";
 import { Dropdown, MenuEntries } from "@/components/shared/dropdown";
 import { Icons } from "@/components/shared/icons";
+import { Pattern } from "@/components/shared/pattern";
 import { TableType } from "@/components/table/table.types";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
@@ -79,7 +80,7 @@ export const TableItem = ({
                     isSubscribed && item.isRead ? "bg-slate-100" : undefined
                 }`}
             >
-                {content.imageUrl && (
+                {content.imageUrl ? (
                     <Image
                         src={content.imageUrl}
                         onClick={onClick}
@@ -87,6 +88,8 @@ export const TableItem = ({
                         preview={true}
                         loading="lazy"
                     />
+                ) : (
+                    <Pattern name={content.title} className="w-full h-44 object-cover" />
                 )}
 
                 <CardHeader className="cursor-pointer" onClick={onClick}>
