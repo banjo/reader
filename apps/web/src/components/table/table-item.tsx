@@ -74,7 +74,11 @@ export const TableItem = ({
 
     if (type === "card") {
         return (
-            <Card className="overflow-hidden relative flex flex-col">
+            <Card
+                className={`overflow-hidden relative flex flex-col ${
+                    isSubscribed && item.isRead ? "bg-slate-100" : undefined
+                }`}
+            >
                 {content.imageUrl && (
                     <Image
                         src={content.imageUrl}
