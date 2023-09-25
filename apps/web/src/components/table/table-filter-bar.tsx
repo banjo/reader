@@ -79,7 +79,7 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                 )}
             </div>
 
-            {isSubscribed && feed && (
+            {isSubscribed && (
                 <div className="mr-2 flex items-center gap-4">
                     <Dropdown
                         align="start"
@@ -106,12 +106,14 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                         tooltip="Refresh"
                     />
 
-                    <ResponsiveIcon
-                        Icon={Icons.check}
-                        onClick={() => actions.markAllAsRead(feed.id)}
-                        disabled={filters.hasReadAll}
-                        tooltip="Mark all as read"
-                    />
+                    {feed && (
+                        <ResponsiveIcon
+                            Icon={Icons.check}
+                            onClick={() => actions.markAllAsRead(feed.id)}
+                            disabled={filters.hasReadAll}
+                            tooltip="Mark all as read"
+                        />
+                    )}
 
                     <ResponsiveIcon
                         Icon={filters.showUnreadOnly ? Icons.eyeOff : Icons.eye}
