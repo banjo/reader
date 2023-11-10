@@ -17,7 +17,7 @@ module.exports = {
         },
         extend: {
             height: {
-                "full-with-nav": "calc(100vh - 4rem)",
+                "full-with-nav": "calc(100dvh - 4rem)",
             },
             fontFamily: {
                 open: ["Open Sans"],
