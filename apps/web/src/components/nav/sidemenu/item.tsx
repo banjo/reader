@@ -53,7 +53,6 @@ export const Item: FC<ItemProps> = ({
                             src={image ?? backupImage}
                             className="h-6 w-6 max-w-none"
                             onError={e => {
-                                console.log("TJO");
                                 if (!backupImage) return;
                                 e.currentTarget.src = backupImage;
                             }}
