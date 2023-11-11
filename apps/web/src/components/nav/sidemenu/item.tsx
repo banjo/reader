@@ -8,6 +8,7 @@ type ItemProps = {
     title: string;
     Icon?: IconType;
     image?: string | null;
+    backupImage?: string;
     url: string;
     selected: boolean;
     highlight?: boolean;
@@ -23,6 +24,7 @@ export const Item: FC<ItemProps> = ({
     notificationTooltip,
     url,
     image,
+    backupImage,
     selected = false,
     highlight = false,
     onClick,
@@ -46,7 +48,17 @@ export const Item: FC<ItemProps> = ({
             <div className="flex items-center gap-4 relative overflow-hidden">
                 <span className="w-6 h-6 ">
                     {Icon && <Icon className="w-6 h-6" />}
-                    {image && <img src={image} className="h-6 w-6 max-w-none" />}
+                    {(image || backupImage) && (
+                        <img
+                            src={image ?? backupImage}
+                            className="h-6 w-6 max-w-none"
+                            onError={e => {
+                                console.log("TJO");
+                                if (!backupImage) return;
+                                e.currentTarget.src = backupImage;
+                            }}
+                        />
+                    )}
                 </span>
                 <Tooltip tooltip={title}>
                     <span className="text-lg md:text-sm truncate w-full md:w-36">{title}</span>

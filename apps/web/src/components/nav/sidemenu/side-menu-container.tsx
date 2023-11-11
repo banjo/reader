@@ -151,7 +151,8 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                                 key={feed.internalIdentifier}
                                 title={feed.title}
                                 url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
-                                image={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
+                                image={feed.imageUrl}
+                                backupImage={avatarUrl(feed.internalIdentifier)}
                                 selected={isSelected(`/feed/${feed.internalIdentifier}`)}
                                 notification={unread > 0 ? unread : undefined}
                                 highlight={Boolean(unread)}

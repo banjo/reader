@@ -54,6 +54,9 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                         width={40}
                         alt="feed avatar"
                         src={feed.imageUrl ?? avatarUrl(feed.internalIdentifier)}
+                        onError={e => {
+                            e.currentTarget.src = avatarUrl(feed.internalIdentifier);
+                        }}
                     />
                 )}
 
