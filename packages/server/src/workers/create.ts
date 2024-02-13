@@ -1,4 +1,4 @@
-import { randomString, toMilliseconds } from "@banjoanton/utils";
+import { randomString, toMilliseconds, toSeconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
 import { paramCase } from "change-case";
 import { ResultType } from "model";
@@ -27,22 +27,28 @@ export const createWorker = <T extends object>(
 ) => {
     const { JOB_NAME, QUEUE_NAME, logger } = createMisc(name, "worker");
 
-    const hasQueue = singleton.queues.find(q => q.name === QUEUE_NAME);
+    const currentQueue = singleton.queues.find(q => q.name === QUEUE_NAME);
 
     let queue: Queue<T>;
-    if (hasQueue) {
-        queue = hasQueue;
+    if (currentQueue) {
+        queue = currentQueue;
     } else {
         queue = new Queue<T>(QUEUE_NAME, { ...redisConfig, sharedConnection: true });
         singleton.queues.push(queue);
     }
 
-    const hasWorker = singleton.workers.find(w => w.name === QUEUE_NAME);
+    const currentWorker = singleton.workers.find(w => w.name === QUEUE_NAME);
+
     let worker: Worker<T>;
-    if (hasWorker) {
-        worker = hasWorker;
+    if (currentWorker) {
+        worker = currentWorker;
     } else {
-        worker = new Worker<T>(QUEUE_NAME, processor, { ...redisConfig, autorun: false });
+        worker = new Worker<T>(QUEUE_NAME, processor, {
+            ...redisConfig,
+            autorun: false,
+            removeOnComplete: { age: toSeconds({ days: 7 }) },
+            removeOnFail: { age: toSeconds({ days: 7 }) },
+        });
         singleton.workers.push(worker);
     }
 
