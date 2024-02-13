@@ -14,7 +14,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@banjoanton/utils": "^0.1.44",
+        "@banjoanton/utils": "^0.1.71",
         "@types/express": "^4.17.17",
         "@types/morgan": "^1.9.4",
         "db": "workspace:*",

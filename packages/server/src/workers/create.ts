@@ -71,8 +71,8 @@ export const createWorker = <T extends object>(
             logger.info("Adding job...");
             await queue.add(JOB_NAME, data);
         },
-        repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 5 })) => {
-            logger.info(`Adding repeatable job every ${timeInMs / 1000 / 60} minutes...`);
+        repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 60 })) => {
+            logger.info(`Adding repeatable job every 60 minutes...`);
             // TODO: add try catch with Result return type
             await queue.add(JOB_NAME, data, {
                 repeat: {
