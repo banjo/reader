@@ -1,5 +1,5 @@
 # https://github.com/prisma/prisma/issues/18510#issuecomment-1694748984
-FROM node:18.7-alpine AS base
+FROM node:18.12-alpine AS base
 
 # Use Node.js LTS version
 FROM base AS builder
