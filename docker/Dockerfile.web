@@ -6,8 +6,8 @@ WORKDIR /app
 
 # Copy over the monorepo
 COPY package.json .
-RUN npm add -g pnpm
-RUN npm add -g turbo
+RUN npm add -g pnpm@8.7.4
+RUN npm add -g turbo@1.10.12
 COPY . .
 
 

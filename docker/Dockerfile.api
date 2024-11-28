@@ -6,7 +6,7 @@ FROM base AS builder
 
 WORKDIR /app
 COPY package.json .
-RUN npm add -g turbo
+RUN npm add -g turbo@1.10.12
 
 # Create turbo file
 COPY . .
@@ -19,8 +19,8 @@ RUN apk add --update python3 make g++\
     && rm -rf /var/cache/apk/*
 
 WORKDIR /app
-RUN npm add -g pnpm
-RUN npm add -g turbo
+RUN npm add -g pnpm@8.7.4
+RUN npm add -g turbo@1.10.12
 
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
