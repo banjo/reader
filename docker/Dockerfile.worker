@@ -6,7 +6,7 @@ FROM base AS builder
 
 WORKDIR /app
 COPY package.json .
-RUN npm add -g turbo
+RUN npm add -g turbo@1.10.12
 
 # Create turbo file
 COPY . .
