@@ -2,7 +2,7 @@
     "healthchecks": {
         "web": [
             {
-                "type": "startup",
+                "type": "liveness",
                 "name": "web check",
                 "description": "Checking if the app responds to the healthcheck",
                 "path": "/api/health",
