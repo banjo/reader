@@ -2,11 +2,28 @@
     "healthchecks": {
         "web": [
             {
-                "type": "liveness",
+                "type": "startup",
                 "name": "web check",
                 "description": "Checking if the app responds to the healthcheck",
                 "path": "/api/health",
                 "attempts": 3
+            },
+            {
+                "listening": true,
+                "port": "3003",
+                "attempts": 3,
+                "warn": true,
+                "description": "Checking if the app responds to the healthcheck",
+                "name": "web check",
+                "path": "/api/health",
+                "type": "liveness"
+            },
+            {
+                "listening": true,
+                "name": "port listening check",
+                "port": 3003,
+                "type": "startup",
+                "warn": true
             }
         ]
     },
