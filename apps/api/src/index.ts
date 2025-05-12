@@ -18,6 +18,14 @@ app.use(
         origin: "*",
     })
 );
+
+app.get("/health", c => {
+    return c.json({
+        status: "ok",
+        message: "API is running",
+    });
+});
+
 app.use("*", authMiddleware);
 
 app.route("/feed", feed);
