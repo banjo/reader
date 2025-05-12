@@ -7,13 +7,6 @@
                 "description": "Checking if the app responds to the healthcheck",
                 "path": "/api/health",
                 "attempts": 3
-            },
-            {
-                "listening": true,
-                "name": "port listening check",
-                "port": 3003,
-                "type": "startup",
-                "warn": true
             }
         ]
     },
