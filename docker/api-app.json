@@ -10,7 +10,7 @@
             },
             {
                 "listening": true,
-                "port": "3003",
+                "port": 3003,
                 "attempts": 3,
                 "warn": true,
                 "description": "Checking if the app responds to the healthcheck",
