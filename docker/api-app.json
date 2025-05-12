@@ -2,13 +2,6 @@
     "healthchecks": {
         "web": [
             {
-                "type": "startup",
-                "name": "web check",
-                "description": "Checking if the app responds to the healthcheck",
-                "path": "/api/health",
-                "attempts": 3
-            },
-            {
                 "listening": true,
                 "port": 3003,
                 "attempts": 3,
