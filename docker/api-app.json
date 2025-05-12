@@ -7,6 +7,13 @@
                 "description": "Checking if the app responds to the healthcheck",
                 "path": "/api/health",
                 "attempts": 3
+            },
+            {
+                "type": "liveness",
+                "name": "web liveness check",
+                "description": "Periodically checking if the app is still healthy",
+                "path": "/api/health",
+                "timeout": 5
             }
         ]
     },
