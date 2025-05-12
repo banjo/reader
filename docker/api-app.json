@@ -9,5 +9,8 @@
                 "attempts": 3
             }
         ]
+    },
+    "scripts": {
+        "postdeploy": "echo hello"
     }
 }
