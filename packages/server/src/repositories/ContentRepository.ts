@@ -43,13 +43,24 @@ const updateContentImageStatus = async (
     return Result.ok(content);
 };
 
-const getContentWithoutImage = async (): AsyncResultType<ItemContent[]> => {
+const getContentWithoutImage = async ({
+    cursorId,
+    limit = 200,
+}: {
+    cursorId?: number;
+    limit?: number;
+} = {}): AsyncResultType<ItemContent[]> => {
     let items: ItemContent[];
     try {
         items = await prisma.itemContent.findMany({
             where: {
                 hasFetchedImage: false,
+                ...(cursorId ? { id: { gt: cursorId } } : {}),
             },
+            orderBy: {
+                id: "asc",
+            },
+            take: limit,
         });
 
         return Result.ok(items);
