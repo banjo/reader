@@ -46,8 +46,8 @@ export const createWorker = <T extends object>(
         worker = new Worker<T>(QUEUE_NAME, processor, {
             ...redisConfig,
             autorun: false,
-            removeOnComplete: { age: toSeconds({ days: 7 }) },
-            removeOnFail: { age: toSeconds({ days: 7 }) },
+            removeOnComplete: { age: toSeconds({ hours: 6 }), count: 500 },
+            removeOnFail: { age: toSeconds({ days: 1 }), count: 1_000 },
         });
         singleton.workers.push(worker);
     }
