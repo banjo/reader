@@ -9,10 +9,11 @@ import { feed } from "./routes/feed/routes";
 
 import "dotenv/config";
 
-const app = createHonoInstance().basePath("/api");
+const app = createHonoInstance();
+const api = app.basePath("/api");
 
-app.use("*", logger());
-app.use(
+api.use("*", logger());
+api.use(
     "*",
     cors({
         origin: "*",
@@ -26,11 +27,18 @@ app.get("/health", c => {
     });
 });
 
-app.use("*", authMiddleware);
+api.get("/health", c => {
+    return c.json({
+        status: "ok",
+        message: "API is running",
+    });
+});
 
-app.route("/feed", feed);
-app.route("/item", item);
-app.route("/items", items);
+api.use("*", authMiddleware);
+
+api.route("/feed", feed);
+api.route("/item", item);
+api.route("/items", items);
 
 const PORT = Number(process.env.PORT) || 3003;
 const isProd = process.env.NODE_ENV === "production";
