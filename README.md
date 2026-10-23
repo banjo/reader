@@ -48,6 +48,7 @@ request then runs as that user.
 
 ```bash
 pnpm build                          # Build all apps.
+pnpm typecheck                      # Type check everything.
 pnpm lint:all                       # Lint everything.
 pnpm format                         # Format everything with Prettier.
 pnpm db:reset                       # Recreate the database. This removes all data.

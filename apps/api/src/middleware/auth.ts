@@ -25,7 +25,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
         return;
     }
 
-    const authHeader = c.req.headers.get("Authorization");
+    const authHeader = c.req.header("Authorization");
 
     if (!authHeader) {
         logger.info("No auth header");
@@ -82,7 +82,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
             return new Response("Unauthorized", { status: 401 });
         }
 
-        logger.info("Created user with id: ", user.data.id);
+        logger.info(`Created user with id: ${user.data.id}`);
 
         c.set("userId", user.data.id);
 

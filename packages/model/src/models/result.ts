@@ -2,13 +2,15 @@ import { ZodIssue } from "zod";
 
 export type ErrorType = "NotFound" | "BadRequest" | "Unauthorized" | "Forbidden" | "InternalError";
 
-export const ErrorStatus: Record<ErrorType, number> = {
+export const ErrorStatus = {
     NotFound: 404,
     BadRequest: 400,
     Unauthorized: 401,
     Forbidden: 403,
     InternalError: 500,
-};
+} as const satisfies Record<ErrorType, number>;
+
+export type ErrorStatusCode = (typeof ErrorStatus)[ErrorType];
 
 export type SuccessResult<T> = {
     success: true;
@@ -19,7 +21,7 @@ export type ErrorResult = {
     success: false;
     type: ErrorType;
     message: string;
-    status: number;
+    status: ErrorStatusCode;
 };
 
 export type BadRequestResult = Omit<ErrorResult, "type"> & {

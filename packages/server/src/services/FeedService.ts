@@ -1,4 +1,3 @@
-import { first } from "@banjoanton/utils";
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
 import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
@@ -13,106 +12,6 @@ import { fetchContentWithoutImageWorker, fetchRssFeedWorker } from "../workers";
 import { ParseService } from "./ParseService";
 
 const logger = createLogger("FeedService");
-
-// TODO: add items to users that also follow the feed or do it when they sign in?
-// TODO: better logic for when to scan for new items, within a certain time? or just when they sign in? worker?
-// TODO: update latest fetch and check if it's been a while since last fetch
-const fetchAndUpdateRssFeed = async (
-    internalIdentifier: string,
-    userId: number
-): AsyncResultType<void> => {
-    const isSubscribedResponse = await FeedRepository.isSubscribedToFeed(
-        internalIdentifier,
-        userId
-    );
-
-    if (!isSubscribedResponse.success || isSubscribedResponse.data === false) {
-        logger.error(
-            `user is not subscribed to feed with internal identifier ${internalIdentifier}`
-        );
-        return Result.error("User is not subscribed to feed", "NotFound");
-    }
-
-    const feedContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
-        internalIdentifier
-    );
-
-    if (!feedContentResponse.success) {
-        logger.error(`no feed found in db with internal identifier ${internalIdentifier}`);
-        return Result.error("Feed not found", "NotFound");
-    }
-
-    const currentFeedWithItemsResponse = await FeedRepository.getFeedByInternalIdentifier(
-        internalIdentifier
-    );
-
-    if (currentFeedWithItemsResponse.success) {
-        const currentFeedWithItems = currentFeedWithItemsResponse.data;
-
-        const latestItem = first(currentFeedWithItems.items);
-        const latestContent = first(feedContentResponse.data.contentItems);
-
-        if (latestItem.content.title !== latestContent.title) {
-            logger.info("Content has been updated, updating feed");
-            const content = feedContentResponse.data.contentItems;
-            const items = currentFeedWithItems.items;
-
-            const notAddedContent = content.filter(
-                c => !items.some(item => item.content.title === c.title)
-            );
-
-            const createContentResult = await ItemRepository.createItemsFromContent(
-                notAddedContent,
-                feedContentResponse.data.id,
-                userId
-            );
-
-            if (!createContentResult.success) {
-                logger.error(
-                    `failed to create content for feed with url ${feedContentResponse.data.rssUrl}`
-                );
-                return Result.error("Failed to create content", "InternalError");
-            }
-        }
-    }
-
-    const updatedContent = await ParseService.shouldParseAgain(
-        feedContentResponse.data.contentItems,
-        feedContentResponse.data.rssUrl
-    );
-
-    if (!updatedContent) {
-        logger.info("no need to fetch again");
-        return Result.okEmpty();
-    }
-
-    const createContentResult = await ItemRepository.createContent(
-        updatedContent,
-        feedContentResponse.data.id
-    );
-
-    if (!createContentResult.success) {
-        logger.error(
-            `failed to create content for feed with url ${feedContentResponse.data.rssUrl}`
-        );
-        return Result.error("Failed to create content", "InternalError");
-    }
-
-    const createItemsResult = await ItemRepository.createItemsFromContent(
-        createContentResult.data,
-        feedContentResponse.data.id,
-        userId
-    );
-
-    if (!createItemsResult.success) {
-        logger.error(
-            `failed to create items for user ${userId} with url ${feedContentResponse.data.rssUrl}`
-        );
-        return Result.error("Failed to create content", "InternalError");
-    }
-
-    return Result.okEmpty();
-};
 
 const getUserFeedByInternalIdentifier = async ({
     feedInternalIdentifier,
@@ -380,9 +279,8 @@ const getFeedWithItemsOrContent = async ({
     }
 
     // not subscribed
-    const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
-        internalIdentifier
-    );
+    const feedWithContentResponse =
+        await FeedRepository.getFeedWithContentByInternalIdentifier(internalIdentifier);
 
     if (!feedWithContentResponse.success) {
         return Result.error("Could not get content feed by identifier", "InternalError");
@@ -455,7 +353,6 @@ export const FeedService = {
     unsubscribeFromFeed,
     getFeedWithItemsOrContent,
     subscribeToFeed,
-    fetchAndUpdateRssFeed,
     getFeedItemsCount,
     markAllAsRead,
 };

@@ -8,31 +8,28 @@
         "run": "tsx src/index.ts",
         "dev": "tsx watch src/index.ts",
         "build": "tsup",
+        "lint": "eslint .",
+        "typecheck": "tsc --noEmit",
         "clean": "rimraf node_modules dist"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@banjoanton/utils": "^0.1.71",
-        "@types/express": "^4.17.17",
-        "@types/morgan": "^1.9.4",
+        "@banjoanton/utils": "^1.1.16",
         "db": "workspace:*",
         "firebase-server": "workspace:*",
         "model": "workspace:*",
         "server": "workspace:*",
         "tsconfig": "workspace:*",
-        "tsx": "^3.12.7",
-        "utils": "workspace:*",
-        "vitest": "^0.33.0"
+        "utils": "workspace:*"
     },
     "dependencies": {
-        "@hono/node-server": "^1.1.0",
-        "@hono/zod-validator": "^0.1.3",
-        "dotenv": "^16.3.1",
-        "firebase-admin": "^11.10.1",
-        "hono": "^3.3.4",
-        "svix": "^1.7.0",
-        "zod": "^3.21.4"
+        "@hono/node-server": "^2.1.5",
+        "@hono/zod-validator": "^0.9.1",
+        "dotenv": "^16.6.1",
+        "firebase-admin": "^14.5.0",
+        "hono": "^4.13.13",
+        "zod": "^3.25.76"
     }
 }

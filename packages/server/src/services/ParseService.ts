@@ -50,7 +50,7 @@ const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
     const baseFeed = ParseFeedSchema.safeParse(preparedResult);
 
     if (!baseFeed.success) {
-        logger.error(`Failed to parse feed with url: ${url}`, baseFeed.error.issues);
+        logger.error({ issues: baseFeed.error.issues }, `Failed to parse feed with url: ${url}`);
         return Result.error("Failed to parse feed", "InternalError");
     }
 
@@ -118,7 +118,7 @@ const shouldParseAgain = async (
     const newFeed = await parseRssFeed(url);
 
     if (!newFeed.success) {
-        logger.error(`Failed to parse feed with url: ${url}`, newFeed.message);
+        logger.error(`Failed to parse feed with url: ${url} - ${newFeed.message}`);
         return null;
     }
 

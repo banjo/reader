@@ -167,7 +167,6 @@ feed.post("/add-many", zValidator("json", feedAddManyBodySchema), async c => {
     const userId = c.get("userId");
     const body = c.req.valid("json");
 
-    // eslint-disable-next-line n/no-unsupported-features/es-builtins
     const results = await Promise.allSettled(
         body.urls.map(url => FeedService.addFeed(url, userId))
     );

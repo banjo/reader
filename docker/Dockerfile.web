@@ -1,5 +1,5 @@
 # Use Node.js LTS version
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Create directory for the application
 WORKDIR /app
@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy over the monorepo
 COPY package.json .
 RUN npm add -g pnpm@8.7.4
-RUN npm add -g turbo@1.10.12
+RUN npm add -g turbo@2.11.10
 COPY . .
 
 
@@ -20,7 +20,7 @@ RUN pnpm install
 RUN turbo run build --filter={./apps/web}...
 
 # Production Stage
-FROM node:18-alpine AS production
+FROM node:24-alpine AS production
 
 # Install nginx
 RUN apk add --update nginx

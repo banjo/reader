@@ -52,21 +52,18 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     };
 
     const totalUnread = useMemo(() => {
-        // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
             return acc + feed.totalItemsUnreadCount;
         }, 0);
     }, [data]);
 
     const bookmarksUnread = useMemo(() => {
-        // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
             return acc + feed.bookmarkedItemsUnreadCount;
         }, 0);
     }, [data]);
 
     const favoritesUnread = useMemo(() => {
-        // eslint-disable-next-line unicorn/no-array-reduce
         return data.reduce((acc, feed) => {
             return acc + feed.favoriteItemsUnreadCount;
         }, 0);

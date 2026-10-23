@@ -1,6 +1,6 @@
 import { randomString, toMilliseconds, toSeconds } from "@banjoanton/utils";
 import { Job, Queue, Worker } from "bullmq";
-import { paramCase } from "change-case";
+import { kebabCase } from "change-case";
 import { ResultType } from "model";
 import { createLogger } from "utils";
 import { redisConfig } from "./config";
@@ -8,7 +8,7 @@ import { redisConfig } from "./config";
 type WorkerType = "queue" | "worker";
 
 const createMisc = (name: string, type: WorkerType) => {
-    const formattedName = paramCase(name);
+    const formattedName = kebabCase(name);
     const logger = createLogger(`${type}:create:${formattedName}`);
     const QUEUE_NAME = `${formattedName}-queue`;
     const JOB_NAME = `${formattedName}-job`;
@@ -16,9 +16,14 @@ const createMisc = (name: string, type: WorkerType) => {
     return { logger, QUEUE_NAME, JOB_NAME };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyQueue = Queue<any, any, string>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyWorker = Worker<any, any, string>;
+
 const singleton = {
-    queues: [] as Queue<any>[],
-    workers: [] as Worker<any>[],
+    queues: [] as AnyQueue[],
+    workers: [] as AnyWorker[],
 };
 
 export const createWorker = <T extends object>(
@@ -29,21 +34,21 @@ export const createWorker = <T extends object>(
 
     const currentQueue = singleton.queues.find(q => q.name === QUEUE_NAME);
 
-    let queue: Queue<T>;
+    let queue: Queue<T, void, string, T, void, string>;
     if (currentQueue) {
         queue = currentQueue;
     } else {
-        queue = new Queue<T>(QUEUE_NAME, { ...redisConfig, sharedConnection: true });
+        queue = new Queue<T, void, string, T, void, string>(QUEUE_NAME, redisConfig);
         singleton.queues.push(queue);
     }
 
     const currentWorker = singleton.workers.find(w => w.name === QUEUE_NAME);
 
-    let worker: Worker<T>;
+    let worker: Worker<T, ResultType<void>, string>;
     if (currentWorker) {
         worker = currentWorker;
     } else {
-        worker = new Worker<T>(QUEUE_NAME, processor, {
+        worker = new Worker<T, ResultType<void>, string>(QUEUE_NAME, processor, {
             ...redisConfig,
             autorun: false,
             removeOnComplete: { age: toSeconds({ hours: 6 }), count: 500 },

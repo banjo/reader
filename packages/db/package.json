@@ -16,17 +16,18 @@
         "db:migrate:prod": "pnpm exec prisma migrate deploy",
         "db:generate": "pnpm exec prisma generate",
         "db:push": "pnpm exec prisma db push --skip-generate",
-        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && pnpm run db:generate && pnpm exec prisma db seed"
+        "db:reset": "pnpm exec prisma migrate reset --skip-seed --skip-generate --force && pnpm exec prisma db push && pnpm run db:generate && pnpm exec prisma db seed",
+        "typecheck": "tsc --noEmit"
     },
     "prisma": {
-        "seed": "esno src/seed.ts"
+        "seed": "tsx src/seed.ts"
     },
     "dependencies": {
-        "@prisma/client": "^5.0.0"
+        "@prisma/client": "^6.19.3"
     },
     "devDependencies": {
-        "@types/node": "^18.17.1",
-        "prisma": "^5.0.0",
+        "@types/node": "^24.19.2",
+        "prisma": "^6.19.3",
         "tsconfig": "workspace:*"
     }
 }

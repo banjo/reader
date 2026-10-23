@@ -27,7 +27,6 @@ export const AddFeedNav: FC = () => {
         const updatedUrl = url.startsWith("http") ? url : `https://${url}`;
 
         try {
-            // eslint-disable-next-line n/no-unsupported-features/node-builtins
             new URL(updatedUrl);
         } catch {
             toast.error("Please enter a valid URL");

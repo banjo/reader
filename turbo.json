@@ -1,9 +1,10 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "pipeline": {
+    "tasks": {
         "build": {
             "dependsOn": ["^db:generate"],
             "env": [
+                "NODE_ENV",
                 "DATABASE_URL",
                 "REDIS_HOST",
                 "REDIS_PORT",
@@ -42,6 +43,10 @@
             "cache": false
         },
         "db:push": {
+            "cache": false
+        },
+        "typecheck": {
+            "dependsOn": ["^db:generate"],
             "cache": false
         }
     }

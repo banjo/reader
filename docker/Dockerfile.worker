@@ -1,12 +1,13 @@
 # https://github.com/prisma/prisma/issues/18510#issuecomment-1694748984
-FROM node:18.7-alpine AS base
+FROM node:24-alpine AS base
+RUN apk add --no-cache openssl
 
 # Use Node.js LTS version
 FROM base AS builder
 
 WORKDIR /app
 COPY package.json .
-RUN npm add -g turbo@1.10.12
+RUN npm add -g turbo@2.11.10
 
 # Create turbo file
 COPY . .
@@ -20,7 +21,7 @@ RUN apk add --update python3 make g++\
 
 WORKDIR /app
 RUN npm add -g pnpm@8.7.4
-RUN npm add -g turbo@1.10.12
+RUN npm add -g turbo@2.11.10
 
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
