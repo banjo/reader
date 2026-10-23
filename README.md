@@ -1,80 +1,98 @@
 <p align="center">
-  <img src="apps/web/public/banjoreader.svg" width="96" height="96" alt="Banjoreader logo">
+  <img src="apps/web/public/banjoreader.svg" width="96" height="96" alt="Banjo Reader logo">
 </p>
 
-# banjo-rss
+<h1 align="center">Banjo Reader</h1>
 
-A simple RSS reader.
+<p align="center">
+  A simple RSS reader. Not much more than that, actually.
+</p>
 
-## Database
+## Highlights
 
-```bash
-# use local docker instance (change .env)
-nr db:local:run
+- 📰 Subscribe to a feed by URL, or search the feeds other readers already follow
+- 🔄 Feeds refresh in the background every hour, so new posts are waiting when you open the app
+- 📥 Bring your subscriptions from another reader with an OPML import
+- ⭐️ Favorite and bookmark posts, and find them again in their own lists
+- ✅ Show only unread posts, and mark a whole feed as read in one click
+- 🗂️ Switch between a compact list and cards with images
+- 🔐 Sign in with Google, and your feeds follow you across devices
 
-# see logs
-nr db:local:logs
+## Getting started
 
-# reset database (remove all data)
-nr db:reset
-
-# open prisma studio
-npx prisma studio
-```
-
-## TODO:
-
--   [x] Create user in database on sign up
--   [x] Fix problem with externalId and local id, auth() only contains externalId
--   [x] Add createdAt and updatedAt to all models
--   [x] Add validation and workflow with zod
--   [x] Add logging
--   [ ] Add tests with vitest
--   [x] Make own model separate from database model
--   [x] Add feed image to feed model
--   [x] Add public id for feed model (for url)
--   [x] Do not return result from repository, return result from service?
--   [x] Fetch client side for dynamic data instead (or combo?)
--   [x] fix dark and white mode for table
--   [ ] Add delay for "no items found" box
--   [ ] Add transactions to database
--   [ ] CleanFeedWithItems currently can return items or content as items, should be consistent and type safe in future.
--   [x] Do not need worker url in packages that do not use it 
--   [x] API Urls should be in a separate file
--   [x] Replace ky with something else where headers work
--   [x] Add env example file
--   [ ] Fix why ESM does not work with TSUP in a library?
--   [x] Fix docker cleanup job
--   [x] Fix dockerbuild using turbo
--   [x] Change to postgresql
--   [x] Add logging (axiom?)
--   [x] Do not use api for worker in api, use worker directly
--   [ ] Add request id to logging
--   [ ] Add error handling to repositories
--   [x] Why does not the image worker run?
--   [x] Fix local development without internet
--   [ ] Fix bug with pagination on prod with josh w comaeu double?
--   [ ] Fix bug with import large rss file request takes 60 seconds and time outs
--   [ ] Fix auth 401 things, how to keep it up to date?
--   [x] Mark all as read, not only the ones that are visible
--   [x] When on subscribe, go to start page
--   [ ] Card, no image placeholder
--   [ ] Pagination, current page or amount of pages or something
--   [ ] Fix optimistic updates on favorite and bookmark?
-
-## Build specific app
+You need [Node.js](https://nodejs.org) (see `.nvmrc`), [pnpm](https://pnpm.io), and
+[Docker](https://www.docker.com) for Postgres and Redis:
 
 ```bash
-# build web
-turbo run build --filter={./apps/web}...
+pnpm install
+pnpm db:local:start    # Start Postgres and Redis in Docker.
+pnpm dev               # Run the web app, the API, and the worker.
 ```
 
-## Clean build
+The web app runs on [localhost:3005](http://localhost:3005), the API on port 3003, and the
+worker on port 3001.
 
-```bash 
-nr clean && find . -name '.turbo' | xargs rm -rf && ni && nr build --filter api && node apps/api/dist/index.cjs
+Each app needs a `.env` file. Copy the `.env.example` files in `apps/worker` and `packages/db`,
+and add these to the others:
+
+| File            | Variables                                                                  |
+| --------------- | -------------------------------------------------------------------------- |
+| `apps/web/.env` | `VITE_API_URL` and the `VITE_FIREBASE_*` keys from your Firebase project   |
+| `apps/api/.env` | `DATABASE_URL`, the Redis settings, and `FIREBASE_ADMIN_KEY` (base64 JSON) |
+
+To skip Google sign-in while developing, set `LOCAL_DEVELOPMENT=true` and `DEVELOPMENT_UID` in
+the API, and `VITE_LOCAL_DEVELOPMENT=true` and `VITE_DEVELOPMENT_UID` in the web app. Every
+request then runs as that user.
+
+## Development
+
+```bash
+pnpm build                          # Build all apps.
+pnpm lint:all                       # Lint everything.
+pnpm format                         # Format everything with Prettier.
+pnpm db:reset                       # Recreate the database. This removes all data.
+pnpm db:local:logs                  # Follow the Postgres and Redis logs.
+pnpm --filter db exec prisma studio # Browse the database.
 ```
+
+To build a single app and the packages it depends on:
+
+```bash
+pnpm turbo run build --filter=web...
+```
+
+If a build gets stuck on stale output, start over from a clean slate:
+
+```bash
+pnpm clean && find . -name '.turbo' | xargs rm -rf
+pnpm install && pnpm build
+```
+
+The repository is a [pnpm workspace](https://pnpm.io/workspaces) run with
+[Turborepo](https://turbo.build):
+
+- `apps/web`: React, Vite, Tailwind, TanStack Query, and Firebase Auth
+- `apps/api`: Node.js, Hono, and Zod
+- `apps/worker`: BullMQ jobs that fetch feeds and images, with Bull Board at `/ui`
+- `packages/db`: Prisma and PostgreSQL
+- `packages/server`: Services, repositories, and queues shared by the API and the worker
+- `packages/firebase-server`: Firebase Admin, used to verify sign-ins
+- `packages/model` and `packages/utils`: Shared types, logging, and helpers
+
+## Deployment
+
+The API and the worker are deployed to [CapRover](https://caprover.com) with the Dockerfiles in
+`docker/`:
+
+```bash
+pnpm deploy:api       # Push and deploy the API.
+pnpm deploy:worker    # Push and deploy the worker.
+pnpm logs:api         # Follow the API logs.
+```
+
+In production, logs are sent to [Axiom](https://axiom.co), so the API and the worker also need
+`AXIOM_DATASET` and `AXIOM_TOKEN`.
 
 ## License
 
-Licensed under the [MIT license](https://github.com/shadcn/ui/blob/main/LICENSE.md).
+MIT
