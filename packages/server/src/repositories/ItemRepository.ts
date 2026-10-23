@@ -80,34 +80,49 @@ const getItemById = async (itemId: number): AsyncResultType<ItemWithContent> => 
     return Result.ok(item);
 };
 
-const updateItem = async (id: number, item: ItemWithContent): AsyncResultType<Item> => {
-    let updatedItem: Item;
+export type ItemStatus = {
+    isRead?: boolean;
+    isBookmarked?: boolean;
+    isFavorite?: boolean;
+};
+
+const updateItemStatus = async (
+    id: number,
+    userId: number,
+    status: ItemStatus
+): AsyncResultType<void> => {
+    let count: number;
     try {
-        updatedItem = await prisma.item.update({
+        const result = await prisma.item.updateMany({
             where: {
-                id: id,
+                id,
+                userId,
             },
-            data: {
-                ...item,
-                content: undefined,
-                feed: undefined,
-            },
+            data: status,
         });
+
+        count = result.count;
     } catch (error: unknown) {
         logger.error(`Could not update item with id ${id} - ${error}`);
         return Result.error(`Could not update item with id ${id}`, "InternalError");
     }
 
-    return Result.ok(updatedItem);
+    if (count === 0) {
+        logger.info(`Could not find item with id ${id} for user ${userId}`);
+        return Result.error(`Could not find item with id ${id}`, "NotFound");
+    }
+
+    return Result.okEmpty();
 };
 
-const markItemsAsRead = async (itemIds: number[]): AsyncResultType<void> => {
+const markItemsAsRead = async (itemIds: number[], userId: number): AsyncResultType<void> => {
     try {
         await prisma.item.updateMany({
             where: {
                 id: {
                     in: itemIds,
                 },
+                userId,
             },
             data: {
                 isRead: true,
@@ -269,7 +284,7 @@ export const ItemRepository = {
     createItems,
     createItem,
     createItemsFromContent,
-    updateItem,
+    updateItemStatus,
     removeFeedItemsForUser,
     getAllItemsByUserId,
     createContent,

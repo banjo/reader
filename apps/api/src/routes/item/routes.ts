@@ -8,20 +8,34 @@ export const item = createHonoInstance();
 const logger = createLogger("api:item");
 
 const itemIdSchema = z.object({
-    id: z.string(),
+    id: z
+        .string()
+        .regex(/^\d+$/)
+        .transform(id => Number(id)),
 });
 
-item.put("/:id", zValidator("param", itemIdSchema), async c => {
-    const { id } = c.req.valid("param");
+const itemStatusSchema = z.object({
+    isRead: z.boolean().optional(),
+    isBookmarked: z.boolean().optional(),
+    isFavorite: z.boolean().optional(),
+});
 
-    const body = await c.req.json();
+item.put(
+    "/:id",
+    zValidator("param", itemIdSchema),
+    zValidator("json", itemStatusSchema),
+    async c => {
+        const userId = c.get("userId");
+        const { id } = c.req.valid("param");
+        const status = c.req.valid("json");
 
-    const itemResult = await ItemService.updateItem(body);
+        const itemResult = await ItemService.updateItemStatus(id, userId, status);
 
-    if (!itemResult.success) {
-        logger.error(`Could not update item with internal identifier ${id}`);
-        return c.json(Result.error(itemResult.message, itemResult.type));
+        if (!itemResult.success) {
+            logger.error(`Could not update item with id ${id} for user ${userId}`);
+            return c.json(Result.error(itemResult.message, itemResult.type));
+        }
+
+        return c.json(Result.okEmpty());
     }
-
-    return c.json(Result.okEmpty());
-});
+);

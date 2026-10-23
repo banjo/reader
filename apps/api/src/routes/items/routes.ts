@@ -39,13 +39,14 @@ items.get("/", async c => {
 });
 
 const itemsPostReadSchema = z.object({
-    ids: z.array(z.number()),
+    ids: z.array(z.number().int()).max(500),
 });
 
 items.post("/read", zValidator("json", itemsPostReadSchema), async c => {
-    const body = await c.req.valid("json");
+    const userId = c.get("userId");
+    const body = c.req.valid("json");
 
-    const item = await ItemService.markItemsAsRead(body.ids);
+    const item = await ItemService.markItemsAsRead(body.ids, userId);
 
     if (!item.success) {
         logger.error(`Could not mark items as read`);
