@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="apps/web/public/banjoreader.svg" width="96" height="96" alt="Banjoreader logo">
+</p>
+
 # banjo-rss
 
 A simple RSS reader.
