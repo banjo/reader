@@ -5,17 +5,9 @@ import { TableContainerItems } from "@/components/table/table-container-items";
 import { useFeedFetcher } from "@/features/feed/hooks/use-feed-fetcher";
 import { useMutateFeed } from "@/hooks/backend/mutators/use-mutate-feed";
 import { useTableItemMenu } from "@/hooks/shared/use-table-item-menu";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
-export const FeedContainer = () => {
-    const { slug } = useParams();
-    const redirect = useNavigate();
-
-    if (!slug) {
-        redirect("/");
-        return null;
-    }
-
+const FeedContent = ({ slug }: { slug: string }) => {
     const { data, isLoading, filter, paginate } = useFeedFetcher(slug);
     const { menuOptionsItems } = useTableItemMenu();
     const { unsubscribe } = useMutateFeed();
@@ -59,4 +51,14 @@ export const FeedContainer = () => {
             )}
         </div>
     );
+};
+
+export const FeedContainer = () => {
+    const { slug } = useParams();
+
+    if (!slug) {
+        return <Navigate to="/" />;
+    }
+
+    return <FeedContent slug={slug} />;
 };
