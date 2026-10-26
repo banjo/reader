@@ -5,7 +5,6 @@ const parseItemToCreateContent = (item: ParseItem): Prisma.ItemContentCreateMany
     return {
         content: item.contentSnippet ?? item.content,
         description: item.description ?? item.contentSnippet,
-        htmlContent: item.content,
         imageUrl: null,
         link: item.link,
         lastFetch: new Date(),

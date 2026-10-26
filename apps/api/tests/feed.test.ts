@@ -75,7 +75,6 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
                     link: `https://shared.test/${index}`,
                     lastFetch: new Date(),
                     pubDate: new Date(),
-                    htmlContent: "<p>Full HTML must not be loaded for counts or subscriptions</p>",
                 },
             })
         )

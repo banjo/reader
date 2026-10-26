@@ -58,7 +58,6 @@ model ItemContent {
   description     String?  @db.Text
   link            String
   content         String?  @db.Text
-  htmlContent     String?  @db.Text
   lastFetch       DateTime
   pubDate         DateTime
 

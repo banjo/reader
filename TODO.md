@@ -156,13 +156,14 @@ several MB. The full HTML is also stored in Postgres for every post.
 
 **Fix**
 
-- [ ] Use `select` on `content` in the item and feed queries to return only `id`, `title`,
+- [x] Use `select` on `content` in the item and feed queries to return only `id`, `title`,
       `description`, `content`, `link`, `imageUrl`, and `pubDate`, or use Prisma 6's
-      `omit: { htmlContent: true }`.
-- [ ] Decide whether to keep storing `htmlContent` at all. If it's for a future reader view,
+      `omit: { htmlContent: true }`. Not needed: the column is dropped below.
+- [x] Decide whether to keep storing `htmlContent` at all. If it's for a future reader view,
       keep it but never send it in lists. If not, stop saving it and drop the column.
-- [ ] Consider truncating `content` and `description` to a few hundred characters when
-      saving, since they're only shown as a preview.
+      Decided to stop saving it and drop the column.
+- [x] Consider truncating `content` and `description` to a few hundred characters when
+      saving, since they're only shown as a preview. Decided to keep storing them in full.
 
 ## 6. Make the hourly feed refresh cheap
 
