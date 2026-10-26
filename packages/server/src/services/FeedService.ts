@@ -1,9 +1,9 @@
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { AsyncResultType, Filter, Pagination, ResultType } from "model";
+import { AsyncResultType, Filter, Pagination, ResultType, SearchFeed } from "model";
 import { Result, createLogger } from "utils";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
-import { FeedMapper, SearchFeed } from "../mappers/FeedMapper";
+import { FeedMapper } from "../mappers/FeedMapper";
 import {
     FeedItemsCountOptions,
     FeedRepository,
@@ -105,19 +105,15 @@ const addFeed = async (
     }
 };
 
-const searchFeeds = async (query: string, userId?: number): AsyncResultType<SearchFeed[]> => {
-    const feedsResponse = await FeedRepository.searchFeeds(query);
+const searchFeeds = async (query: string, userId: number): AsyncResultType<SearchFeed[]> => {
+    const feedsResponse = await FeedRepository.searchFeeds({ query, userId });
 
     if (!feedsResponse.success) {
-        logger.error(`no feeds found in db for query ${query}`);
-        return Result.error("No feeds found", "NotFound");
+        logger.error(`Could not search feeds for query ${query} - ${feedsResponse.message}`);
+        return Result.error("Could not search feeds", "InternalError");
     }
 
-    const feedsNotConnectedToUser = feedsResponse.data.filter(feed => {
-        return feed.users.every(user => user.id !== userId);
-    });
-
-    return Result.ok(feedsNotConnectedToUser.map(feed => FeedMapper.feedToSearchFeed(feed)));
+    return Result.ok(feedsResponse.data);
 };
 
 const unsubscribeFromFeed = async (

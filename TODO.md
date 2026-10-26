@@ -243,16 +243,19 @@ either: `addFeed` returns `Result.error` instead of throwing, so every promise i
 
 ## 9. Smaller cleanups
 
-- [ ] **Search:** `FeedRepository.searchFeeds` is case-sensitive, has no limit, and loads every
-      follower of every match only to filter them in JavaScript. Use
-      `mode: "insensitive"`, `take: 20`, `users: { none: { id: userId } }` in the `where`,
-      and `select` only the fields `SearchFeed` needs.
-- [ ] **Queues in the API:** `createWorker` builds a BullMQ `Worker` right away, so the API
-      also opens worker Redis connections that are never used. Create the `Worker` lazily in
-      `start()`, so the API only creates `Queue`s.
-- [ ] **Dead code:** `FeedService.fetchAndUpdateRssFeed` is already removed (in the dependency
-      upgrade). Run `pnpm knip` to find others (`getFeedById`, `getAllItemsByFeed`,
-      `createItem` look unused).
+- [x] **Search:** make it case-insensitive with `mode: "insensitive"`, cap it at 20 results,
+      exclude followed feeds with `users: { none: { id: userId } }`, and select only the
+      fields `SearchFeed` needs. Reject blank or over-100-character queries. Move the shared
+      `SearchFeed` type to `model` and encode the browser query string.
+- [x] **Queues in the API:** create the BullMQ `Worker` lazily in `start()` so API processes
+      only create `Queue`s. Repeated starts reuse one worker, and closing an unused factory
+      does not create a worker.
+- [x] **Dead code:** audit with `pnpm knip`. Remove the unused server helpers `getFeedById`,
+      `getAllItemsByFeed`, `createItem`, `createItems`, `createContent`,
+      `createItemsFromContent`, `createFeed`, `checkIfFeedIsAssignedToUser`, and the unused
+      `FeedWithUsers`/`FeedWithUsersAndItems` types. Remaining Knip findings include
+      intentional component-library exports, test entrypoints, and dependency entries that
+      need a separate audit before removal.
 
 ## Other open items
 

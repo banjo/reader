@@ -34,3 +34,7 @@ The integration suite also checks image recovery, retry exhaustion, a real 10-se
 timeout, five concurrent image requests, and retry options on scheduled RSS jobs. Failed
 temporary image lookups stay unchecked for the next hourly scan; successful pages without
 an image are marked checked. Permanent HTTP/format failures are not retried immediately.
+
+`worker-lifecycle.test.ts` checks that a worker factory opens only its queue until `start()`
+is called, that repeated starts share one worker, and that closing a queue-only instance
+never creates a worker. It needs Redis but no database.

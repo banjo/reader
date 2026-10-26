@@ -1,28 +1,9 @@
-import { Item, ItemContent, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
+import { ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
 import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
 import { getFilterWhere, getPagination, itemOrderBy } from "../shared/lib/utils";
 
 const logger = createLogger("ItemRepository");
-
-const getAllItemsByFeed = async (feedId: number): AsyncResultType<ItemWithContent[]> => {
-    let items: ItemWithContent[];
-    try {
-        items = await prisma.item.findMany({
-            where: {
-                feedId: feedId,
-            },
-            include: {
-                content: true,
-            },
-        });
-    } catch (error: unknown) {
-        logger.error(`Could not find items for feed with id ${feedId} - ${error}`);
-        return Result.error(`Could not find items for feed with id ${feedId}`, "InternalError");
-    }
-
-    return Result.ok(items);
-};
 
 const getAllItemsByUserId = async (
     userId: number,
@@ -132,13 +113,6 @@ const markItemsAsRead = async (itemIds: number[], userId: number): AsyncResultTy
     return Result.okEmpty();
 };
 
-type CreateItemProps = {
-    item: Prisma.ItemCreateManyInput;
-    contentId: number;
-    feedId: number;
-    userId: number;
-};
-
 type AssignFeedItemsToUserProps = {
     feedId: number;
     userId: number;
@@ -195,38 +169,6 @@ const assignFeedItemsToUser = async ({
     return Result.okEmpty();
 };
 
-// TODO: update create item to accomodate for content
-const createItem = async ({ item }: CreateItemProps): AsyncResultType<Item> => {
-    try {
-        const createdItem = await prisma.item.create({
-            data: item,
-        });
-
-        return Result.ok(createdItem);
-    } catch (error: unknown) {
-        logger.error(`Could not create item - ${error}`);
-        return Result.error(`Could not create item`, "InternalError");
-    }
-};
-
-const createItems = async (items: Prisma.ItemCreateManyInput[]) => {
-    try {
-        const createdItems = await prisma.item.createMany({
-            data: items,
-        });
-
-        if (createdItems.count !== items.length) {
-            logger.error(`Could not create all items`);
-            return Result.error(`Could not create all items`, "InternalError");
-        }
-
-        return Result.okEmpty();
-    } catch (error: unknown) {
-        logger.error(`Could not create items - ${error}`);
-        return Result.error(`Could not create items`, "InternalError");
-    }
-};
-
 const insertContent = (content: Prisma.ItemContentCreateManyFeedInput[], feedId: number) =>
     prisma.itemContent.createMany({
         data: content.map(itemContent => ({ ...itemContent, feedId })),
@@ -247,55 +189,6 @@ const createContentIds = async (
     } catch (error: unknown) {
         logger.error(`Could not create content for feed ${feedId} - ${error}`);
         return Result.error("Could not create content", "InternalError");
-    }
-};
-
-const createContent = async (
-    content: Prisma.ItemContentCreateManyFeedInput[],
-    feedId: number
-): AsyncResultType<ItemContent[]> => {
-    try {
-        await insertContent(content, feedId);
-
-        // Include existing posts too; createMany skips duplicate feed/link pairs.
-        const createdContent = await prisma.itemContent.findMany({
-            where: {
-                feedId,
-                link: {
-                    in: content.map(itemContent => itemContent.link),
-                },
-            },
-        });
-
-        return Result.ok(createdContent);
-    } catch (error: unknown) {
-        logger.error(`Could not create content - ${error}`);
-        return Result.error(`Could not create content`, "InternalError");
-    }
-};
-
-const createItemsFromContent = async (
-    content: ItemContent[],
-    feedId: number,
-    userId: number
-): AsyncResultType<void> => {
-    try {
-        await prisma.item.createMany({
-            data: content.map(itemContent => ({
-                contentId: itemContent.id,
-                feedId,
-                userId,
-                isBookmarked: false,
-                isRead: false,
-                isFavorite: false,
-            })),
-            skipDuplicates: true,
-        });
-
-        return Result.okEmpty();
-    } catch (error: unknown) {
-        logger.error(`Could not create items - ${error}`);
-        return Result.error(`Could not create items`, "InternalError");
     }
 };
 
@@ -336,16 +229,11 @@ const getItemCount = async (userId: number, filter: Filter): AsyncResultType<num
 export const ItemRepository = {
     assignContentToFollowers,
     assignFeedItemsToUser,
-    getAllItemsByFeed,
     getItemById,
     markItemsAsRead,
-    createItems,
-    createItem,
-    createItemsFromContent,
     updateItemStatus,
     removeFeedItemsForUser,
     getAllItemsByUserId,
-    createContent,
     createContentIds,
     getItemCount,
 };

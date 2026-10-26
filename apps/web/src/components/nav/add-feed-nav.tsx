@@ -4,7 +4,7 @@ import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
 import { avatarUrl } from "@/lib/utils";
-import { SearchFeed } from "@/models/server";
+import type { SearchFeed } from "model";
 import { useGlobalLoadingStore } from "@/stores/use-global-loading-store";
 import { FC, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -52,7 +52,7 @@ export const AddFeedNav: FC = () => {
     };
 
     const loadResults = async (query: string) => {
-        const res = await api.GET<SearchFeed[]>(`/feed/search?query=${query}`);
+        const res = await api.GET<SearchFeed[]>(`/feed/search?query=${encodeURIComponent(query)}`);
 
         if (!res.success) {
             toast.error("Failed to search for feed");

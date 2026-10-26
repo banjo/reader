@@ -1,4 +1,4 @@
-import { Feed, Item, ItemContent, User } from "@prisma/client";
+import { Feed, Item, ItemContent } from "@prisma/client";
 
 export type ItemWithContent = Item & {
     content: ItemContent;
@@ -11,12 +11,6 @@ export type ItemWithContentAndFeed = ItemWithContent & {
 export type FeedWithItems = Feed & {
     items: ItemWithContent[];
 };
-
-export type FeedWithUsers = Feed & {
-    users: User[];
-};
-
-export type FeedWithUsersAndItems = FeedWithUsers & FeedWithItems;
 
 export type FeedWithContent = Feed & {
     contentItems: ItemContent[];

@@ -73,7 +73,7 @@ feed.post("/mark-all-as-read", zValidator("json", feedMarkAllAsReadSchema), asyn
 });
 
 const feedSearchQuerySchema = z.object({
-    query: z.string(),
+    query: z.string().trim().min(1).max(100),
 });
 
 feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {

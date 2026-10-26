@@ -5,7 +5,7 @@ type SelectNewFeedItemsProps = {
     currentLinks: Set<string>;
 };
 
-export const initialFeedItemLimit = 200;
+const initialFeedItemLimit = 200;
 
 const newestFirst = (items: ParseItem[]) =>
     [...items].sort(

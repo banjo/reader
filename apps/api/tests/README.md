@@ -9,7 +9,9 @@ TEST_DATABASE_URL='postgresql://localhost:5432/test' \
 
 The tests create an isolated schema, apply the existing migrations, and drop that schema
 afterward. Without `TEST_DATABASE_URL`, the database tests are skipped. They do not use the
-database URL from `.env`.
+database URL from `.env`. The feed suite also covers case-insensitive search, its 20-result
+cap, the subscribed-feed exclusion, selected fields only, and rejected blank or oversized
+queries.
 
 Background imports also use Redis from `docker/docker-compose.yml`. For the isolated local
 Compose project used during browser testing:

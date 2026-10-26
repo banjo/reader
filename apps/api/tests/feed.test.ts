@@ -337,4 +337,63 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
             assert.equal(await prisma.item.count({ where: { userId: thirdUser.id } }), 5);
         }
     );
+
+    await t.test("search is case-insensitive, capped, and excludes subscribed feeds", async () => {
+        signedInUserId = firstUser.id;
+        await prisma.feed.createMany({
+            data: Array.from({ length: 25 }, (_, index) => ({
+                name: `Needle ${String(index).padStart(2, "0")}`,
+                url: `https://needle-${index}.test`,
+                rssUrl: `https://needle-${index}.test/rss`,
+            })),
+        });
+        const followedMatch = await prisma.feed.create({
+            data: {
+                name: "NEEDLE followed",
+                url: "https://followed-needle.test",
+                rssUrl: "https://followed-needle.test/rss",
+                users: { connect: { id: firstUser.id } },
+            },
+        });
+        await prisma.feed.create({
+            data: {
+                name: "Unrelated",
+                description: "A desc-only-needle result",
+                url: "https://description.test",
+                rssUrl: "https://description.test/rss",
+            },
+        });
+
+        const response = await app.request("/feed/search?query=nEeDlE");
+        assert.equal(response.status, 200);
+        const result = await response.json();
+        assert.equal(result.success, true);
+        assert.equal(result.data.length, 20);
+        assert.ok(result.data.every((feed: { name: string }) => feed.name.startsWith("Needle ")));
+        assert.ok(
+            result.data.every(
+                (feed: { internalIdentifier: string }) =>
+                    feed.internalIdentifier !== followedMatch.internalIdentifier
+            )
+        );
+        assert.deepEqual(Object.keys(result.data[0]).sort(), [
+            "description",
+            "imageUrl",
+            "internalIdentifier",
+            "name",
+            "rssUrl",
+            "url",
+        ]);
+
+        const described = await app.request("/feed/search?query=DESC-ONLY-NEEDLE");
+        assert.deepEqual(
+            (await described.json()).data.map((feed: { name: string }) => feed.name),
+            ["Unrelated"]
+        );
+        assert.equal((await app.request("/feed/search?query=description.test")).status, 200);
+        assert.equal((await app.request(`/feed/search?query=${"x".repeat(101)}`)).status, 400);
+        for (const query of ["", "%20%20"]) {
+            assert.equal((await app.request(`/feed/search?query=${query}`)).status, 400);
+        }
+    });
 });

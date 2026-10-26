@@ -1,4 +1,3 @@
-// copy of server models without having to import the whole server
 export type SearchFeed = {
     description: string | null;
     imageUrl: string | null;
@@ -7,3 +6,5 @@ export type SearchFeed = {
     url: string;
     internalIdentifier: string;
 };
+
+export const feedSearchLimit = 20;

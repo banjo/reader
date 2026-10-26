@@ -30,6 +30,7 @@ type AnyWorker = Worker<any, any, string>;
 const singleton = {
     queues: [] as AnyQueue[],
     workers: [] as AnyWorker[],
+    startedWorkers: new WeakSet<AnyWorker>(),
 };
 
 export const createWorker = <T extends object>(
@@ -52,13 +53,17 @@ export const createWorker = <T extends object>(
         singleton.queues.push(queue);
     }
 
-    const currentWorker = singleton.workers.find(w => w.name === QUEUE_NAME);
+    const getWorker = () =>
+        singleton.workers.find(worker => worker.name === QUEUE_NAME) as
+            Worker<T, ResultType<void>, string> | undefined;
 
-    let worker: Worker<T, ResultType<void>, string>;
-    if (currentWorker) {
-        worker = currentWorker;
-    } else {
-        worker = new Worker<T, ResultType<void>, string>(QUEUE_NAME, processor, {
+    const createAndStartWorker = () => {
+        const currentWorker = getWorker();
+        if (currentWorker) {
+            return currentWorker;
+        }
+
+        const worker = new Worker<T, ResultType<void>, string>(QUEUE_NAME, processor, {
             ...redisConfig,
             autorun: false,
             concurrency: options.concurrency ?? 1,
@@ -75,7 +80,9 @@ export const createWorker = <T extends object>(
             });
         }
         singleton.workers.push(worker);
-    }
+        logger.info(`Created worker ${QUEUE_NAME}`);
+        return worker;
+    };
 
     logger.info(
         // @ts-ignore
@@ -95,7 +102,12 @@ export const createWorker = <T extends object>(
     const wrapper = {
         start: () => {
             logger.info("Starting...");
-            setTimeout(() => worker.run());
+            const worker = createAndStartWorker();
+            if (!singleton.startedWorkers.has(worker)) {
+                singleton.startedWorkers.add(worker);
+                setTimeout(() => void worker.run());
+            }
+            return worker;
         },
         add: async (data: T, jobOptions?: JobsOptions) => {
             logger.info("Adding job...");
@@ -119,6 +131,7 @@ export const createWorker = <T extends object>(
             return await queue.getActiveCount();
         },
         getQueue: () => queue,
+        getWorker,
         clear: async () => {
             logger.info(`Clearing ${QUEUE_NAME} queue...`);
             await queue.obliterate();
@@ -132,7 +145,7 @@ export const createWorker = <T extends object>(
         close: async () => {
             logger.info("Closing...");
             await queue.close();
-            await worker.close();
+            await getWorker()?.close();
         },
     };
 
