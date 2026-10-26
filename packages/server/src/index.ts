@@ -7,6 +7,7 @@ export * from "./repositories/FeedRepository";
 export * from "./repositories/ItemRepository";
 export * from "./repositories/UserRepository";
 export * from "./services/FeedService";
+export * from "./services/FeedImportService";
 export * from "./services/ItemService";
 export * from "./services/ParseService";
 export * from "./services/UserService";

@@ -32,6 +32,40 @@ type FeedForRefresh = {
     contentItems: { link: string }[];
 };
 
+type SaveSubscriptionProps = {
+    rssUrl: string;
+    userId: number;
+    feed?: Prisma.FeedCreateManyInput;
+    content?: Prisma.ItemContentCreateManyFeedInput[];
+};
+
+const saveSubscription = async ({ rssUrl, userId, feed, content = [] }: SaveSubscriptionProps) => {
+    return prisma.$transaction(async tx => {
+        const created = feed
+            ? await tx.feed.createMany({ data: [feed], skipDuplicates: true })
+            : undefined;
+        const saved = await tx.feed.findUniqueOrThrow({ where: { rssUrl }, select: { id: true } });
+        await tx.feed.update({
+            where: { id: saved.id },
+            data: { users: { connect: { id: userId } } },
+        });
+        if (created?.count) {
+            await tx.itemContent.createMany({
+                data: content.map(item => ({ ...item, feedId: saved.id })),
+                skipDuplicates: true,
+            });
+        }
+        await tx.$executeRaw`
+            INSERT INTO "Item" ("updatedAt", "feedId", "userId", "contentId")
+            SELECT CURRENT_TIMESTAMP, ${saved.id}, ${userId}, "id"
+            FROM "ItemContent"
+            WHERE "feedId" = ${saved.id}
+            ON CONFLICT ("userId", "contentId") DO NOTHING
+        `;
+        return saved.id;
+    });
+};
+
 const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItemCounts[]> => {
     const [feeds, counts] = await Promise.all([
         prisma.feed.findMany({
@@ -423,6 +457,7 @@ const markAllAsRead = async (feedId: number, userId: number): AsyncResultType<vo
 };
 
 export const FeedRepository = {
+    saveSubscription,
     getAllFeedsByUserId,
     getFeedById,
     getFeedForRefresh,

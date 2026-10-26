@@ -1,8 +1,9 @@
 import { createHonoInstance } from "@app/instance";
 import { parseFilters, parsePagination } from "@app/utils";
 import { zValidator } from "@hono/zod-validator";
-import { PaginationResponse } from "model";
-import { FeedService } from "server";
+import { feedImportLimit, PaginationResponse } from "model";
+import { FeedImportService, FeedService } from "server";
+import { bodyLimit } from "hono/body-limit";
 import { Result, createLogger } from "utils";
 import { z } from "zod";
 
@@ -161,31 +162,45 @@ feed.post("/:internalIdentifier/subscribe", async c => {
 });
 
 const feedAddManyBodySchema = z.object({
-    urls: z.string().array(),
+    urls: z
+        .array(
+            z
+                .string()
+                .trim()
+                .max(2_048)
+                .url()
+                .refine(url => /^https?:\/\//i.test(url))
+        )
+        .min(1)
+        .max(feedImportLimit),
 });
 
-feed.post("/add-many", zValidator("json", feedAddManyBodySchema), async c => {
-    const userId = c.get("userId");
-    const body = c.req.valid("json");
+feed.post(
+    "/add-many",
+    bodyLimit({ maxSize: 3 * 1024 * 1024 }),
+    zValidator("json", feedAddManyBodySchema),
+    async c => {
+        const userId = c.get("userId");
+        const body = c.req.valid("json");
 
-    const results = await Promise.allSettled(
-        body.urls.map(url => FeedService.addFeed(url, userId))
-    );
+        const result = await FeedImportService.enqueue({ urls: body.urls, userId });
+        if (!result.success) {
+            return c.json(result, result.status);
+        }
+        return c.json(result, 202);
+    }
+);
 
-    const total = results.length;
-    const success = results.filter(result => result.status === "fulfilled").length;
-
-    const errors = results
-        .filter(result => result.status === "rejected")
-        .map(r => {
-            const result = r as PromiseRejectedResult;
-
-            return {
-                url: result.reason.url,
-                message: result.reason.message,
-                type: result.reason.type,
-            };
-        });
-
-    return c.json(Result.ok({ total, success, errors }));
-});
+feed.get(
+    "/imports/:importId",
+    zValidator("param", z.object({ importId: z.string().uuid() })),
+    async c => {
+        const { importId } = c.req.valid("param");
+        const result = await FeedImportService.getStatus({ importId, userId: c.get("userId") });
+        c.header("Cache-Control", "no-store");
+        if (!result.success) {
+            return c.json(result, result.status);
+        }
+        return c.json(result);
+    }
+);

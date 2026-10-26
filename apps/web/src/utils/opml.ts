@@ -3,6 +3,9 @@ import { isDefined } from "@banjoanton/utils";
 
 export const parseOpmlRssSubscriptions = async (file: File): Promise<string[]> => {
     const xml = await parseXml(file);
+    if (xml.querySelector("parsererror")) {
+        throw new Error("Invalid OPML XML");
+    }
     const body = xml.querySelector("body");
     const outlines = body?.querySelectorAll("outline");
     const feeds = Array.from(outlines || []);

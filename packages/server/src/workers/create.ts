@@ -6,9 +6,11 @@ import { createLogger } from "utils";
 import { redisConfig } from "./config";
 
 type WorkerType = "queue" | "worker";
-type WorkerOptions = {
+type WorkerOptions<T> = {
     concurrency?: number;
     jobOptions?: Pick<JobsOptions, "attempts" | "backoff">;
+    repeatJobId?: (data: T) => string;
+    onFailed?: (job: Job<T> | undefined, error: Error) => Promise<void>;
 };
 
 const createMisc = (name: string, type: WorkerType) => {
@@ -33,7 +35,7 @@ const singleton = {
 export const createWorker = <T extends object>(
     name: string,
     processor: (job: Job<T>) => Promise<ResultType<void>>,
-    options: WorkerOptions = {}
+    options: WorkerOptions<T> = {}
 ) => {
     const { JOB_NAME, QUEUE_NAME, logger } = createMisc(name, "worker");
 
@@ -63,6 +65,15 @@ export const createWorker = <T extends object>(
             removeOnComplete: { age: toSeconds({ hours: 6 }), count: 500 },
             removeOnFail: { age: toSeconds({ days: 1 }), count: 1_000 },
         });
+        if (options.onFailed) {
+            worker.on("failed", (job, error) => {
+                void options
+                    .onFailed?.(job, error)
+                    .catch(failure =>
+                        logger.error({ err: failure }, "Could not record job failure")
+                    );
+            });
+        }
         singleton.workers.push(worker);
     }
 
@@ -86,9 +97,9 @@ export const createWorker = <T extends object>(
             logger.info("Starting...");
             setTimeout(() => worker.run());
         },
-        add: async (data: T) => {
+        add: async (data: T, jobOptions?: JobsOptions) => {
             logger.info("Adding job...");
-            await queue.add(JOB_NAME, data);
+            await queue.add(JOB_NAME, data, jobOptions);
         },
         repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 60 })) => {
             logger.info(`Adding repeatable job every 60 minutes...`);
@@ -99,7 +110,7 @@ export const createWorker = <T extends object>(
                     every: timeInMs,
                     immediately: true,
                 },
-                jobId: `${JOB_NAME}-${randomString()}`,
+                jobId: options.repeatJobId?.(data) ?? `${JOB_NAME}-${randomString()}`,
             });
         },
         stopRepeatable,

@@ -5,7 +5,7 @@ const parseFeedToCreateFeed = (
     feed: ParseFeed,
     rssUrl: string,
     faviconUrl?: string
-): Prisma.FeedCreateInput => {
+): Prisma.FeedCreateManyInput => {
     return {
         description: feed.description,
         rssUrl: rssUrl,

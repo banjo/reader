@@ -75,4 +75,5 @@ const processor = async (job: Job<FetchJobData>) => {
 export const fetchRssFeedWorker = () =>
     createWorker<FetchJobData>("fetchRssFeedWorker", processor, {
         jobOptions: externalRequestRetry,
+        repeatJobId: ({ feedId }) => `feed-${feedId}`,
     });

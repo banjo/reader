@@ -10,6 +10,7 @@ import {
     addToUsersWorker,
     fetchContentWithoutImageWorker,
     fetchRssFeedWorker,
+    importFeedsWorker,
 } from "server";
 import { Result, createLogger } from "utils";
 import { start } from "./worker";
@@ -30,6 +31,7 @@ const run = async () => {
             new BullMQAdapter(addToUsersWorker().getQueue()),
             new BullMQAdapter(fetchContentWithoutImageWorker().getQueue()),
             new BullMQAdapter(addImageWorker().getQueue()),
+            new BullMQAdapter(importFeedsWorker().getQueue()),
         ],
         serverAdapter,
     });

@@ -230,15 +230,16 @@ either: `addFeed` returns `Result.error` instead of throwing, so every promise i
 
 **Fix**
 
-- [ ] Add an `import-feeds` queue. The endpoint adds one job per URL (or one job with all URLs)
-      and returns at once with the number queued.
-- [ ] Run the jobs with limited concurrency (for example 5). Rely on BullMQ retries for
-      network errors.
-- [ ] Check `result.success` from `addFeed` and record failures, so the web app can show which
-      feeds failed. A simple version: the web app shows "Importing N feeds" and the sidebar
-      fills in as feeds arrive.
-- [ ] Wrap `addFeed` in a transaction so a failure halfway doesn't leave a feed with no
-      posts.
+- [x] Add an `import-feeds` queue. The endpoint adds one job per unique URL and returns HTTP
+      202 with an import ID and the number queued. Validate 1–1,000 HTTP(S) URLs per import.
+- [x] Run five jobs concurrently. Use three BullMQ attempts for temporary failures, without
+      nesting request-level retries; permanent failures stop immediately.
+- [x] Check `result.success` from `addFeed` and record per-URL results in Redis for seven
+      days. A user-scoped status endpoint supports progress polling, failed URL details, and
+      progress recovery after a page reload. Refresh the sidebar as feeds arrive.
+- [x] Save feed, initial posts, subscription, and user items in one database transaction.
+      Keep network requests outside it. Concurrent imports and retries preserve existing
+      statuses, reuse one refresh schedule per feed, and deduplicate pending image scans.
 
 ## 9. Smaller cleanups
 

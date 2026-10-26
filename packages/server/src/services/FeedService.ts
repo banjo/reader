@@ -1,5 +1,5 @@
 import { CleanFeedWithContent, CleanFeedWithItems } from "db";
-import { AsyncResultType, Filter, Pagination } from "model";
+import { AsyncResultType, Filter, Pagination, ResultType } from "model";
 import { Result, createLogger } from "utils";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
@@ -56,111 +56,53 @@ const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItem
 type AddFeedResponse = {
     feedId: number;
 };
+type AddFeedOptions = { requestAttempts?: number; scheduleExisting?: boolean };
 
-const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedResponse> => {
-    // TODO: add transactions in db
-    const existingFeed = await FeedRepository.getFeedByRssUrl(rssUrl);
-
-    if (existingFeed.success) {
-        logger.info("feed already exists in db, adding to user's feeds");
-        const id = existingFeed.data.id;
-
-        const feedAssignedToUserResult = await FeedRepository.checkIfFeedIsAssignedToUser(
-            id,
-            userId
-        );
-
-        if (!feedAssignedToUserResult.success) {
-            logger.info(
-                `Something went wrong with checking if feed ${id} was assigned to user ${userId}`
+const addFeed = async (
+    rssUrl: string,
+    userId: number,
+    { requestAttempts, scheduleExisting = false }: AddFeedOptions = {}
+): Promise<ResultType<AddFeedResponse> & { retryable?: boolean }> => {
+    try {
+        const existingFeed = await FeedRepository.getFeedByRssUrl(rssUrl);
+        let feedId: number;
+        if (existingFeed.success) {
+            feedId = await FeedRepository.saveSubscription({ rssUrl, userId });
+            if (!scheduleExisting) {
+                return Result.ok({ feedId });
+            }
+        } else {
+            const parseResult = await ParseService.parseRssFeed(rssUrl, {
+                attempts: requestAttempts,
+            });
+            if (!parseResult.success) {
+                return parseResult;
+            }
+            const faviconResult = await ParseService.parseFavicon(parseResult.data.link, {
+                attempts: requestAttempts,
+            });
+            const faviconUrl = faviconResult.success ? faviconResult.data : undefined;
+            const feed = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl, faviconUrl);
+            const content = FeedRefresh.selectInitialFeedItems(parseResult.data.items).map(
+                ContentMapper.parseItemToCreateContent
             );
-            return Result.error("Failed to add feed to user", "InternalError");
+            feedId = await FeedRepository.saveSubscription({ rssUrl, userId, feed, content });
         }
 
-        if (feedAssignedToUserResult.data) {
-            // TODO: update feed items
-            logger.info(`feed ${id} already assigned to user ${userId}`);
-            return Result.ok({ feedId: id });
-        }
-
-        const addFeedToUserResult = await FeedRepository.addFeedToUser(id, userId);
-
-        if (!addFeedToUserResult.success) {
-            logger.error("failed to add feed to user");
-            return Result.error("Failed to add feed to user", "InternalError");
-        }
-
-        // TODO: update feed items with new scan
-        const assignFeedItemsToUserResult = await ItemRepository.assignFeedItemsToUser({
-            feedId: id,
-            userId,
-        });
-
-        if (!assignFeedItemsToUserResult.success) {
-            logger.error("failed to add items to feed");
-            return Result.error("Failed to add items to feed", "InternalError");
-        }
-
-        return Result.ok({ feedId: id });
+        // Retrying after a queue failure is safe: the database writes and schedule are idempotent.
+        await fetchRssFeedWorker().repeatable({ feedId });
+        await fetchContentWithoutImageWorker().add(
+            {},
+            { deduplication: { id: "feed-import-image-scan" } }
+        );
+        return Result.ok({ feedId });
+    } catch (error) {
+        logger.error({ err: error, rssUrl, userId }, "Failed to save feed subscription");
+        return {
+            ...Result.error<AddFeedResponse>("Failed to save feed subscription", "InternalError"),
+            retryable: true,
+        };
     }
-
-    const parseResult = await ParseService.parseRssFeed(rssUrl);
-
-    if (!parseResult.success) {
-        logger.error("failed to parse feed");
-        return Result.error("Failed to parse feed", "InternalError");
-    }
-
-    const faviconResult = await ParseService.parseFavicon(parseResult.data.link);
-
-    let faviconUrl: undefined | string;
-    if (faviconResult.success) {
-        faviconUrl = faviconResult.data;
-    }
-
-    const feedToCreate = FeedMapper.parseFeedToCreateFeed(parseResult.data, rssUrl, faviconUrl);
-
-    const createFeedResult = await FeedRepository.createFeed(feedToCreate, userId);
-
-    if (!createFeedResult.success) {
-        logger.error(`failed to create feed with url ${rssUrl}`);
-        return Result.error("Failed to create feed", "InternalError");
-    }
-
-    const contentToCreate = FeedRefresh.selectInitialFeedItems(parseResult.data.items).map(
-        parsedItem => {
-            return ContentMapper.parseItemToCreateContent(parsedItem);
-        }
-    );
-
-    const createContentResult = await ItemRepository.createContent(
-        contentToCreate,
-        createFeedResult.data.id
-    );
-
-    if (!createContentResult.success) {
-        logger.error(`failed to create content for feed with url ${rssUrl}`);
-        return Result.error("Failed to create content", "InternalError");
-    }
-
-    const createItemsResult = await ItemRepository.createItemsFromContent(
-        createContentResult.data,
-        createFeedResult.data.id,
-        userId
-    );
-
-    if (!createItemsResult.success) {
-        logger.error(`failed to create items for feed with url ${rssUrl}`);
-        return Result.error("Failed to create items", "InternalError");
-    }
-
-    await fetchRssFeedWorker().repeatable({
-        feedId: createFeedResult.data.id,
-    });
-
-    await fetchContentWithoutImageWorker().add({});
-
-    return Result.ok({ feedId: createFeedResult.data.id });
 };
 
 const searchFeeds = async (query: string, userId?: number): AsyncResultType<SearchFeed[]> => {

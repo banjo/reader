@@ -21,7 +21,7 @@ export function SiteHeader() {
                         {userId && (
                             <>
                                 <AddFeedNav />
-                                <SettingsNav />
+                                <SettingsNav key={userId} />
                                 <ResponsiveIcon
                                     Icon={Icons.hamburger}
                                     onClick={toggleMenu}

@@ -3,6 +3,7 @@ import {
     addToUsersWorker,
     fetchContentWithoutImageWorker,
     fetchRssFeedWorker,
+    importFeedsWorker,
 } from "server";
 import { addFetchRss } from "./add";
 
@@ -12,6 +13,7 @@ export const start = async () => {
     addToUsersWorker().start();
     fetchContentWithoutImageWorker().start();
     addImageWorker().start();
+    importFeedsWorker().start();
 
     await fetchRssFeedWorker().stopRepeatable();
     await addToUsersWorker().stopRepeatable();

@@ -9,21 +9,26 @@ export const selectFile = async ({ accept, multiple = false, handleFile }: Selec
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.id = id;
-    if (accept) fileInput.accept = accept;
+    if (accept) {
+        fileInput.accept = accept;
+    }
     fileInput.multiple = multiple;
     fileInput.style.display = "none";
 
+    fileInput.addEventListener(
+        "change",
+        () => {
+            const file = fileInput.files?.[0];
+            fileInput.remove();
+            if (file) {
+                handleFile(file);
+            }
+        },
+        { once: true }
+    );
+    fileInput.addEventListener("cancel", () => fileInput.remove(), { once: true });
     document.body.appendChild(fileInput);
     fileInput.click();
-
-    fileInput.addEventListener("change", () => {
-        const file = fileInput.files?.[0];
-        if (file) {
-            handleFile(file);
-        }
-    });
-
-    fileInput.remove();
 };
 
 export const parseXml = async (file: File) => {
