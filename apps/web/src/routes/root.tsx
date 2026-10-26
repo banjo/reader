@@ -1,6 +1,5 @@
 import { SideMenuContainer } from "@/components/nav/sidemenu/side-menu-container";
 import { SiteHeader } from "@/components/nav/site-header";
-import { CenteredContainer } from "@/components/shared/centered-container";
 import { useAuth } from "@/contexts/auth-context";
 import { FeedContainer } from "@/features/feed/containers/feed-container";
 import { AllContainer } from "@/features/items/containers/all-container";
@@ -84,11 +83,7 @@ const signedOutRouter = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: (
-                    <CenteredContainer>
-                        <LandingPage />
-                    </CenteredContainer>
-                ),
+                element: <LandingPage />,
             },
             // {
             //     path: "/sign-in/*",

@@ -23,6 +23,10 @@ module.exports = {
                 open: ["Open Sans"],
             },
             colors: {
+                brand: {
+                    DEFAULT: "#C363E4",
+                    deep: "#B95ED9",
+                },
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",

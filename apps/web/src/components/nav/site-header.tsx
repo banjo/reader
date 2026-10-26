@@ -3,6 +3,7 @@ import { MainNav } from "@/components/nav/main-nav";
 import { SettingsNav } from "@/components/nav/settings-nav";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
+import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { useAuth } from "@/contexts/auth-context";
 import { useMenuStore } from "@/stores/use-menu-store";
@@ -10,7 +11,7 @@ import { useMenuStore } from "@/stores/use-menu-store";
 export function SiteHeader() {
     const toggleMenu = useMenuStore(state => state.toggle);
 
-    const { userId } = useAuth();
+    const { userId, signInWithGoogle } = useAuth();
 
     return (
         <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -18,7 +19,7 @@ export function SiteHeader() {
                 <MainNav items={siteConfig.mainNav} />
                 <div className="flex flex-1 items-center justify-end">
                     <nav className="flex items-center relative justify-center gap-3">
-                        {userId && (
+                        {userId ? (
                             <>
                                 <AddFeedNav />
                                 <SettingsNav key={userId} />
@@ -29,6 +30,14 @@ export function SiteHeader() {
                                     className="md:hidden"
                                 />
                             </>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={signInWithGoogle}
+                                className={buttonVariants({ variant: "ghost", size: "sm" })}
+                            >
+                                Sign in
+                            </button>
                         )}
                     </nav>
                 </div>

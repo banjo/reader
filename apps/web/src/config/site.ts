@@ -1,6 +1,6 @@
 export const siteConfig = {
     name: "Banjo Reader",
-    description: "A super simple RSS feed reader. Not much more than that actually.",
+    description: "A simple RSS reader.",
     mainNav: [
         // {
         //     title: "Dashboard",
