@@ -62,12 +62,16 @@ test(
             await import("../src/workers/runners/add-to-users/add-to-users-worker");
         const { fetchContentWithoutImageWorker } =
             await import("../src/workers/runners/fetch-content-without-image/fetch-content-without-image-worker");
+        const { addImageWorker } =
+            await import("../src/workers/runners/add-image/add-image-worker");
         const { FeedRepository } = await import("../src/repositories/FeedRepository");
         const { ItemRepository } = await import("../src/repositories/ItemRepository");
         const { FeedService } = await import("../src/services/FeedService");
         const fetcher = fetchRssFeedWorker();
         const delivery = addToUsersWorker();
         const images = fetchContentWithoutImageWorker();
+        const imageLookup = addImageWorker();
+        const imageEvents = new QueueEvents(imageLookup.getQueue().name, { connection, prefix });
         const events = new QueueEvents(fetcher.getQueue().name, { connection, prefix });
         const deliveryEvents = new QueueEvents(delivery.getQueue().name, { connection, prefix });
         const legacyProducer = new Queue<{
@@ -75,12 +79,23 @@ test(
             content: { id: number; title: string; content: string }[];
         }>(delivery.getQueue().name, { connection, prefix });
         t.after(async () => {
-            await Promise.all([fetcher.close(), delivery.close(), images.close()]);
-            await Promise.all([events.close(), deliveryEvents.close(), legacyProducer.close()]);
+            await Promise.all([
+                fetcher.close(),
+                delivery.close(),
+                images.close(),
+                imageLookup.close(),
+            ]);
+            await Promise.all([
+                events.close(),
+                deliveryEvents.close(),
+                imageEvents.close(),
+                legacyProducer.close(),
+            ]);
             for (const name of [
                 fetcher.getQueue().name,
                 delivery.getQueue().name,
                 images.getQueue().name,
+                imageLookup.getQueue().name,
             ]) {
                 const cleanup = new Queue(name, { connection, prefix });
                 try {
@@ -90,16 +105,64 @@ test(
                 }
             }
         });
-        await Promise.all([events.waitUntilReady(), deliveryEvents.waitUntilReady()]);
+        await Promise.all([
+            events.waitUntilReady(),
+            deliveryEvents.waitUntilReady(),
+            imageEvents.waitUntilReady(),
+        ]);
         fetcher.start();
         delivery.start();
+        imageLookup.start();
 
         let mainPosts = 2;
         let largePosts = 5000;
         let broken = false;
         let base = "";
+        const requestCounts = new Map<string, number>();
+        let activeImages = 0;
+        let peakImages = 0;
         const server = createServer((req, res) => {
             const path = req.url ?? "/";
+            const requestCount = (requestCounts.get(path) ?? 0) + 1;
+            requestCounts.set(path, requestCount);
+            if (path === "/image-timeout") {
+                res.writeHead(200, { "content-type": "text/html" });
+                res.write("<html><head>");
+                return;
+            }
+            if (
+                path === "/image-fail" ||
+                (path === "/image-recover" && requestCount < 3) ||
+                (path === "/recover/rss" && requestCount < 3)
+            ) {
+                res.writeHead(503);
+                res.end("Temporary failure");
+                return;
+            }
+            if (path === "/permanent/rss") {
+                res.writeHead(404);
+                res.end();
+                return;
+            }
+            if (path.startsWith("/image-concurrent/")) {
+                activeImages++;
+                peakImages = Math.max(peakImages, activeImages);
+                res.setHeader("content-type", "text/html");
+                setTimeout(() => {
+                    activeImages--;
+                    res.end(
+                        '<html><head><meta property="og:image" content="/photo.png"></head></html>'
+                    );
+                }, 100);
+                return;
+            }
+            if (path === "/image-recover") {
+                res.setHeader("content-type", "text/html");
+                res.end(
+                    '<html><head><meta property="og:image" content="/photo.png"></head></html>'
+                );
+                return;
+            }
             if (!path.endsWith("/rss")) {
                 res.setHeader("content-type", "text/html");
                 res.end(
@@ -318,5 +381,123 @@ test(
                 );
             }
         );
+
+        const createImagePost = (path: string) =>
+            prisma.itemContent.create({
+                data: {
+                    feedId: feed.id,
+                    title: path,
+                    link: base + path,
+                    lastFetch: new Date(),
+                    pubDate: new Date(),
+                },
+            });
+        const queueImage = (post: { id: number; link: string }) =>
+            imageLookup.getQueue().add("test-image", { contentId: post.id, url: post.link });
+
+        await t.test("RSS jobs retry temporary failures, but not permanent errors", async () => {
+            const recover = await prisma.feed.create({
+                data: { name: "Recover", url: base, rssUrl: `${base}/recover/rss` },
+            });
+            const job = await fetcher.getQueue().add("test-recover", { feedId: recover.id });
+            assert.equal(job.opts.attempts, 3);
+            assert.deepEqual(job.opts.backoff, { type: "exponential", delay: 1_000 });
+            await job.waitUntilFinished(events, 15_000);
+            assert.equal(requestCounts.get("/recover/rss"), 3);
+            const permanent = await prisma.feed.create({
+                data: { name: "Permanent", url: base, rssUrl: `${base}/permanent/rss` },
+            });
+            await assert.rejects(refresh(permanent.id), /HTTP 404/);
+            assert.equal(requestCounts.get("/permanent/rss"), 1);
+        });
+
+        await t.test(
+            "image retries recover without prematurely marking the post checked",
+            async () => {
+                const post = await createImagePost("/image-recover");
+                const job = await queueImage(post);
+                await waitFor(async () => (requestCounts.get("/image-recover") ?? 0) >= 1);
+                assert.equal(
+                    (await prisma.itemContent.findUniqueOrThrow({ where: { id: post.id } }))
+                        .hasFetchedImage,
+                    false
+                );
+                await job.waitUntilFinished(imageEvents, 15_000);
+                const saved = await prisma.itemContent.findUniqueOrThrow({
+                    where: { id: post.id },
+                });
+                assert.equal(requestCounts.get("/image-recover"), 3);
+                assert.equal(saved.imageUrl, `${base}/photo.png`);
+                assert.equal(saved.hasFetchedImage, true);
+            }
+        );
+
+        await t.test(
+            "exhausted image retries remain unchecked; successful no-image pages complete",
+            async () => {
+                const failed = await createImagePost("/image-fail");
+                const job = await queueImage(failed);
+                await assert.rejects(
+                    job.waitUntilFinished(imageEvents, 15_000),
+                    /Temporary image lookup failure/
+                );
+                assert.equal(requestCounts.get("/image-fail"), 3);
+                const saved = await prisma.itemContent.findUniqueOrThrow({
+                    where: { id: failed.id },
+                });
+                assert.equal(saved.hasFetchedImage, false);
+                assert.equal(saved.imageUrl, null);
+                const missing = await createImagePost("/image-missing");
+                await (await queueImage(missing)).waitUntilFinished(imageEvents, 15_000);
+                assert.equal(
+                    (await prisma.itemContent.findUniqueOrThrow({ where: { id: missing.id } }))
+                        .hasFetchedImage,
+                    true
+                );
+                assert.equal(requestCounts.get("/image-missing"), 1);
+            }
+        );
+
+        await t.test("a real image timeout leaves the post eligible for a later scan", async () => {
+            const post = await createImagePost("/image-timeout");
+            const job = await imageLookup
+                .getQueue()
+                .add("test-timeout", { contentId: post.id, url: post.link }, { attempts: 1 });
+            await assert.rejects(job.waitUntilFinished(imageEvents, 15_000), /timed out/);
+            assert.equal(
+                (await prisma.itemContent.findUniqueOrThrow({ where: { id: post.id } }))
+                    .hasFetchedImage,
+                false
+            );
+        });
+
+        await t.test("image lookups process five jobs concurrently", async () => {
+            const posts = await Promise.all(
+                Array.from({ length: 10 }, (_, index) =>
+                    createImagePost(`/image-concurrent/${index}`)
+                )
+            );
+            const jobs = await Promise.all(posts.map(queueImage));
+            await Promise.all(jobs.map(job => job.waitUntilFinished(imageEvents, 15_000)));
+            assert.equal(peakImages, 5);
+            assert.equal(
+                await prisma.itemContent.count({
+                    where: { id: { in: posts.map(post => post.id) }, hasFetchedImage: true },
+                }),
+                10
+            );
+        });
+
+        await t.test("scheduled RSS refreshes retain the retry policy", async () => {
+            await fetcher.repeatable({ feedId: feed.id });
+            const jobs = await fetcher
+                .getQueue()
+                .getJobs(["wait", "delayed", "active", "completed"]);
+            const scheduled = jobs.find(job => job.opts.repeat);
+            assert.ok(scheduled);
+            assert.equal(scheduled.opts.attempts, 3);
+            assert.deepEqual(scheduled.opts.backoff, { type: "exponential", delay: 1_000 });
+            await fetcher.stopRepeatable();
+        });
     }
 );

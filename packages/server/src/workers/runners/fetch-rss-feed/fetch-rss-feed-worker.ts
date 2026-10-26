@@ -1,8 +1,9 @@
-import { Job } from "bullmq";
+import { Job, UnrecoverableError } from "bullmq";
 import { Result } from "utils";
 import { FeedRepository } from "../../../repositories/FeedRepository";
 import { ItemRepository } from "../../../repositories/ItemRepository";
 import { ParseService } from "../../../services/ParseService";
+import { externalRequestRetry } from "../../../services/ExternalRequestService";
 import { createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
 import { addToUsersWorker } from "../add-to-users/add-to-users-worker";
@@ -21,7 +22,7 @@ const processor = async (job: Job<FetchJobData>) => {
 
     if (!feedResult.success) {
         logger.error(`Could not find feed with id ${feedId}`);
-        throw new Error(`Could not find feed with id ${feedId}`);
+        throw new UnrecoverableError(`Could not find feed with id ${feedId}`);
     }
 
     const feed = feedResult.data;
@@ -31,10 +32,15 @@ const processor = async (job: Job<FetchJobData>) => {
     const updatedContent = await ParseService.shouldParseAgain({
         currentLinks: new Set(feed.contentItems.map(content => content.link)),
         url: feed.rssUrl,
+        attempts: 1,
     });
 
     if (!updatedContent.success) {
-        throw new Error(`Could not refresh feed ${feedId}: ${updatedContent.message}`);
+        const message = `Could not refresh feed ${feedId}: ${updatedContent.message}`;
+        if (updatedContent.retryable) {
+            throw new Error(message);
+        }
+        throw new UnrecoverableError(message);
     }
 
     if (updatedContent.data.length === 0) {
@@ -66,4 +72,7 @@ const processor = async (job: Job<FetchJobData>) => {
     return Result.okEmpty();
 };
 
-export const fetchRssFeedWorker = () => createWorker<FetchJobData>("fetchRssFeedWorker", processor);
+export const fetchRssFeedWorker = () =>
+    createWorker<FetchJobData>("fetchRssFeedWorker", processor, {
+        jobOptions: externalRequestRetry,
+    });

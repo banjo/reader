@@ -210,11 +210,16 @@ several MB. The full HTML is also stored in Postgres for every post.
 
 **Fix**
 
-- [ ] Use `fetch(url, { signal: AbortSignal.timeout(10_000) })`, check that `content-type` is
-      HTML, and stop reading after the first ~256 KB (the `<head>` is all we need).
-- [ ] Create the parser with `new RssParser({ timeout: 15_000, maxRedirects: 3 })`. For a hard
-      size limit, fetch the feed yourself with a byte cap and use `parseString`.
-- [ ] Set `concurrency` (for example 5) on the add-image worker.
+- [x] Bound HTML requests to 10 seconds, check that `content-type` is HTML, and stop reading
+      after the `<head>` or 256 KB. The deadline includes redirects and body reads.
+- [x] Create the parser with `new RssParser({ timeout: 15_000, maxRedirects: 3 })`. Fetch RSS
+      with a 5 MB decompressed byte cap and use `parseString`.
+- [x] Set `concurrency: 5` on the add-image worker.
+- [x] Retry temporary failures up to three attempts with exponential delays (1s, 2s).
+      Use BullMQ retries for workers and request-level retries for initial imports and favicons,
+      without multiplying the two. Permanent failures do not get immediate retries.
+- [x] Leave image lookups unchecked after transient failures, even after retry exhaustion,
+      so the next hourly scan can try again. Successful no-image lookups remain complete.
 
 ## 8. Move OPML import to a background job
 

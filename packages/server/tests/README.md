@@ -1,9 +1,9 @@
-# Feed refresh tests
+# Feed refresh and external request tests
 
-Run parsing and import-selection tests from the repository root:
+Run parsing, import-selection, and HTTP request tests from the repository root:
 
 ```sh
-pnpm exec tsx --test packages/server/tests/parse-feed.test.ts
+pnpm exec tsx --test packages/server/tests/parse-feed.test.ts packages/server/tests/external-requests.test.ts
 ```
 
 The worker tests use PostgreSQL and Redis from `docker/docker-compose.yml`. Point the test
@@ -24,3 +24,13 @@ Coverage includes malformed posts, GUID and title fallbacks, ID-only queue paylo
 jobs, duplicate delivery, subscriber isolation, and HTTP failures. A 5,000-post fixture
 checks that the initial import stores the newest 200 posts, the next refresh does not
 backfill the skipped history, and new posts are still delivered.
+
+HTTP fixtures cover header/body timeouts, the shared redirect deadline, redirect limits,
+declared/streamed/gzip-expanded RSS size limits, HTML truncation, content types, and retry
+classification. Request-level and BullMQ retries both use three attempts, with 1s and 2s
+delays. Worker calls disable request-level retries to avoid nine attempts per job.
+
+The integration suite also checks image recovery, retry exhaustion, a real 10-second image
+timeout, five concurrent image requests, and retry options on scheduled RSS jobs. Failed
+temporary image lookups stay unchecked for the next hourly scan; successful pages without
+an image are marked checked. Permanent HTTP/format failures are not retried immediately.

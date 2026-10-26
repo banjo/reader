@@ -1,13 +1,29 @@
 import { Prisma } from "db";
 import { parseHTML } from "linkedom";
-import { AsyncResultType } from "model";
+import { ResultType } from "model";
 import RssParser from "rss-parser";
-import { Result, createLogger } from "utils";
+import { createLogger, Result } from "utils";
 import { z } from "zod";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { FeedRefresh } from "../shared/lib/feed-refresh";
+import {
+    ExternalRequestError,
+    externalRequestLimits,
+    ExternalRequestService,
+} from "./ExternalRequestService";
 
-const rssParser = new RssParser();
+const rssParser = new RssParser({ timeout: 15_000, maxRedirects: 3 });
+
+type ParseResult<T> = Promise<ResultType<T> & { retryable?: boolean }>;
+type ParseOptions = { attempts?: number };
+
+const requestFailure = <T>(error: unknown): ResultType<T> & { retryable: boolean } => ({
+    ...Result.error<T>(
+        error instanceof Error ? error.message : "External request failed",
+        "InternalError"
+    ),
+    retryable: error instanceof ExternalRequestError && error.retryable,
+});
 
 const logger = createLogger("ParseService");
 
@@ -74,15 +90,21 @@ export type ParseFeed = z.infer<typeof ParseFeedSchema>;
 type ShouldParseAgainProps = {
     currentLinks: Set<string>;
     url: string;
+    attempts?: number;
 };
 
-const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
+const parseRssFeed = async (url: string, options: ParseOptions = {}): ParseResult<ParseFeed> => {
     let parsedResult;
     try {
-        parsedResult = await rssParser.parseURL(url);
+        const response = await ExternalRequestService.fetchText({
+            url,
+            ...externalRequestLimits.rss,
+            ...options,
+        });
+        parsedResult = await rssParser.parseString(response.text);
     } catch (error) {
         logger.error(error);
-        return Result.error("Failed to parse feed", "InternalError");
+        return requestFailure(error);
     }
 
     if (!parsedResult) {
@@ -116,10 +138,14 @@ const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
     return Result.ok({ ...baseFeed.data, items });
 };
 
-const parseImage = async (url: string): AsyncResultType<string> => {
+const parseImage = async (url: string, options: ParseOptions = {}): ParseResult<string> => {
     try {
-        const html = await fetch(url).then(res => res.text());
-        const doc = parseHTML(html).document;
+        const response = await ExternalRequestService.fetchText({
+            url,
+            ...externalRequestLimits.html,
+            ...options,
+        });
+        const doc = parseHTML(response.text).document;
 
         const head = doc.querySelector("head");
 
@@ -129,24 +155,29 @@ const parseImage = async (url: string): AsyncResultType<string> => {
 
         const meta = head.querySelector("meta[property='og:image']") as HTMLMetaElement;
 
-        if (!meta) {
+        if (!meta?.content?.trim()) {
             return Result.error("Failed to parse image", "NotFound");
         }
 
-        const content = meta.content.startsWith("/")
-            ? new URL(meta.content, url).href
-            : meta.content;
+        const content = new URL(meta.content, response.url).href;
+        if (!postLinkSchema.safeParse(content).success) {
+            return Result.error("Invalid image URL", "NotFound");
+        }
         return Result.ok(content);
     } catch (error) {
         logger.error(error);
-        return Result.error("Failed to parse image", "InternalError");
+        return requestFailure(error);
     }
 };
 
-const parseFavicon = async (url: string): AsyncResultType<string> => {
+const parseFavicon = async (url: string, options: ParseOptions = {}): ParseResult<string> => {
     try {
-        const html = await fetch(url).then(res => res.text());
-        const doc = parseHTML(html).document;
+        const response = await ExternalRequestService.fetchText({
+            url,
+            ...externalRequestLimits.html,
+            ...options,
+        });
+        const doc = parseHTML(response.text).document;
 
         const head = doc.querySelector("head");
 
@@ -156,27 +187,31 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
 
         const link = head.querySelector("link[rel*='icon']") as HTMLLinkElement;
 
-        if (!link) {
+        if (!link?.href?.trim()) {
             return Result.error("Failed to parse favicon", "NotFound");
         }
 
-        const href = link.href.startsWith("/") ? new URL(link.href, url).href : link.href;
+        const href = new URL(link.href, response.url).href;
+        if (!postLinkSchema.safeParse(href).success) {
+            return Result.error("Invalid favicon URL", "NotFound");
+        }
         return Result.ok(href);
     } catch (error) {
         logger.error(error);
-        return Result.error("Failed to parse favicon", "InternalError");
+        return requestFailure(error);
     }
 };
 
 const shouldParseAgain = async ({
     currentLinks,
     url,
-}: ShouldParseAgainProps): AsyncResultType<Prisma.ItemContentCreateManyFeedInput[]> => {
-    const newFeed = await parseRssFeed(url);
+    attempts,
+}: ShouldParseAgainProps): ParseResult<Prisma.ItemContentCreateManyFeedInput[]> => {
+    const newFeed = await parseRssFeed(url, { attempts });
 
     if (!newFeed.success) {
         logger.error(`Failed to parse feed with url: ${url} - ${newFeed.message}`);
-        return Result.error(newFeed.message, newFeed.type);
+        return newFeed;
     }
 
     const contentToCreate = FeedRefresh.selectNewFeedItems({

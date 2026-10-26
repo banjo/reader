@@ -2,6 +2,7 @@ import { Job } from "bullmq";
 import { Result } from "utils";
 import { ContentRepository } from "../../../repositories/ContentRepository";
 import { ParseService } from "../../../services/ParseService";
+import { externalRequestRetry } from "../../../services/ExternalRequestService";
 import { createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
 
@@ -16,10 +17,13 @@ const processor = async (job: Job<AddImageWorker>) => {
 
     logger.info(`Adding image to content with id ${contentId} with image url ${url}`);
 
-    const parseResult = await ParseService.parseImage(url);
+    const parseResult = await ParseService.parseImage(url, { attempts: 1 });
 
     if (!parseResult.success) {
         logger.error(`Failed to parse image ${url}: ${parseResult.message}`);
+        if (parseResult.retryable) {
+            throw new Error(`Temporary image lookup failure: ${parseResult.message}`);
+        }
     }
 
     const addToDbResult = await ContentRepository.updateContentImageStatus(contentId, {
@@ -39,4 +43,8 @@ const processor = async (job: Job<AddImageWorker>) => {
     return Result.okEmpty();
 };
 
-export const addImageWorker = () => createWorker<AddImageWorker>("addImage", processor);
+export const addImageWorker = () =>
+    createWorker<AddImageWorker>("addImage", processor, {
+        concurrency: 5,
+        jobOptions: externalRequestRetry,
+    });

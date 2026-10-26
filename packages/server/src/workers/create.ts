@@ -1,11 +1,15 @@
 import { randomString, toMilliseconds, toSeconds } from "@banjoanton/utils";
-import { Job, Queue, Worker } from "bullmq";
+import { Job, JobsOptions, Queue, Worker } from "bullmq";
 import { kebabCase } from "change-case";
 import { ResultType } from "model";
 import { createLogger } from "utils";
 import { redisConfig } from "./config";
 
 type WorkerType = "queue" | "worker";
+type WorkerOptions = {
+    concurrency?: number;
+    jobOptions?: Pick<JobsOptions, "attempts" | "backoff">;
+};
 
 const createMisc = (name: string, type: WorkerType) => {
     const formattedName = kebabCase(name);
@@ -28,7 +32,8 @@ const singleton = {
 
 export const createWorker = <T extends object>(
     name: string,
-    processor: (job: Job<T>) => Promise<ResultType<void>>
+    processor: (job: Job<T>) => Promise<ResultType<void>>,
+    options: WorkerOptions = {}
 ) => {
     const { JOB_NAME, QUEUE_NAME, logger } = createMisc(name, "worker");
 
@@ -38,7 +43,10 @@ export const createWorker = <T extends object>(
     if (currentQueue) {
         queue = currentQueue;
     } else {
-        queue = new Queue<T, void, string, T, void, string>(QUEUE_NAME, redisConfig);
+        queue = new Queue<T, void, string, T, void, string>(QUEUE_NAME, {
+            ...redisConfig,
+            defaultJobOptions: options.jobOptions,
+        });
         singleton.queues.push(queue);
     }
 
@@ -51,6 +59,7 @@ export const createWorker = <T extends object>(
         worker = new Worker<T, ResultType<void>, string>(QUEUE_NAME, processor, {
             ...redisConfig,
             autorun: false,
+            concurrency: options.concurrency ?? 1,
             removeOnComplete: { age: toSeconds({ hours: 6 }), count: 500 },
             removeOnFail: { age: toSeconds({ days: 1 }), count: 1_000 },
         });
@@ -59,7 +68,6 @@ export const createWorker = <T extends object>(
 
     logger.info(
         // @ts-ignore
-        // eslint-disable-next-line max-len
         `Created queue ${QUEUE_NAME} and job ${JOB_NAME} at host ${redisConfig?.connection?.host}`
     );
 
@@ -86,6 +94,7 @@ export const createWorker = <T extends object>(
             logger.info(`Adding repeatable job every 60 minutes...`);
             // TODO: add try catch with Result return type
             await queue.add(JOB_NAME, data, {
+                ...options.jobOptions,
                 repeat: {
                     every: timeInMs,
                     immediately: true,
