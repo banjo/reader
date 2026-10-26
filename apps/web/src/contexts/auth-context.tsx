@@ -1,14 +1,17 @@
 import { auth } from "@/lib/firebase";
+import { getTokenRefreshDelayMs, isSessionInvalidError } from "@/lib/auth";
 import { isDev } from "@/utils/runtime";
 import { raise } from "@banjoanton/utils";
 import { GoogleAuthProvider, User, signInWithPopup } from "firebase/auth";
-import jwt_decode from "jwt-decode";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+
+const transientRetryMs = 30_000;
 
 export type AuthContextType = {
     userId: string | undefined;
     loading: boolean;
     logout: () => Promise<void>;
+    refreshToken: () => Promise<string | undefined>;
     signInWithGoogle: () => Promise<void>;
     token: string | undefined;
 };
@@ -17,6 +20,7 @@ const emptyContext: AuthContextType = {
     userId: undefined,
     loading: false,
     logout: async () => {},
+    refreshToken: async () => undefined,
     signInWithGoogle: async () => {},
     token: undefined,
 };
@@ -42,7 +46,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setCurrentUser(signInResponse.user);
     };
 
-    const logout = () => auth.signOut();
+    const logout = useCallback(() => auth.signOut(), []);
+
+    const refreshToken = useCallback(async (): Promise<string | undefined> => {
+        if (isDev()) {
+            return "development";
+        }
+
+        if (!currentUser) {
+            return undefined;
+        }
+
+        try {
+            const refreshedToken = await currentUser.getIdToken(true);
+            setToken(refreshedToken);
+            return refreshedToken;
+        } catch (error) {
+            console.error("Failed to refresh token", error);
+
+            // A network blip must not end the session; only a rejected session should.
+            if (isSessionInvalidError(error)) {
+                await logout();
+            }
+
+            return undefined;
+        }
+    }, [currentUser, logout]);
+
     const userId = currentUser?.uid;
 
     useEffect(() => {
@@ -79,37 +109,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     useEffect(() => {
         if (!currentUser || isDev()) return;
 
-        let timeout: NodeJS.Timeout;
+        let timeout: ReturnType<typeof setTimeout>;
         let isCancelled = false;
 
         const refresh = async () => {
-            try {
-                const token = await currentUser.getIdToken();
+            const refreshedToken = await refreshToken();
 
-                if (isCancelled) return;
-                setToken(token);
+            if (isCancelled) return;
 
-                const decodedToken: { exp: number } = jwt_decode(token);
-                const expirationTime = decodedToken.exp * 1000 - 60000;
-                timeout = setTimeout(refresh, expirationTime - Date.now());
-            } catch (error) {
-                // TODO: better refresh logic
-                console.error("Failed to refresh token", error);
-                await logout();
-            }
+            const delay = refreshedToken
+                ? Math.max(getTokenRefreshDelayMs(refreshedToken), 5_000)
+                : transientRetryMs;
+
+            timeout = setTimeout(() => void refresh(), delay);
         };
 
-        refresh();
+        void refresh();
 
         return () => {
             isCancelled = true;
             clearTimeout(timeout);
         };
-    }, [currentUser]);
+    }, [currentUser, refreshToken]);
 
     const value = {
         logout,
         loading,
+        refreshToken,
         signInWithGoogle,
         userId,
         token,

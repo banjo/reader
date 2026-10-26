@@ -33,3 +33,7 @@ The sidebar cache and import UI tests need no database:
 ```sh
 pnpm exec tsx --tsconfig apps/web/tsconfig.json --test apps/web/tests/*.test.ts
 ```
+
+`auth-refresh.test.ts` starts a local HTTP server and checks the API client: one retry with
+the refreshed token after a 401, no retry when the refresh fails, no second refresh when the
+retry is also rejected, and no refresh on success or server errors.

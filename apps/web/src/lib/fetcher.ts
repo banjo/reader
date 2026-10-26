@@ -1,17 +1,32 @@
 import { Result } from "@/lib/result";
 import { jsonDateParser } from "json-date-parser";
-import { AsyncResultType, SuccessRequest } from "model";
+import { AsyncResultType, ResultType, SuccessRequest } from "model";
 import { ofetch } from "ofetch";
 
 /**
  * HELPERS
  */
 
-const handleError = async <T>(error: any): AsyncResultType<T> => {
+const defaultApiUrl = () => import.meta.env.VITE_API_URL ?? "http://localhost:3003";
+
+const isUnauthorizedError = (error: unknown): boolean => {
+    const typedError = error as { statusCode?: number; response?: { status?: number } } | undefined;
+
+    const status = typedError?.statusCode ?? typedError?.response?.status;
+    return status === 401;
+};
+
+const handleError = <T>(error: unknown): ResultType<T> => {
+    if (isUnauthorizedError(error)) {
+        return Result.error("Your session expired. Please sign in again.", "Unauthorized");
+    }
+
+    if (typeof error === "string") {
+        return Result.error(error, "InternalError");
+    }
+
     if (error instanceof Error) {
         return Result.error(error.message, "InternalError");
-    } else if (typeof error === "string") {
-        return Result.error(error, "InternalError");
     }
 
     return Result.error("Something went wrong", "InternalError");
@@ -21,62 +36,77 @@ const handleError = async <T>(error: any): AsyncResultType<T> => {
  * FETCHER
  **/
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3003";
+type requestOptions = {
+    method: "GET" | "POST" | "PUT" | "DELETE";
+    body?: any;
+};
 
-export const fetcher = (token: string | undefined) => {
-    const api = ofetch.create({
-        baseURL: `${API_URL}/api`,
-        headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-            "Content-Type": "application/json",
-        },
-        parseResponse: async res => JSON.parse(res, jsonDateParser),
-    });
+type FetcherOptions = {
+    token: string | undefined;
+    refreshToken?: () => Promise<string | undefined>;
+    baseURL?: string;
+};
 
-    type options = {
-        method: "GET" | "POST" | "PUT" | "DELETE";
-        body?: any;
+export const fetcher = ({ token, refreshToken, baseURL }: FetcherOptions) => {
+    const apiUrl = `${baseURL ?? defaultApiUrl()}/api`;
+    let currentToken = token;
+
+    const send = async <T>(path: string, options: requestOptions): Promise<T> => {
+        const res = await ofetch<SuccessRequest<T>>(path, {
+            baseURL: apiUrl,
+            method: options.method,
+            body: options.body,
+            headers: {
+                Authorization: currentToken ? `Bearer ${currentToken}` : "",
+                "Content-Type": "application/json",
+            },
+            // Error responses can be plain text, and parsing must not hide their status.
+            parseResponse: text => {
+                try {
+                    return JSON.parse(text, jsonDateParser);
+                } catch {
+                    return text;
+                }
+            },
+        });
+
+        return res.data;
     };
 
-    const defaultOptions: options = {
-        method: "GET",
-    };
-
-    const QUERY = async <T>(path: string, options?: options): Promise<T> => {
-        const { method = "GET", body } = { ...defaultOptions, ...options };
+    const request = async <T>(path: string, options: requestOptions): Promise<T> => {
         try {
-            const res = await api<SuccessRequest<T>>(path, {
-                method,
-                body,
-            });
-
-            return res.data;
+            return await send<T>(path, options);
         } catch (error: unknown) {
-            console.log(error);
-            throw error;
+            if (!isUnauthorizedError(error) || !refreshToken) {
+                throw error;
+            }
+
+            // Retry exactly once. A second 401 propagates instead of refreshing again.
+            const refreshedToken = await refreshToken();
+
+            if (!refreshedToken) {
+                throw error;
+            }
+
+            currentToken = refreshedToken;
+            return await send<T>(path, options);
         }
     };
 
+    const QUERY = <T>(path: string, options?: requestOptions): Promise<T> =>
+        request<T>(path, { method: "GET", ...options });
+
     const GET = async <T>(path: string): AsyncResultType<T> => {
         try {
-            const res = await api<SuccessRequest<T>>(path, {
-                method: "GET",
-            });
-
-            return Result.ok(res.data);
+            return Result.ok(await request<T>(path, { method: "GET" }));
         } catch (error: unknown) {
-            console.log(error);
             return handleError(error);
         }
     };
 
     const POST = async <T>(path: string, body: Record<string, any>): AsyncResultType<T> => {
         try {
-            const res = await api<SuccessRequest<T>>(path, {
-                method: "POST",
-                body,
-            });
-            return Result.ok(res.data);
+            return Result.ok(await request<T>(path, { method: "POST", body }));
         } catch (error: unknown) {
             return handleError(error);
         }
@@ -84,12 +114,7 @@ export const fetcher = (token: string | undefined) => {
 
     const PUT = async <T>(path: string, body: Record<string, any>): AsyncResultType<T> => {
         try {
-            const res = await api<SuccessRequest<T>>(path, {
-                method: "PUT",
-                body,
-            });
-
-            return Result.ok(res.data);
+            return Result.ok(await request<T>(path, { method: "PUT", body }));
         } catch (error: unknown) {
             return handleError(error);
         }
@@ -97,11 +122,7 @@ export const fetcher = (token: string | undefined) => {
 
     const DELETE = async <T>(path: string): AsyncResultType<T> => {
         try {
-            const res = await api<SuccessRequest<T>>(path, {
-                method: "DELETE",
-            });
-
-            return Result.ok(res.data);
+            return Result.ok(await request<T>(path, { method: "DELETE" }));
         } catch (error: unknown) {
             return handleError(error);
         }

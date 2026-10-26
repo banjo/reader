@@ -267,7 +267,10 @@ From the earlier TODO list, not covered by the steps above.
       safe.
 - [ ] Find out why ESM doesn't work with tsup in a library
 - [ ] Add a request id to logging
-- [ ] Fix 401s when the auth token expires. How to keep it up to date?
+- [x] Fix 401s when the auth token expires. Refresh the token one minute before expiry, retry
+      a request once with a forced refresh after a 401, and sign out only when Firebase reports
+      an invalid session. Transient refresh failures retry after 30 seconds instead of ending
+      the session.
 - [ ] Add a placeholder for cards with no image
 - [ ] Show the current page or number of pages in the pagination
 - [ ] Fix optimistic updates on favorite and bookmark
