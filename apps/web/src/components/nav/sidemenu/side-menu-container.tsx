@@ -5,6 +5,7 @@ import { SideMenu } from "@/components/nav/sidemenu/menu";
 import { SubMenu } from "@/components/nav/sidemenu/sub-menu";
 import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
+import { feedsQueryKey } from "@/hooks/backend/query-keys";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { avatarUrl } from "@/lib/utils";
 import { useMenuStore } from "@/stores/use-menu-store";
@@ -18,13 +19,15 @@ type Props = {
 
 type FeedReturnObject = {
     title: string;
-    imageUrl: string;
+    imageUrl: string | null;
     internalIdentifier: string;
     totalItemsCount: number;
     totalItemsUnreadCount: number;
     bookmarkedItemsUnreadCount: number;
     favoriteItemsUnreadCount: number;
 };
+
+const emptyFeeds: FeedReturnObject[] = [];
 
 export const SideMenuContainer: FC<Props> = ({ prefix }) => {
     const api = useAuthFetcher();
@@ -35,10 +38,11 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
         setIsOpen(false);
     };
 
-    const { data } = useQuery<FeedReturnObject[]>({
-        queryKey: ["items", "feed", "all"],
+    const { data = emptyFeeds } = useQuery<FeedReturnObject[]>({
+        queryKey: feedsQueryKey,
         queryFn: async () => await api.QUERY("/feed"),
-        initialData: [],
+        placeholderData: emptyFeeds,
+        staleTime: 60_000,
     });
 
     const { pathname } = useLocation();
@@ -148,7 +152,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
                                 key={feed.internalIdentifier}
                                 title={feed.title}
                                 url={prefixUrl(`/feed/${feed.internalIdentifier}`)}
-                                image={feed.imageUrl}
+                                image={feed.imageUrl ?? undefined}
                                 backupImage={avatarUrl(feed.internalIdentifier)}
                                 selected={isSelected(`/feed/${feed.internalIdentifier}`)}
                                 notification={unread > 0 ? unread : undefined}

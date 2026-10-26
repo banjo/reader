@@ -25,7 +25,9 @@ const isCleanFeedWithItemsArray = (data: any): data is CleanFeedWithItems[] => {
 
 export const useMutateItem = () => {
     const api = useAuthFetcher();
-    const { cancelQueries, queryClient, refetch } = useInvalidate();
+    const { cancelQueries, invalidateFeeds, queryClient, refetch } = useInvalidate();
+
+    const refreshAfterItemChange = () => Promise.all([refetch(), invalidateFeeds()]);
 
     const optimisticUpdateItemWithContent = (
         c: MutateContext,
@@ -106,9 +108,7 @@ export const useMutateItem = () => {
         onError: (err, c, context) => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
-        onSettled: () => {
-            refetch();
-        },
+        onSettled: refreshAfterItemChange,
     });
 
     const toggleReadStatus = (item: ItemWithContent) => {
@@ -135,9 +135,7 @@ export const useMutateItem = () => {
         onError: (err, c, context) => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
-        onSettled: () => {
-            refetch();
-        },
+        onSettled: refreshAfterItemChange,
     });
 
     const updateItem = (item: ItemWithContent) => {
@@ -166,9 +164,7 @@ export const useMutateItem = () => {
         onError: (err, c, context) => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
-        onSettled: () => {
-            refetch();
-        },
+        onSettled: refreshAfterItemChange,
     });
 
     const toggleBookmarkStatus = (item: ItemWithContent) => {
@@ -196,9 +192,7 @@ export const useMutateItem = () => {
         onError: (err, c, context) => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
-        onSettled: () => {
-            refetch();
-        },
+        onSettled: refreshAfterItemChange,
     });
 
     const toggleFavoriteStatus = (item: ItemWithContent) => {
@@ -268,9 +262,7 @@ export const useMutateItem = () => {
         onError: (err, c, context) => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
-        onSettled: () => {
-            refetch();
-        },
+        onSettled: refreshAfterItemChange,
     });
 
     const markMultipleAsRead = (items: ItemWithContent[]) => {
@@ -340,9 +332,7 @@ export const useMutateItem = () => {
         onError: (err, c, context) => {
             queryClient.setQueryData(["items"], context?.previousItems);
         },
-        onSettled: () => {
-            refetch();
-        },
+        onSettled: refreshAfterItemChange,
     });
 
     const markAllAsRead = (feedId: number) => {

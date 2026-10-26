@@ -6,33 +6,64 @@ import { getFilterWhere, getPagination, sortItems } from "../shared/lib/utils";
 
 const logger = createLogger("FeedRepository");
 
-const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItems[]> => {
-    const feeds = await prisma.feed.findMany({
-        where: {
-            users: {
-                some: {
-                    id: userId,
+type FeedItemCounts = {
+    feedId: number;
+    total: bigint;
+    unread: bigint;
+    bookmarkedUnread: bigint;
+    favoriteUnread: bigint;
+};
+
+export type FeedWithItemCounts = Feed & {
+    totalItemsCount: number;
+    totalItemsUnreadCount: number;
+    bookmarkedItemsUnreadCount: number;
+    favoriteItemsUnreadCount: number;
+};
+
+export type FeedItemsCountOptions = {
+    internalIdentifier: string;
+    userId: number;
+    filter: Filter;
+};
+
+const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItemCounts[]> => {
+    const [feeds, counts] = await Promise.all([
+        prisma.feed.findMany({
+            where: {
+                users: {
+                    some: {
+                        id: userId,
+                    },
                 },
             },
-        },
-        include: {
-            items: {
-                include: {
-                    content: true,
-                },
-                where: {
-                    userId: userId,
-                },
-            },
-        },
-    });
+        }),
+        prisma.$queryRaw<FeedItemCounts[]>`
+            SELECT "feedId",
+                   count(*) AS total,
+                   count(*) FILTER (WHERE NOT "isRead") AS unread,
+                   count(*) FILTER (WHERE "isBookmarked" AND NOT "isRead") AS "bookmarkedUnread",
+                   count(*) FILTER (WHERE "isFavorite" AND NOT "isRead") AS "favoriteUnread"
+            FROM "Item"
+            WHERE "userId" = ${userId}
+            GROUP BY "feedId"
+        `,
+    ]);
 
-    if (!feeds) {
-        logger.error("No feeds found");
-        return Result.error("No feeds found", "NotFound");
-    }
+    const countsByFeed = new Map(counts.map(count => [count.feedId, count]));
 
-    return Result.ok(feeds);
+    return Result.ok(
+        feeds.map(feed => {
+            const count = countsByFeed.get(feed.id);
+            return {
+                ...feed,
+                totalItemsCount: Number(count?.total ?? 0),
+                totalItemsUnreadCount: Number(count?.unread ?? 0),
+                bookmarkedItemsUnreadCount: Number(count?.bookmarkedUnread ?? 0),
+                favoriteItemsUnreadCount: Number(count?.favoriteUnread ?? 0),
+            };
+        })
+    );
 };
 
 const getFeedWithContentByInternalIdentifier = async (
@@ -96,17 +127,10 @@ const getFeedById = async (feedId: number): AsyncResultType<FeedWithItems> => {
     return Result.ok(feed);
 };
 
-const getFeedByRssUrl = async (rssUrl: string): AsyncResultType<FeedWithItems> => {
+const getFeedByRssUrl = async (rssUrl: string): AsyncResultType<Feed> => {
     const feed = await prisma.feed.findUnique({
         where: {
             rssUrl: rssUrl,
-        },
-        include: {
-            items: {
-                include: {
-                    content: true,
-                },
-            },
         },
     });
 
@@ -120,17 +144,10 @@ const getFeedByRssUrl = async (rssUrl: string): AsyncResultType<FeedWithItems> =
 
 const getFeedByInternalIdentifier = async (
     feedInternalIdentifier: string
-): AsyncResultType<FeedWithItems> => {
+): AsyncResultType<Feed> => {
     const feed = await prisma.feed.findUnique({
         where: {
             internalIdentifier: feedInternalIdentifier,
-        },
-        include: {
-            items: {
-                include: {
-                    content: true,
-                },
-            },
         },
     });
 
@@ -139,7 +156,6 @@ const getFeedByInternalIdentifier = async (
         return Result.error("Feed not found", "NotFound");
     }
 
-    feed.items = sortItems(feed.items);
     return Result.ok(feed);
 };
 
@@ -206,7 +222,7 @@ const createFeed = async (feed: Prisma.FeedCreateInput, userId: number): AsyncRe
     return Result.ok(createdFeed);
 };
 
-const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<FeedWithItems> => {
+const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<Feed> => {
     const feed = await prisma.feed.update({
         where: {
             id: feedId,
@@ -218,13 +234,6 @@ const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<Fe
                 },
             },
         },
-        include: {
-            items: {
-                include: {
-                    content: true,
-                },
-            },
-        },
     });
 
     if (!feed) {
@@ -232,7 +241,6 @@ const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<Fe
         return Result.error("Could not add feed to user", "InternalError");
     }
 
-    feed.items = sortItems(feed.items);
     return Result.ok(feed);
 };
 
@@ -350,29 +358,22 @@ const isSubscribedToFeed = async (
     return Result.ok(feed.users.length > 0);
 };
 
-const getFeedItemsCount = async (
-    internalIdentifier: string,
-    filter: Filter
-): AsyncResultType<number> => {
-    const feed = await prisma.feed.findUnique({
+const getFeedItemsCount = async ({
+    internalIdentifier,
+    userId,
+    filter,
+}: FeedItemsCountOptions): AsyncResultType<number> => {
+    const count = await prisma.item.count({
         where: {
-            internalIdentifier: internalIdentifier,
-        },
-        include: {
-            items: {
-                where: {
-                    ...getFilterWhere(filter),
-                },
+            feed: {
+                internalIdentifier,
             },
+            userId,
+            ...getFilterWhere(filter),
         },
     });
 
-    if (!feed) {
-        logger.error(`Feed not found with id: ${internalIdentifier}`);
-        return Result.error("Feed not found", "NotFound");
-    }
-
-    return Result.ok(feed.items.length);
+    return Result.ok(count);
 };
 
 const markAllAsRead = async (feedId: number, userId: number): AsyncResultType<void> => {

@@ -23,15 +23,12 @@ export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => 
         mutationFn: async (internalIdentifier: string) => {
             await api.POST(`/feed/${internalIdentifier}/subscribe`, {});
         },
-        onSuccess: () => {
-            invalidate();
-        },
+        onSuccess: invalidate,
     });
 
     // ACTIONS
     const subscribe = async (internalIdentifier: string) => {
         await mutateSubscribe.mutateAsync(internalIdentifier);
-        invalidate();
     };
 
     return {

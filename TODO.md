@@ -96,7 +96,7 @@ content just to read their ids.
 
 **Fix**
 
-- [ ] Replace the `GET /feed` counting with one grouped query:
+- [x] Replace the `GET /feed` counting with one grouped query:
 
     ```sql
     select "feedId",
@@ -111,14 +111,14 @@ content just to read their ids.
 
     Load the feeds themselves without `items`.
 
-- [ ] Rename the side menu query key to `["feeds"]` so item mutations don't refetch it.
+- [x] Rename the side menu query key to `["feeds"]` so item mutations don't refetch it.
       Invalidate it on purpose after read changes, or update the counts optimistically. Give
       it a `staleTime`.
-- [ ] Change `getFeedItemsCount` to `prisma.item.count({ where: { feed: { internalIdentifier },
+- [x] Change `getFeedItemsCount` to `prisma.item.count({ where: { feed: { internalIdentifier },
       userId, ...filter } })`.
-- [ ] Remove the `include: { items }` from `getFeedByRssUrl`, `addFeedToUser`, and
+- [x] Remove the `include: { items }` from `getFeedByRssUrl`, `addFeedToUser`, and
       `getFeedByInternalIdentifier`, or add slim versions that return only the feed.
-- [ ] Make `assignFeedItemsToUser` a single `insert into "Item" ... select ... from
+- [x] Make `assignFeedItemsToUser` a single `insert into "Item" ... select ... from
       "ItemContent" where "feedId" = $1 on conflict do nothing`, or at least
       `select: { id: true }`.
 

@@ -4,9 +4,11 @@ import { Result, createLogger } from "utils";
 import { ContentMapper } from "../mappers/ContentMapper";
 import { DatabaseMapper } from "../mappers/DatabaseMapper";
 import { FeedMapper, SearchFeed } from "../mappers/FeedMapper";
-import { ItemMapper } from "../mappers/ItemMapper";
-import { ContentRepository } from "../repositories/ContentRepository";
-import { FeedRepository } from "../repositories/FeedRepository";
+import {
+    FeedItemsCountOptions,
+    FeedRepository,
+    FeedWithItemCounts,
+} from "../repositories/FeedRepository";
 import { ItemRepository } from "../repositories/ItemRepository";
 import { fetchContentWithoutImageWorker, fetchRssFeedWorker } from "../workers";
 import { ParseService } from "./ParseService";
@@ -39,7 +41,7 @@ const getUserFeedByInternalIdentifier = async ({
     return Result.ok(DatabaseMapper.feedWithItems(feedResponse.data));
 };
 
-const getAllFeedsByUserId = async (userId: number): AsyncResultType<CleanFeedWithItems[]> => {
+const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItemCounts[]> => {
     const feedsResponse = await FeedRepository.getAllFeedsByUserId(userId);
 
     if (!feedsResponse.success) {
@@ -47,35 +49,7 @@ const getAllFeedsByUserId = async (userId: number): AsyncResultType<CleanFeedWit
         return Result.error("No feeds found", "NotFound");
     }
 
-    return Result.ok(feedsResponse.data.map(feed => DatabaseMapper.feedWithItems(feed)));
-};
-
-const assignFeedItemsToUser = async (feedId: number, userId: number): AsyncResultType<void> => {
-    const contentResponse = await ContentRepository.getAllContentById(feedId);
-
-    if (!contentResponse.success) {
-        logger.error(`no content items found in db for feed with id ${feedId}`);
-        return Result.error("Content not found", "NotFound");
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const newItems = contentResponse.data.map(content => {
-        return {
-            ...ItemMapper.defaultItem(),
-            userId,
-            contentId: content.id,
-            feedId,
-        };
-    });
-
-    const addItemsResult = await ItemRepository.createItems(newItems);
-
-    if (!addItemsResult.success) {
-        logger.error(`failed to add items to user with id ${userId}`);
-        return Result.error("Failed to add items to user", "InternalError");
-    }
-
-    return Result.okEmpty();
+    return Result.ok(feedsResponse.data);
 };
 
 type AddFeedResponse = {
@@ -116,7 +90,10 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         }
 
         // TODO: update feed items with new scan
-        const assignFeedItemsToUserResult = await assignFeedItemsToUser(id, userId);
+        const assignFeedItemsToUserResult = await ItemRepository.assignFeedItemsToUser({
+            feedId: id,
+            userId,
+        });
 
         if (!assignFeedItemsToUserResult.success) {
             logger.error("failed to add items to feed");
@@ -202,10 +179,7 @@ const unsubscribeFromFeed = async (
     internalIdentifier: string,
     userId: number
 ): AsyncResultType<void> => {
-    const feedResult = await FeedRepository.getUserFeedByInternalIdentifier({
-        feedInternalIdentifier: internalIdentifier,
-        userId,
-    });
+    const feedResult = await FeedRepository.getFeedByInternalIdentifier(internalIdentifier);
 
     if (!feedResult.success) {
         if (feedResult.type === "NotFound") {
@@ -310,7 +284,10 @@ const subscribeToFeed = async (
         return Result.error("Could not add feed to user", "InternalError");
     }
 
-    const assignResult = await assignFeedItemsToUser(feedResult.data.id, userId);
+    const assignResult = await ItemRepository.assignFeedItemsToUser({
+        feedId: feedResult.data.id,
+        userId,
+    });
 
     if (!assignResult.success) {
         logger.error(`Could not assign items for feed with id ${feedResult.data.id}`);
@@ -320,14 +297,11 @@ const subscribeToFeed = async (
     return Result.okEmpty();
 };
 
-const getFeedItemsCount = async (
-    feedInternalIdentifier: string,
-    filter: Filter
-): AsyncResultType<number> => {
-    const count = await FeedRepository.getFeedItemsCount(feedInternalIdentifier, filter);
+const getFeedItemsCount = async (options: FeedItemsCountOptions): AsyncResultType<number> => {
+    const count = await FeedRepository.getFeedItemsCount(options);
 
     if (!count.success) {
-        logger.error(`Could not get count for feed with identifier ${feedInternalIdentifier}`);
+        logger.error(`Could not get count for feed with identifier ${options.internalIdentifier}`);
         return Result.error("Could not get count for feed", "InternalError");
     }
 

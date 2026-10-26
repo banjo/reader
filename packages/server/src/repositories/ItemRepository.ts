@@ -143,6 +143,31 @@ type CreateItemProps = {
     userId: number;
 };
 
+type AssignFeedItemsToUserProps = {
+    feedId: number;
+    userId: number;
+};
+
+const assignFeedItemsToUser = async ({
+    feedId,
+    userId,
+}: AssignFeedItemsToUserProps): AsyncResultType<void> => {
+    try {
+        await prisma.$executeRaw`
+            INSERT INTO "Item" ("updatedAt", "feedId", "userId", "contentId")
+            SELECT CURRENT_TIMESTAMP, ${feedId}, ${userId}, "id"
+            FROM "ItemContent"
+            WHERE "feedId" = ${feedId}
+            ON CONFLICT ("userId", "contentId") DO NOTHING
+        `;
+    } catch (error: unknown) {
+        logger.error(`Could not assign feed ${feedId} to user ${userId} - ${error}`);
+        return Result.error("Could not assign feed items to user", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
 // TODO: update create item to accomodate for content
 const createItem = async ({ item }: CreateItemProps): AsyncResultType<Item> => {
     try {
@@ -265,6 +290,7 @@ const getItemCount = async (userId: number, filter: Filter): AsyncResultType<num
 };
 
 export const ItemRepository = {
+    assignFeedItemsToUser,
     getAllItemsByFeed,
     getItemById,
     markItemsAsRead,

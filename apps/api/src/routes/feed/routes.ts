@@ -25,11 +25,10 @@ feed.get("/", async c => {
         title: feed.name,
         imageUrl: feed.imageUrl,
         internalIdentifier: feed.internalIdentifier,
-        totalItemsCount: feed.items.length,
-        totalItemsUnreadCount: feed.items.filter(item => !item.isRead).length,
-        bookmarkedItemsUnreadCount: feed.items.filter(item => item.isBookmarked && !item.isRead)
-            .length,
-        favoriteItemsUnreadCount: feed.items.filter(item => item.isFavorite && !item.isRead).length,
+        totalItemsCount: feed.totalItemsCount,
+        totalItemsUnreadCount: feed.totalItemsUnreadCount,
+        bookmarkedItemsUnreadCount: feed.bookmarkedItemsUnreadCount,
+        favoriteItemsUnreadCount: feed.favoriteItemsUnreadCount,
     }));
 
     return c.json(Result.ok(returnObject));
@@ -109,7 +108,9 @@ feed.get("/:internalIdentifier", async c => {
         return c.json(Result.error(feedResult.message, feedResult.type));
     }
 
-    const totalItemsCount = await FeedService.getFeedItemsCount(internalIdentifier, filter);
+    const totalItemsCount = feedResult.data.isSubscribed
+        ? await FeedService.getFeedItemsCount({ internalIdentifier, userId, filter })
+        : Result.ok(feedResult.data.contentItems.length);
 
     if (!totalItemsCount.success) {
         logger.error(
