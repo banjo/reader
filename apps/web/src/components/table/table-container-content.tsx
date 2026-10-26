@@ -4,6 +4,7 @@ import { FilterBar } from "@/components/table/table-filter-bar";
 import { TableItem } from "@/components/table/table-item";
 import { useTableFiltersContent } from "@/components/table/use-table-filters-content";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Paginate } from "@/hooks/shared/use-pagination";
 import { noop } from "@banjoanton/utils";
 import { CleanFeedWithContent, ItemContent } from "db";
 import { FC } from "react";
@@ -18,6 +19,7 @@ type TableContainerProps = {
     menuOptions?: MenuEntries<ItemContent>[];
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     title: string;
+    paginate?: Paginate;
 };
 
 export const TableContainerContent: FC<TableContainerProps> = ({
@@ -26,6 +28,7 @@ export const TableContainerContent: FC<TableContainerProps> = ({
     title,
     titleMenuOptions,
     feed,
+    paginate,
 }) => {
     const { filters, actions, data } = useTableFiltersContent(content);
 
@@ -38,6 +41,7 @@ export const TableContainerContent: FC<TableContainerProps> = ({
                 titleMenuOptions={titleMenuOptions}
                 isSubscribed={false}
                 feed={feed}
+                paginate={paginate}
             />
             <Table type="list">
                 {data.length > 0 &&

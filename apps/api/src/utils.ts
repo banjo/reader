@@ -14,11 +14,22 @@ export const parseFilters = (context: Context): Filter => {
     };
 };
 
+const DEFAULT_PAGE_SIZE = 12;
+const MAX_PAGE_SIZE = 100;
+
+const parsePositiveInt = (value: string | undefined, fallback: number) => {
+    const parsed = Number.parseInt(value ?? "", 10);
+    return Number.isNaN(parsed) ? fallback : Math.max(parsed, 1);
+};
+
 export const parsePagination = (context: Context): Pagination => {
     const queryParams = context.req.query();
 
     return {
-        page: queryParams.page ? Number.parseInt(queryParams.page as string) : 1,
-        pageSize: queryParams.pageSize ? Number.parseInt(queryParams.pageSize as string) : 12,
+        page: parsePositiveInt(queryParams.page, 1),
+        pageSize: Math.min(
+            parsePositiveInt(queryParams.pageSize, DEFAULT_PAGE_SIZE),
+            MAX_PAGE_SIZE
+        ),
     };
 };

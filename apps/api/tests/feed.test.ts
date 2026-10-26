@@ -213,6 +213,83 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
         assert.equal((await preview.json()).data.pagination.total, 1);
     });
 
+    await t.test("pages are stable when posts share a publish date", async () => {
+        signedInUserId = firstUser.id;
+        const pubDate = new Date("2026-01-01T00:00:00Z");
+        const [followedTie, unfollowedTie] = await Promise.all(
+            ["followed-tie", "unfollowed-tie"].map(name =>
+                prisma.feed.create({
+                    data: { name, url: `https://${name}.test`, rssUrl: `https://${name}.test/rss` },
+                })
+            )
+        );
+        assert.ok(followedTie && unfollowedTie);
+        for (const tieFeed of [followedTie, unfollowedTie]) {
+            await prisma.itemContent.createMany({
+                data: Array.from({ length: 7 }, (_, index) => ({
+                    feedId: tieFeed.id,
+                    title: `Tie ${index}`,
+                    link: `${tieFeed.url}/${index}`,
+                    lastFetch: pubDate,
+                    pubDate,
+                })),
+            });
+        }
+        await prisma.feed.update({
+            where: { id: followedTie.id },
+            data: { users: { connect: { id: firstUser.id } } },
+        });
+        await ItemRepository.assignFeedItemsToUser({
+            feedId: followedTie.id,
+            userId: firstUser.id,
+        });
+
+        const collectIds = async (internalIdentifier: string, key: "items" | "contentItems") => {
+            const ids: number[] = [];
+            for (let page = 1; page <= 3; page++) {
+                const response = await app.request(
+                    `/feed/${internalIdentifier}?page=${page}&pageSize=3`
+                );
+                const body = await response.json();
+                assert.equal(body.data.pagination.total, 7);
+                ids.push(...body.data.data[key].map((entry: { id: number }) => entry.id));
+            }
+            return ids;
+        };
+
+        const itemIds = await collectIds(followedTie.internalIdentifier, "items");
+        assert.equal(itemIds.length, 7);
+        assert.equal(new Set(itemIds).size, 7);
+        assert.deepEqual(
+            itemIds,
+            [...itemIds].sort((a, b) => b - a)
+        );
+
+        const contentIds = await collectIds(unfollowedTie.internalIdentifier, "contentItems");
+        assert.equal(contentIds.length, 7);
+        assert.equal(new Set(contentIds).size, 7);
+        assert.deepEqual(
+            contentIds,
+            [...contentIds].sort((a, b) => b - a)
+        );
+    });
+
+    await t.test("page and page size are clamped and fall back on invalid values", async () => {
+        signedInUserId = firstUser.id;
+        const path = `/feed/${shared.internalIdentifier}`;
+        for (const [query, page, pageSize] of [
+            ["page=abc&pageSize=xyz", 1, 12],
+            ["page=0&pageSize=0", 1, 1],
+            ["page=-3&pageSize=-5", 1, 1],
+            ["page=2&pageSize=1000", 2, 100],
+        ] as const) {
+            const response = await app.request(`${path}?${query}`);
+            const body = await response.json();
+            assert.equal(body.success, true, query);
+            assert.deepEqual(body.data.pagination, { page, pageSize, total: 5 }, query);
+        }
+    });
+
     await t.test("bulk assignment is concurrent-safe and preserves existing statuses", async () => {
         const results = await Promise.all(
             Array.from({ length: 3 }, () =>

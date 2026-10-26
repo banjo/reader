@@ -110,7 +110,7 @@ feed.get("/:internalIdentifier", async c => {
 
     const totalItemsCount = feedResult.data.isSubscribed
         ? await FeedService.getFeedItemsCount({ internalIdentifier, userId, filter })
-        : Result.ok(feedResult.data.contentItems.length);
+        : await FeedService.getFeedContentCount(internalIdentifier);
 
     if (!totalItemsCount.success) {
         logger.error(

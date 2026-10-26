@@ -2,7 +2,6 @@ import { ItemWithContentAndFeed } from "db";
 import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
 import { ItemRepository, ItemStatus } from "../repositories/ItemRepository";
-import { sortItems } from "../shared/lib/utils";
 
 const logger = createLogger("ItemService");
 
@@ -18,7 +17,7 @@ const getAllItemsByUserId = async (
         return Result.error(`Could not find items for user with id ${userId}`, "NotFound");
     }
 
-    return Result.ok(sortItems(items.data));
+    return Result.ok(items.data);
 };
 
 const getItemById = async (id: number) => {

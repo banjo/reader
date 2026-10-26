@@ -1,8 +1,7 @@
-import { sortBy } from "@banjoanton/utils";
 import { Feed, FeedWithContent, FeedWithItems, FeedWithUsers, Prisma, prisma } from "db";
 import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
-import { getFilterWhere, getPagination, sortItems } from "../shared/lib/utils";
+import { contentOrderBy, getFilterWhere, getPagination, itemOrderBy } from "../shared/lib/utils";
 
 const logger = createLogger("FeedRepository");
 
@@ -67,14 +66,18 @@ const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItem
 };
 
 const getFeedWithContentByInternalIdentifier = async (
-    internalIdentifier: string
+    internalIdentifier: string,
+    pagination?: Pagination
 ): AsyncResultType<FeedWithContent> => {
     const feed = await prisma.feed.findUnique({
         where: {
             internalIdentifier: internalIdentifier,
         },
         include: {
-            contentItems: true,
+            contentItems: {
+                orderBy: contentOrderBy,
+                ...getPagination(pagination),
+            },
         },
     });
 
@@ -83,8 +86,19 @@ const getFeedWithContentByInternalIdentifier = async (
         return Result.error("Feed not found", "NotFound");
     }
 
-    feed.contentItems = sortBy(feed.contentItems, "createdAt", "desc");
     return Result.ok(feed);
+};
+
+const getFeedContentCount = async (internalIdentifier: string): AsyncResultType<number> => {
+    const count = await prisma.itemContent.count({
+        where: {
+            feed: {
+                internalIdentifier,
+            },
+        },
+    });
+
+    return Result.ok(count);
 };
 
 const getFeedWithContentById = async (feedId: number): AsyncResultType<FeedWithContent> => {
@@ -183,11 +197,7 @@ const getUserFeedByInternalIdentifier = async ({
                     userId: userId,
                     ...getFilterWhere(filter),
                 },
-                orderBy: {
-                    content: {
-                        pubDate: "desc",
-                    },
-                },
+                orderBy: itemOrderBy,
                 ...getPagination(pagination),
             },
         },
@@ -198,7 +208,6 @@ const getUserFeedByInternalIdentifier = async ({
         return Result.error("Feed not found", "NotFound");
     }
 
-    feed.items = sortItems(feed.items);
     return Result.ok(feed);
 };
 
@@ -418,5 +427,6 @@ export const FeedRepository = {
     removeFeedFromUser,
     isSubscribedToFeed,
     getFeedItemsCount,
+    getFeedContentCount,
     markAllAsRead,
 };

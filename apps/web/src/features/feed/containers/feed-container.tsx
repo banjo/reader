@@ -47,7 +47,12 @@ const FeedContent = ({ slug }: { slug: string }) => {
                     paginate={paginate}
                 />
             ) : (
-                <TableContainerContent content={data.contentItems} feed={data} title={data.name} />
+                <TableContainerContent
+                    content={data.contentItems}
+                    feed={data}
+                    title={data.name}
+                    paginate={paginate}
+                />
             )}
         </div>
     );

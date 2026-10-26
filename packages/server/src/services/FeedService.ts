@@ -253,8 +253,10 @@ const getFeedWithItemsOrContent = async ({
     }
 
     // not subscribed
-    const feedWithContentResponse =
-        await FeedRepository.getFeedWithContentByInternalIdentifier(internalIdentifier);
+    const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
+        internalIdentifier,
+        pagination
+    );
 
     if (!feedWithContentResponse.success) {
         return Result.error("Could not get content feed by identifier", "InternalError");
@@ -308,6 +310,17 @@ const getFeedItemsCount = async (options: FeedItemsCountOptions): AsyncResultTyp
     return Result.ok(count.data);
 };
 
+const getFeedContentCount = async (internalIdentifier: string): AsyncResultType<number> => {
+    const count = await FeedRepository.getFeedContentCount(internalIdentifier);
+
+    if (!count.success) {
+        logger.error(`Could not get content count for feed with identifier ${internalIdentifier}`);
+        return Result.error("Could not get count for feed", "InternalError");
+    }
+
+    return Result.ok(count.data);
+};
+
 const markAllAsRead = async (feedId: number, userId: number): AsyncResultType<void> => {
     const markResult = await FeedRepository.markAllAsRead(feedId, userId);
 
@@ -328,5 +341,6 @@ export const FeedService = {
     getFeedWithItemsOrContent,
     subscribeToFeed,
     getFeedItemsCount,
+    getFeedContentCount,
     markAllAsRead,
 };

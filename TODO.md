@@ -139,13 +139,13 @@ the whole feed, with all its HTML, when you aren't subscribed.
 
 **Fix**
 
-- [ ] Sort by `[{ content: { pubDate: "desc" } }, { id: "desc" }]` everywhere, and by
+- [x] Sort by `[{ content: { pubDate: "desc" } }, { id: "desc" }]` everywhere, and by
       `[{ pubDate: "desc" }, { id: "desc" }]` for content.
-- [ ] Remove the extra in-memory `sortItems` calls after the database query. They're
+- [x] Remove the extra in-memory `sortItems` calls after the database query. They're
       redundant and not stable.
-- [ ] Clamp `page` to at least 1 and `pageSize` to 1–100, and fall back to the defaults on
+- [x] Clamp `page` to at least 1 and `pageSize` to 1–100, and fall back to the defaults on
       `NaN`.
-- [ ] Paginate `contentItems` in the unfollowed view with `take`, `skip`, and the same sort,
+- [x] Paginate `contentItems` in the unfollowed view with `take`, `skip`, and the same sort,
       and count them separately.
 
 ## 5. Send and store less post content

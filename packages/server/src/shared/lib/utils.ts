@@ -1,16 +1,16 @@
-import { ItemWithContent, Prisma } from "db";
+import { Prisma } from "db";
 import { Filter, Pagination } from "model";
 
-export function sortItems<T extends ItemWithContent>(items: T[]): T[] {
-    return [
-        ...items.sort((a, b) => {
-            if (a.content.pubDate && b.content.pubDate) {
-                return b.content.pubDate.getTime() - a.content.pubDate.getTime();
-            }
-            return 0;
-        }),
-    ];
-}
+// Publish dates are not unique, so `id` keeps the order stable between pages.
+export const itemOrderBy = [
+    { content: { pubDate: "desc" } },
+    { id: "desc" },
+] satisfies Prisma.ItemOrderByWithRelationInput[];
+
+export const contentOrderBy = [
+    { pubDate: "desc" },
+    { id: "desc" },
+] satisfies Prisma.ItemContentOrderByWithRelationInput[];
 
 export const getFilterWhere = (filter?: Filter): Prisma.ItemWhereInput => {
     return {

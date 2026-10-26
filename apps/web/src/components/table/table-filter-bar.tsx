@@ -45,6 +45,24 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     feed,
     paginate,
 }) => {
+    const paginationControls = paginate && (
+        <div className="ml-6 flex gap-2">
+            <ResponsiveIcon
+                Icon={Icons.chevronLeft}
+                onClick={() => paginate.prevPage()}
+                disabled={!paginate.hasPrevPage()}
+                tooltip="Previous"
+            />
+
+            <ResponsiveIcon
+                Icon={Icons.chevronRight}
+                onClick={() => paginate.nextPage()}
+                disabled={!paginate.hasNextPage()}
+                tooltip="Next"
+            />
+        </div>
+    );
+
     return (
         <div className="flex h-16 w-full items-center justify-end gap-4 rounded-md border border-border p-4">
             <div className="flex mr-auto">
@@ -124,30 +142,13 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                         tooltip="Show unread only"
                     />
 
-                    {paginate && (
-                        <>
-                            <div className="ml-6 flex gap-2">
-                                <ResponsiveIcon
-                                    Icon={Icons.chevronLeft}
-                                    onClick={() => paginate.prevPage()}
-                                    disabled={!paginate.hasPrevPage()}
-                                    tooltip="Previous"
-                                />
-
-                                <ResponsiveIcon
-                                    Icon={Icons.chevronRight}
-                                    onClick={() => paginate.nextPage()}
-                                    disabled={!paginate.hasNextPage()}
-                                    tooltip="Next"
-                                />
-                            </div>
-                        </>
-                    )}
+                    {paginationControls}
                 </div>
             )}
 
             {feed && !isSubscribed && (
                 <>
+                    {paginationControls}
                     <Button onClick={async () => await actions.subscribe(feed.internalIdentifier)}>
                         Subscribe
                     </Button>

@@ -1,7 +1,7 @@
 import { Item, ItemContent, ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
 import { AsyncResultType, Filter, Pagination } from "model";
 import { Result, createLogger } from "utils";
-import { getFilterWhere, getPagination } from "../shared/lib/utils";
+import { getFilterWhere, getPagination, itemOrderBy } from "../shared/lib/utils";
 
 const logger = createLogger("ItemRepository");
 
@@ -41,11 +41,7 @@ const getAllItemsByUserId = async (
                 content: true,
                 feed: true,
             },
-            orderBy: {
-                content: {
-                    pubDate: "desc",
-                },
-            },
+            orderBy: itemOrderBy,
             ...getPagination(pagination),
         });
     } catch (error: unknown) {
