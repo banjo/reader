@@ -6,15 +6,6 @@ const defaultItem = () => {
     };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const prepareSafeParse = (item: any) => {
-    return {
-        ...item,
-        pubDate: item.pubDate ?? new Date().toISOString(),
-    };
-};
-
 export const ItemMapper = {
     defaultItem,
-    prepareSafeParse,
 };

@@ -1,43 +1,37 @@
 import { Job } from "bullmq";
-import { ItemContent } from "db";
 import { Result } from "utils";
+import { z } from "zod";
 import { ItemRepository } from "../../../repositories/ItemRepository";
-import { UserRepository } from "../../../repositories/UserRepository";
 import { createWorker } from "../../create";
 import { createWorkerLogger } from "../../logger";
 
 type AddToUsersJobData = {
-    content: ItemContent[];
+    contentIds: number[];
     feedId: number;
 };
 
+const idSchema = z.number().int().positive();
+const jobSchema = z.union([
+    z.object({ feedId: idSchema, contentIds: z.array(idSchema) }),
+    // Jobs queued before this release still contain full content objects.
+    z
+        .object({ feedId: idSchema, content: z.array(z.object({ id: idSchema })) })
+        .transform(({ feedId, content }) => ({ feedId, contentIds: content.map(item => item.id) })),
+]);
+
 const processor = async (job: Job<AddToUsersJobData>) => {
-    const { content, feedId } = job.data;
+    const { contentIds, feedId } = jobSchema.parse(job.data);
     const logger = createWorkerLogger("worker:add-to-users", job);
 
-    const users = await UserRepository.getUsersByFeedId(feedId);
+    const result = await ItemRepository.assignContentToFollowers({ feedId, contentIds });
 
-    if (!users) {
-        logger.info(`No users found for feedId: ${feedId}`);
-        return Result.okEmpty();
+    if (!result.success) {
+        throw new Error(
+            `Could not assign content to followers of feed ${feedId}: ${result.message}`
+        );
     }
 
-    logger.info(`Adding ${content.length} items to ${users.length} users`);
-
-    await Promise.all(
-        users.map(async user => {
-            const result = await ItemRepository.createItemsFromContent(content, feedId, user.id);
-
-            if (!result.success) {
-                logger.error(`Failed to add items to user ${user.id} - ${result.message}`);
-                throw new Error(`Failed to add items to user ${user.id}: ${result.message}`);
-            }
-
-            logger.info(`Added ${content.length} items to user with id ${user.id}`);
-        })
-    );
-
-    logger.info(`Successfully added ${content.length} items to ${users.length} users`);
+    logger.info(`Assigned ${contentIds.length} posts to followers of feed ${feedId}`);
 
     return Result.okEmpty();
 };

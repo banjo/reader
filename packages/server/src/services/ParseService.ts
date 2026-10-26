@@ -1,27 +1,65 @@
-import { first, sortBy } from "@banjoanton/utils";
-import { ItemContent, Prisma } from "db";
+import { Prisma } from "db";
 import { parseHTML } from "linkedom";
 import { AsyncResultType } from "model";
 import RssParser from "rss-parser";
 import { Result, createLogger } from "utils";
 import { z } from "zod";
 import { ContentMapper } from "../mappers/ContentMapper";
-import { FeedMapper } from "../mappers/FeedMapper";
+import { FeedRefresh } from "../shared/lib/feed-refresh";
 
 const rssParser = new RssParser();
 
 const logger = createLogger("ParseService");
 
-export const ParseItemSchema = z.object({
-    title: z.string(),
-    link: z.string().url(),
-    pubDate: z.union([z.string(), z.null()]),
-    description: z.string().optional(),
-    content: z.string().optional(),
-    guid: z.string().optional(),
-    categories: z.string().array().optional(),
-    contentSnippet: z.string().optional(),
-});
+const postLinkSchema = z
+    .string()
+    .trim()
+    .url()
+    .refine(link => /^https?:\/\//i.test(link));
+
+const prepareItem = (input: unknown): unknown => {
+    if (typeof input !== "object" || input === null || Array.isArray(input)) {
+        return input;
+    }
+
+    const item = input as Record<string, unknown>;
+    const title = typeof item.title === "string" ? item.title.trim() : "";
+    const description = [item.description, item.contentSnippet, item.content].find(
+        value => typeof value === "string" && value.trim()
+    );
+    const fallbackTitle =
+        !title && typeof description === "string"
+            ? parseHTML(`<html><body>${description}</body></html>`)
+                  .document.body.textContent.replace(/\s+/g, " ")
+                  .trim()
+                  .slice(0, 120)
+            : "";
+    const link = [item.link, item.guid].find(value => postLinkSchema.safeParse(value).success);
+    const pubDate = [item.isoDate, item.pubDate].find(
+        value => typeof value === "string" && Number.isFinite(Date.parse(value))
+    );
+
+    return {
+        ...item,
+        title: title || fallbackTitle,
+        link,
+        pubDate: pubDate ?? null,
+    };
+};
+
+export const ParseItemSchema = z.preprocess(
+    prepareItem,
+    z.object({
+        title: z.string().trim().min(1),
+        link: postLinkSchema,
+        pubDate: z.string().nullable(),
+        description: z.string().optional(),
+        content: z.string().optional(),
+        guid: z.string().optional(),
+        categories: z.string().array().optional(),
+        contentSnippet: z.string().optional(),
+    })
+);
 
 export const ParseFeedSchema = z.object({
     title: z.string(),
@@ -32,6 +70,11 @@ export const ParseFeedSchema = z.object({
 
 export type ParseItem = z.infer<typeof ParseItemSchema>;
 export type ParseFeed = z.infer<typeof ParseFeedSchema>;
+
+type ShouldParseAgainProps = {
+    currentLinks: Set<string>;
+    url: string;
+};
 
 const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
     let parsedResult;
@@ -46,17 +89,31 @@ const parseRssFeed = async (url: string): AsyncResultType<ParseFeed> => {
         return Result.error("Failed to parse feed", "InternalError");
     }
 
-    const preparedResult = FeedMapper.prepareSafeParse(parsedResult);
-    const baseFeed = ParseFeedSchema.safeParse(preparedResult);
+    const baseFeed = ParseFeedSchema.omit({ items: true }).safeParse(parsedResult);
 
     if (!baseFeed.success) {
         logger.error({ issues: baseFeed.error.issues }, `Failed to parse feed with url: ${url}`);
         return Result.error("Failed to parse feed", "InternalError");
     }
 
+    const items: ParseItem[] = [];
+    const links = new Set<string>();
+    for (const [index, rawItem] of parsedResult.items.entries()) {
+        const item = ParseItemSchema.safeParse(rawItem);
+        if (!item.success) {
+            logger.warn({ url, index, issues: item.error.issues }, "Skipping invalid RSS post");
+            continue;
+        }
+        if (links.has(item.data.link)) {
+            continue;
+        }
+        links.add(item.data.link);
+        items.push(item.data);
+    }
+
     logger.info(`Successfully parsed feed with url: ${url}`);
 
-    return Result.ok(baseFeed.data);
+    return Result.ok({ ...baseFeed.data, items });
 };
 
 const parseImage = async (url: string): AsyncResultType<string> => {
@@ -111,47 +168,23 @@ const parseFavicon = async (url: string): AsyncResultType<string> => {
     }
 };
 
-const shouldParseAgain = async (
-    currentContent: ItemContent[],
-    url: string
-): Promise<Prisma.ItemContentCreateManyFeedInput[] | null> => {
+const shouldParseAgain = async ({
+    currentLinks,
+    url,
+}: ShouldParseAgainProps): AsyncResultType<Prisma.ItemContentCreateManyFeedInput[]> => {
     const newFeed = await parseRssFeed(url);
 
     if (!newFeed.success) {
         logger.error(`Failed to parse feed with url: ${url} - ${newFeed.message}`);
-        return null;
+        return Result.error(newFeed.message, newFeed.type);
     }
 
-    const latestFeed = newFeed.data;
+    const contentToCreate = FeedRefresh.selectNewFeedItems({
+        items: newFeed.data.items,
+        currentLinks,
+    }).map(ContentMapper.parseItemToCreateContent);
 
-    if (latestFeed.items.length === 0) {
-        logger.error(`Feed with url: ${url} has no items`);
-        return null;
-    }
-
-    const latestNewItem = first(latestFeed.items);
-
-    if (!latestNewItem || !latestNewItem.pubDate) {
-        logger.error(`Feed with url: ${url} has no items`);
-        return null;
-    }
-
-    // TODO: pubDate or created at?
-    const latestCurrentContent = first(sortBy(currentContent, "createdAt"));
-
-    // TODO: better logic for getting latest?
-    if (latestCurrentContent?.title === latestNewItem?.title) {
-        return null;
-    }
-
-    const contentToCreate = latestFeed.items
-        .filter(item => currentContent.every(contentItem => contentItem.link !== item.link))
-        .map(parsedItem => {
-            return ContentMapper.parseItemToCreateContent(parsedItem);
-        });
-
-    logger.info(`Feed with url: ${url} has new items`);
-    return contentToCreate;
+    return Result.ok(contentToCreate);
 };
 
 export const ParseService = {

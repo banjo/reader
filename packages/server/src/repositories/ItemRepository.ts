@@ -144,6 +144,37 @@ type AssignFeedItemsToUserProps = {
     userId: number;
 };
 
+type AssignContentToFollowersProps = {
+    feedId: number;
+    contentIds: number[];
+};
+
+const assignContentToFollowers = async ({
+    feedId,
+    contentIds,
+}: AssignContentToFollowersProps): AsyncResultType<void> => {
+    if (contentIds.length === 0) {
+        return Result.okEmpty();
+    }
+
+    try {
+        await prisma.$executeRaw`
+            INSERT INTO "Item" ("updatedAt", "feedId", "userId", "contentId")
+            SELECT CURRENT_TIMESTAMP, followers."A", followers."B", content."id"
+            FROM "_FeedToUser" AS followers
+            JOIN "ItemContent" AS content ON content."feedId" = followers."A"
+            WHERE followers."A" = ${feedId}
+              AND content."id" IN (${Prisma.join(contentIds)})
+            ON CONFLICT ("userId", "contentId") DO NOTHING
+        `;
+    } catch (error: unknown) {
+        logger.error(`Could not assign content to followers of feed ${feedId} - ${error}`);
+        return Result.error("Could not assign content to feed followers", "InternalError");
+    }
+
+    return Result.okEmpty();
+};
+
 const assignFeedItemsToUser = async ({
     feedId,
     userId,
@@ -196,18 +227,35 @@ const createItems = async (items: Prisma.ItemCreateManyInput[]) => {
     }
 };
 
+const insertContent = (content: Prisma.ItemContentCreateManyFeedInput[], feedId: number) =>
+    prisma.itemContent.createMany({
+        data: content.map(itemContent => ({ ...itemContent, feedId })),
+        skipDuplicates: true,
+    });
+
+const createContentIds = async (
+    content: Prisma.ItemContentCreateManyFeedInput[],
+    feedId: number
+): AsyncResultType<number[]> => {
+    try {
+        await insertContent(content, feedId);
+        const saved = await prisma.itemContent.findMany({
+            where: { feedId, link: { in: content.map(item => item.link) } },
+            select: { id: true },
+        });
+        return Result.ok(saved.map(item => item.id));
+    } catch (error: unknown) {
+        logger.error(`Could not create content for feed ${feedId} - ${error}`);
+        return Result.error("Could not create content", "InternalError");
+    }
+};
+
 const createContent = async (
     content: Prisma.ItemContentCreateManyFeedInput[],
     feedId: number
 ): AsyncResultType<ItemContent[]> => {
     try {
-        await prisma.itemContent.createMany({
-            data: content.map(itemContent => ({
-                ...itemContent,
-                feedId,
-            })),
-            skipDuplicates: true,
-        });
+        await insertContent(content, feedId);
 
         // Include existing posts too; createMany skips duplicate feed/link pairs.
         const createdContent = await prisma.itemContent.findMany({
@@ -286,6 +334,7 @@ const getItemCount = async (userId: number, filter: Filter): AsyncResultType<num
 };
 
 export const ItemRepository = {
+    assignContentToFollowers,
     assignFeedItemsToUser,
     getAllItemsByFeed,
     getItemById,
@@ -297,5 +346,6 @@ export const ItemRepository = {
     removeFeedItemsForUser,
     getAllItemsByUserId,
     createContent,
+    createContentIds,
     getItemCount,
 };

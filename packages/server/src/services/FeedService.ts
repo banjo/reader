@@ -10,6 +10,7 @@ import {
     FeedWithItemCounts,
 } from "../repositories/FeedRepository";
 import { ItemRepository } from "../repositories/ItemRepository";
+import { FeedRefresh } from "../shared/lib/feed-refresh";
 import { fetchContentWithoutImageWorker, fetchRssFeedWorker } from "../workers";
 import { ParseService } from "./ParseService";
 
@@ -126,9 +127,11 @@ const addFeed = async (rssUrl: string, userId: number): AsyncResultType<AddFeedR
         return Result.error("Failed to create feed", "InternalError");
     }
 
-    const contentToCreate = parseResult.data.items.map(parsedItem => {
-        return ContentMapper.parseItemToCreateContent(parsedItem);
-    });
+    const contentToCreate = FeedRefresh.selectInitialFeedItems(parseResult.data.items).map(
+        parsedItem => {
+            return ContentMapper.parseItemToCreateContent(parsedItem);
+        }
+    );
 
     const createContentResult = await ItemRepository.createContent(
         contentToCreate,

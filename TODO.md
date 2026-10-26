@@ -184,20 +184,20 @@ several MB. The full HTML is also stored in Postgres for every post.
 
 **Fix**
 
-- [ ] Load only links:
+- [x] Load only links:
       `prisma.itemContent.findMany({ where: { feedId }, select: { link: true } })`, then put
       them in a `Set`.
-- [ ] Remove the `sortBy` title check. With the unique constraint from step 2, inserting with
+- [x] Remove the `sortBy` title check. With the unique constraint from step 2, inserting with
       `skipDuplicates` is enough. Fix or remove the other `sortBy(..., "createdAt")` too.
-- [ ] Pass only `contentIds` and `feedId` into the add-to-users job.
-- [ ] In add-to-users, insert for all followers in one statement: `insert into "Item" (...)
+- [x] Pass only `contentIds` and `feedId` into the add-to-users job.
+- [x] In add-to-users, insert for all followers in one statement: `insert into "Item" (...)
       select ft."B", $feedId, c.id, ... from "_FeedToUser" ft cross join "ItemContent" c
       where ft."A" = $feedId and c.id = any($ids) on conflict do nothing`. Check which of `A`
       and `B` is the feed and which is the user in the migration.
-- [ ] Validate each post separately with `safeParse` and skip bad ones with a log line. Fall
+- [x] Validate each post separately with `safeParse` and skip bad ones with a log line. Fall
       back to `guid` when `link` is missing, and to a cut-down description when `title` is
       missing.
-- [ ] Store only the newest N posts (for example 200) the first time a feed is added, so a
+- [x] Store only the newest N posts (for example 200) the first time a feed is added, so a
       feed with 5,000 posts in its RSS doesn't fill the database on day one.
 
 ## 7. Add limits to outside requests

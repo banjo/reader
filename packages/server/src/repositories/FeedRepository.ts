@@ -26,6 +26,12 @@ export type FeedItemsCountOptions = {
     filter: Filter;
 };
 
+type FeedForRefresh = {
+    id: number;
+    rssUrl: string;
+    contentItems: { link: string }[];
+};
+
 const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItemCounts[]> => {
     const [feeds, counts] = await Promise.all([
         prisma.feed.findMany({
@@ -101,13 +107,17 @@ const getFeedContentCount = async (internalIdentifier: string): AsyncResultType<
     return Result.ok(count);
 };
 
-const getFeedWithContentById = async (feedId: number): AsyncResultType<FeedWithContent> => {
+const getFeedForRefresh = async (feedId: number): AsyncResultType<FeedForRefresh> => {
     const feed = await prisma.feed.findUnique({
         where: {
             id: feedId,
         },
-        include: {
-            contentItems: true,
+        select: {
+            id: true,
+            rssUrl: true,
+            contentItems: {
+                select: { link: true },
+            },
         },
     });
 
@@ -415,7 +425,7 @@ const markAllAsRead = async (feedId: number, userId: number): AsyncResultType<vo
 export const FeedRepository = {
     getAllFeedsByUserId,
     getFeedById,
-    getFeedWithContentById,
+    getFeedForRefresh,
     getFeedByRssUrl,
     getUserFeedByInternalIdentifier,
     getFeedByInternalIdentifier,

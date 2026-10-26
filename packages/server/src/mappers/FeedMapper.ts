@@ -1,6 +1,5 @@
 import { Feed, FeedWithUsers, Prisma } from "db";
 import { ParseFeed } from "../services/ParseService";
-import { ItemMapper } from "./ItemMapper";
 
 const parseFeedToCreateFeed = (
     feed: ParseFeed,
@@ -37,15 +36,4 @@ const feedToSearchFeed = (feed: Feed | FeedWithUsers): SearchFeed => {
     };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const prepareSafeParse = (feed: any) => {
-    return {
-        ...feed,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        items: feed.items.map((item: any) => {
-            return ItemMapper.prepareSafeParse(item);
-        }),
-    };
-};
-
-export const FeedMapper = { parseFeedToCreateFeed, feedToSearchFeed, prepareSafeParse };
+export const FeedMapper = { parseFeedToCreateFeed, feedToSearchFeed };

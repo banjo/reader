@@ -17,7 +17,7 @@ const processor = async (job: Job<FetchJobData>) => {
 
     logger.info(`Fetching feed with id ${feedId}`);
 
-    const feedResult = await FeedRepository.getFeedWithContentById(feedId);
+    const feedResult = await FeedRepository.getFeedForRefresh(feedId);
 
     if (!feedResult.success) {
         logger.error(`Could not find feed with id ${feedId}`);
@@ -28,16 +28,23 @@ const processor = async (job: Job<FetchJobData>) => {
 
     logger.info(`Fetching ${feed.rssUrl}`);
 
-    const updatedContent = await ParseService.shouldParseAgain(feed.contentItems, feed.rssUrl);
+    const updatedContent = await ParseService.shouldParseAgain({
+        currentLinks: new Set(feed.contentItems.map(content => content.link)),
+        url: feed.rssUrl,
+    });
 
-    if (!updatedContent) {
+    if (!updatedContent.success) {
+        throw new Error(`Could not refresh feed ${feedId}: ${updatedContent.message}`);
+    }
+
+    if (updatedContent.data.length === 0) {
         logger.info("no need to fetch again");
         return Result.okEmpty();
     }
 
     logger.info("Successfully fetched rss content");
 
-    const updateContentResult = await ItemRepository.createContent(updatedContent, feed.id);
+    const updateContentResult = await ItemRepository.createContentIds(updatedContent.data, feed.id);
 
     if (!updateContentResult.success) {
         logger.error(`Failed to update content: ${updateContentResult.message}`);
@@ -52,7 +59,7 @@ const processor = async (job: Job<FetchJobData>) => {
     }
 
     await addToUsersWorker().add({
-        content: updateContentResult.data,
+        contentIds: updateContentResult.data,
         feedId: feed.id,
     });
 
