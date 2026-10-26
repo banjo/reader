@@ -37,7 +37,7 @@ rows.
 
 **Fix**
 
-- [ ] In `packages/db/prisma/schema.prisma`, add:
+- [x] In `packages/db/prisma/schema.prisma`, add:
 
     ```prisma
     model Item {
@@ -60,15 +60,15 @@ rows.
     }
     ```
 
-- [ ] Before the migration, remove existing duplicates or it will fail. Delete duplicate
+- [x] Before the migration, remove existing duplicates or it will fail. Delete duplicate
       `Item` rows by `(userId, contentId)`, keeping the lowest `id`. For duplicate
       `ItemContent` rows by `(feedId, link)`, keep the lowest `id`, point their items at it
       (or delete those items), then delete the rest. Write this as SQL at the top of the
       migration file.
-- [ ] Update the count checks in `ItemRepository.createContent` and
+- [x] Update the count checks in `ItemRepository.createContent` and
       `createItemsFromContent`. They return an error when `count !== length`. With unique
       constraints, skipped duplicates are expected, so drop the check or only log it.
-- [ ] In `createContent`, look up the new rows with `feedId` and `link in [...]`. Leave out
+- [x] In `createContent`, look up the new rows with `feedId` and `link in [...]`. Leave out
       `title in [...]`, since two separate `in` filters can match rows you didn't create.
 
 ## 3. Stop loading every item to count or look up a feed

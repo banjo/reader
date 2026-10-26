@@ -38,6 +38,11 @@ model Item {
   isBookmarked Boolean     @default(false)
   isFavorite   Boolean     @default(false)
   tags         Tag[]
+
+  @@unique([userId, contentId])
+  @@index([userId, feedId])
+  @@index([feedId])
+  @@index([contentId])
 }
 
 model ItemContent {
@@ -56,6 +61,9 @@ model ItemContent {
   htmlContent     String?  @db.Text
   lastFetch       DateTime
   pubDate         DateTime
+
+  @@unique([feedId, link])
+  @@index([hasFetchedImage, id])
 }
 
 model User {
@@ -78,4 +86,6 @@ model Tag {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   items     Item[]
+
+  @@index([userId])
 }

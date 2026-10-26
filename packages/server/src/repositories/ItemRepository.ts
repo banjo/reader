@@ -180,7 +180,7 @@ const createContent = async (
     feedId: number
 ): AsyncResultType<ItemContent[]> => {
     try {
-        const createdContentResult = await prisma.itemContent.createMany({
+        await prisma.itemContent.createMany({
             data: content.map(itemContent => ({
                 ...itemContent,
                 feedId,
@@ -188,18 +188,10 @@ const createContent = async (
             skipDuplicates: true,
         });
 
-        if (createdContentResult.count !== content.length) {
-            logger.error(`Could not create all content`);
-            return Result.error(`Could not create all content`, "InternalError");
-        }
-
-        // fetch only the created content as prisma do not return ids for createMany
+        // Include existing posts too; createMany skips duplicate feed/link pairs.
         const createdContent = await prisma.itemContent.findMany({
             where: {
                 feedId,
-                title: {
-                    in: content.map(itemContent => itemContent.title),
-                },
                 link: {
                     in: content.map(itemContent => itemContent.link),
                 },
@@ -219,7 +211,7 @@ const createItemsFromContent = async (
     userId: number
 ): AsyncResultType<void> => {
     try {
-        const createdItems = await prisma.item.createMany({
+        await prisma.item.createMany({
             data: content.map(itemContent => ({
                 contentId: itemContent.id,
                 feedId,
@@ -230,11 +222,6 @@ const createItemsFromContent = async (
             })),
             skipDuplicates: true,
         });
-
-        if (createdItems.count !== content.length) {
-            logger.error(`Could not create all items`);
-            return Result.error(`Could not create all items`, "InternalError");
-        }
 
         return Result.okEmpty();
     } catch (error: unknown) {
