@@ -29,7 +29,10 @@ item.put("/:id", zValidator("json", itemStatusSchema), async c => {
 
     if (!itemResult.success) {
         logger.error(`Could not update item with id ${id} for user ${userId}`);
-        return c.json(Result.error(itemResult.message, itemResult.type));
+        return c.json(
+            Result.error(itemResult.message, itemResult.type),
+            itemResult.type === "NotFound" ? 404 : 500
+        );
     }
 
     return c.json(Result.okEmpty());
