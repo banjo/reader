@@ -52,6 +52,7 @@ const FeedContent = ({ slug }: { slug: string }) => {
                     feed={data}
                     title={data.name}
                     paginate={paginate}
+                    filter={filter}
                 />
             )}
         </div>
@@ -65,5 +66,5 @@ export const FeedContainer = () => {
         return <Navigate to="/" />;
     }
 
-    return <FeedContent slug={slug} />;
+    return <FeedContent key={slug} slug={slug} />;
 };

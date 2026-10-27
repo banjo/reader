@@ -17,11 +17,14 @@ export const useFeedFetcher = (slug: string) => {
         keys: paginationKeys,
     } = usePagination();
 
+    const { paramString: filterString, filter, keys: filterKeys, setSearch } = useFilters();
+
     useEffect(() => {
         paginate.setPage(1);
+        setSearch("");
+        // Reset the page and search when the open feed changes, not when those setters change.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug]);
-
-    const { paramString: filterString, filter, keys: filterKeys } = useFilters();
 
     const url = useMemo(
         () => `/feed/${slug}?${paginationString}&${filterString}`,
@@ -34,6 +37,7 @@ export const useFeedFetcher = (slug: string) => {
         queryKey: ["items", "feed", slug, ...paginationKeys, ...filterKeys],
         queryFn: async () => await fetcher(url),
         staleTime: toMilliseconds({ hours: 1 }),
+        keepPreviousData: true,
     });
 
     useEffect(() => {

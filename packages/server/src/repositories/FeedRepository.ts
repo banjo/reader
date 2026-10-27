@@ -1,7 +1,13 @@
 import { Feed, FeedWithContent, FeedWithItems, Prisma, prisma } from "db";
 import { AsyncResultType, feedSearchLimit, Filter, Pagination, SearchFeed } from "model";
 import { Result, createLogger } from "utils";
-import { contentOrderBy, getFilterWhere, getPagination, itemOrderBy } from "../shared/lib/utils";
+import {
+    contentOrderBy,
+    getContentSearchWhere,
+    getFilterWhere,
+    getPagination,
+    itemOrderBy,
+} from "../shared/lib/utils";
 
 const logger = createLogger("FeedRepository");
 
@@ -121,7 +127,8 @@ const getAllFeedsByUserId = async (userId: number): AsyncResultType<FeedWithItem
 
 const getFeedWithContentByInternalIdentifier = async (
     internalIdentifier: string,
-    pagination?: Pagination
+    pagination?: Pagination,
+    filter?: Filter
 ): AsyncResultType<FeedWithContent> => {
     const feed = await prisma.feed.findUnique({
         where: {
@@ -129,6 +136,7 @@ const getFeedWithContentByInternalIdentifier = async (
         },
         include: {
             contentItems: {
+                where: getContentSearchWhere(filter?.search),
                 orderBy: contentOrderBy,
                 ...getPagination(pagination),
             },
@@ -143,12 +151,16 @@ const getFeedWithContentByInternalIdentifier = async (
     return Result.ok(feed);
 };
 
-const getFeedContentCount = async (internalIdentifier: string): AsyncResultType<number> => {
+const getFeedContentCount = async (
+    internalIdentifier: string,
+    filter?: Filter
+): AsyncResultType<number> => {
     const count = await prisma.itemContent.count({
         where: {
             feed: {
                 internalIdentifier,
             },
+            ...getContentSearchWhere(filter?.search),
         },
     });
 

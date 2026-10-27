@@ -196,7 +196,8 @@ const getFeedWithItemsOrContent = async ({
     // not subscribed
     const feedWithContentResponse = await FeedRepository.getFeedWithContentByInternalIdentifier(
         internalIdentifier,
-        pagination
+        pagination,
+        filter
     );
 
     if (!feedWithContentResponse.success) {
@@ -251,8 +252,11 @@ const getFeedItemsCount = async (options: FeedItemsCountOptions): AsyncResultTyp
     return Result.ok(count.data);
 };
 
-const getFeedContentCount = async (internalIdentifier: string): AsyncResultType<number> => {
-    const count = await FeedRepository.getFeedContentCount(internalIdentifier);
+const getFeedContentCount = async (
+    internalIdentifier: string,
+    filter?: Filter
+): AsyncResultType<number> => {
+    const count = await FeedRepository.getFeedContentCount(internalIdentifier, filter);
 
     if (!count.success) {
         logger.error(`Could not get content count for feed with identifier ${internalIdentifier}`);

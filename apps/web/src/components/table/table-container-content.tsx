@@ -4,6 +4,7 @@ import { FilterBar } from "@/components/table/table-filter-bar";
 import { TableItem } from "@/components/table/table-item";
 import { useTableFiltersContent } from "@/components/table/use-table-filters-content";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Filter } from "@/hooks/shared/use-filters";
 import { Paginate } from "@/hooks/shared/use-pagination";
 import { noop } from "@banjoanton/utils";
 import { CleanFeedWithContent, ItemContent } from "db";
@@ -20,6 +21,7 @@ type TableContainerProps = {
     titleMenuOptions?: MenuEntries<TitleMenu>[];
     title: string;
     paginate?: Paginate;
+    filter?: Filter;
 };
 
 export const TableContainerContent: FC<TableContainerProps> = ({
@@ -29,8 +31,9 @@ export const TableContainerContent: FC<TableContainerProps> = ({
     titleMenuOptions,
     feed,
     paginate,
+    filter,
 }) => {
-    const { filters, actions, data } = useTableFiltersContent(content);
+    const { filters, actions, data } = useTableFiltersContent(content, filter, paginate);
 
     return (
         <>
@@ -62,7 +65,9 @@ export const TableContainerContent: FC<TableContainerProps> = ({
                 {data.length === 0 && (
                     <Alert>
                         <AlertTitle>Ops!</AlertTitle>
-                        <AlertDescription>No content found</AlertDescription>
+                        <AlertDescription>
+                            {filters.search ? "No articles match your search" : "No content found"}
+                        </AlertDescription>
                     </Alert>
                 )}
             </Table>
