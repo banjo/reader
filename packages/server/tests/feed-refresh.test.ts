@@ -64,6 +64,8 @@ test(
             await import("../src/workers/runners/fetch-content-without-image/fetch-content-without-image-worker");
         const { addImageWorker } =
             await import("../src/workers/runners/add-image/add-image-worker");
+        const { verifyImagesWorker } =
+            await import("../src/workers/runners/verify-images/verify-images-worker");
         const { FeedRepository } = await import("../src/repositories/FeedRepository");
         const { ItemRepository } = await import("../src/repositories/ItemRepository");
         const { FeedService } = await import("../src/services/FeedService");
@@ -71,7 +73,9 @@ test(
         const delivery = addToUsersWorker();
         const images = fetchContentWithoutImageWorker();
         const imageLookup = addImageWorker();
+        const verification = verifyImagesWorker();
         const imageEvents = new QueueEvents(imageLookup.getQueue().name, { connection, prefix });
+        const verifyEvents = new QueueEvents(verification.getQueue().name, { connection, prefix });
         const events = new QueueEvents(fetcher.getQueue().name, { connection, prefix });
         const deliveryEvents = new QueueEvents(delivery.getQueue().name, { connection, prefix });
         const legacyProducer = new Queue<{
@@ -84,11 +88,13 @@ test(
                 delivery.close(),
                 images.close(),
                 imageLookup.close(),
+                verification.close(),
             ]);
             await Promise.all([
                 events.close(),
                 deliveryEvents.close(),
                 imageEvents.close(),
+                verifyEvents.close(),
                 legacyProducer.close(),
             ]);
             for (const name of [
@@ -96,6 +102,7 @@ test(
                 delivery.getQueue().name,
                 images.getQueue().name,
                 imageLookup.getQueue().name,
+                verification.getQueue().name,
             ]) {
                 const cleanup = new Queue(name, { connection, prefix });
                 try {
@@ -109,10 +116,12 @@ test(
             events.waitUntilReady(),
             deliveryEvents.waitUntilReady(),
             imageEvents.waitUntilReady(),
+            verifyEvents.waitUntilReady(),
         ]);
         fetcher.start();
         delivery.start();
         imageLookup.start();
+        verification.start();
 
         let mainPosts = 2;
         let largePosts = 5000;
@@ -125,6 +134,11 @@ test(
             const path = req.url ?? "/";
             const requestCount = (requestCounts.get(path) ?? 0) + 1;
             requestCounts.set(path, requestCount);
+            if (path === "/photo.png") {
+                res.writeHead(200, { "content-type": "image/png" });
+                res.end("png");
+                return;
+            }
             if (path === "/image-timeout") {
                 res.writeHead(200, { "content-type": "text/html" });
                 res.write("<html><head>");
@@ -486,6 +500,56 @@ test(
                 }),
                 10
             );
+        });
+
+        await t.test("image verification clears broken URLs and allows one retry", async () => {
+            const valid = await prisma.itemContent.create({
+                data: {
+                    feedId: feed.id,
+                    title: "Valid image",
+                    link: `${base}/valid-image`,
+                    imageUrl: `${base}/photo.png`,
+                    hasFetchedImage: true,
+                    lastFetch: new Date(),
+                    pubDate: new Date(),
+                },
+            });
+            const brokenImage = await prisma.itemContent.create({
+                data: {
+                    feedId: feed.id,
+                    title: "Broken image",
+                    link: `${base}/broken-image`,
+                    imageUrl: `${base}/html-image`,
+                    hasFetchedImage: true,
+                    lastFetch: new Date(),
+                    pubDate: new Date(),
+                },
+            });
+
+            const job = await verification.getQueue().add("test-verify", {});
+            await job.waitUntilFinished(verifyEvents, 15_000);
+
+            const savedValid = await prisma.itemContent.findUniqueOrThrow({
+                where: { id: valid.id },
+            });
+            const savedBroken = await prisma.itemContent.findUniqueOrThrow({
+                where: { id: brokenImage.id },
+            });
+            assert.equal(savedValid.imageUrl, `${base}/photo.png`);
+            assert.equal(savedBroken.imageUrl, null);
+            assert.equal(savedBroken.hasFetchedImage, false);
+
+            const retry = await imageLookup.getQueue().add("test-broken-retry", {
+                contentId: brokenImage.id,
+                url: `${base}/broken-image`,
+            });
+            await retry.waitUntilFinished(imageEvents, 15_000);
+
+            const retried = await prisma.itemContent.findUniqueOrThrow({
+                where: { id: brokenImage.id },
+            });
+            assert.equal(retried.imageUrl, null);
+            assert.equal(retried.hasFetchedImage, true);
         });
 
         await t.test("scheduled RSS refreshes retain the retry policy", async () => {

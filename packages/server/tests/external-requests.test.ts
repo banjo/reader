@@ -94,7 +94,21 @@ test("bounded external requests", async t => {
             res.end(JSON.stringify({ html: head }));
             return;
         }
+        if (path.endsWith(".png")) {
+            res.writeHead(200, { "content-type": "image/png" });
+            res.end(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+            return;
+        }
+        if (path.endsWith(".svg")) {
+            res.writeHead(200, { "content-type": "image/svg+xml" });
+            res.end("<svg xmlns='http://www.w3.org/2000/svg'/>");
+            return;
+        }
         res.setHeader("content-type", "text/html; charset=utf-8");
+        if (path === "/fake-image") {
+            res.end('<html><head><meta property="og:image" content="/html-image"></head></html>');
+            return;
+        }
         if (path === "/head-only") {
             res.write(head);
             return;
@@ -200,6 +214,25 @@ test("bounded external requests", async t => {
             assert.equal((await ParseService.parseFavicon(`${base}/large-html`)).success, false);
         }
     );
+    await t.test("image URLs must return an image content type", async () => {
+        const image = await ExternalRequestService.fetchImageMetadata({
+            url: `${base}/nested/images/post.png`,
+            ...externalRequestLimits.image,
+        });
+        assert.equal(image.contentType, "image/png");
+
+        await assert.rejects(
+            ExternalRequestService.fetchImageMetadata({
+                url: `${base}/html-image`,
+                ...externalRequestLimits.image,
+            }),
+            permanent
+        );
+
+        const broken = await ParseService.parseImage(`${base}/fake-image`);
+        assert.ok(!broken.success && !broken.retryable);
+        assert.equal(hits.get("/html-image"), 2);
+    });
     await t.test("non-HTML responses and missing metadata do not trigger retries", async () => {
         for (const parse of [ParseService.parseImage, ParseService.parseFavicon]) {
             const result = await parse(`${base}/json`);

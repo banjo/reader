@@ -22,7 +22,7 @@ const getAllContentById = async (feedId: number): AsyncResultType<ItemContent[]>
 
 const updateContentImageStatus = async (
     contentId: number,
-    status: { imageUrl?: string; hasFetchedImage?: boolean }
+    status: { imageUrl?: string | null; hasFetchedImage?: boolean }
 ): AsyncResultType<ItemContent> => {
     let content: ItemContent | null;
     try {
@@ -31,7 +31,7 @@ const updateContentImageStatus = async (
                 id: contentId,
             },
             data: {
-                imageUrl: status.imageUrl ?? undefined,
+                imageUrl: status.imageUrl === undefined ? undefined : status.imageUrl,
                 hasFetchedImage: status.hasFetchedImage ?? undefined,
             },
         });
@@ -70,8 +70,36 @@ const getContentWithoutImage = async ({
     }
 };
 
+const getContentWithImage = async ({
+    cursorId,
+    limit = 200,
+}: {
+    cursorId?: number;
+    limit?: number;
+} = {}): AsyncResultType<ItemContent[]> => {
+    let items: ItemContent[];
+    try {
+        items = await prisma.itemContent.findMany({
+            where: {
+                imageUrl: { not: null },
+                ...(cursorId ? { id: { gt: cursorId } } : {}),
+            },
+            orderBy: {
+                id: "asc",
+            },
+            take: limit,
+        });
+
+        return Result.ok(items);
+    } catch (error: unknown) {
+        logger.error(`Could not find content with image - ${error}`);
+        return Result.error(`Could not find content with image`, "InternalError");
+    }
+};
+
 export const ContentRepository = {
     getAllContentById,
     updateContentImageStatus,
     getContentWithoutImage,
+    getContentWithImage,
 };

@@ -14,16 +14,31 @@ import {
 
 const rssParser = new RssParser({ timeout: 15_000, maxRedirects: 3 });
 
-type ParseResult<T> = Promise<ResultType<T> & { retryable?: boolean }>;
+type ParseResult<T> = Promise<ResultType<T> & { retryable?: boolean; statusCode?: number }>;
 type ParseOptions = { attempts?: number };
+type ImageError = { success: boolean; retryable?: boolean; statusCode?: number };
 
-const requestFailure = <T>(error: unknown): ResultType<T> & { retryable: boolean } => ({
+const requestFailure = <T>(
+    error: unknown
+): ResultType<T> & { retryable: boolean; statusCode?: number } => ({
     ...Result.error<T>(
         error instanceof Error ? error.message : "External request failed",
         "InternalError"
     ),
     retryable: error instanceof ExternalRequestError && error.retryable,
+    statusCode: error instanceof ExternalRequestError ? error.statusCode : undefined,
 });
+
+const isClearableImageError = (result: ImageError) => {
+    if (result.success || result.retryable) {
+        return false;
+    }
+
+    const status = result.statusCode;
+    return (
+        status === undefined || status === 404 || status === 410 || (status >= 200 && status < 300)
+    );
+};
 
 const logger = createLogger("ParseService");
 
@@ -138,6 +153,20 @@ const parseRssFeed = async (url: string, options: ParseOptions = {}): ParseResul
     return Result.ok({ ...baseFeed.data, items });
 };
 
+const validateImage = async (url: string, options: ParseOptions = {}): ParseResult<string> => {
+    try {
+        const metadata = await ExternalRequestService.fetchImageMetadata({
+            url,
+            ...externalRequestLimits.image,
+            ...options,
+        });
+        return Result.ok(metadata.url);
+    } catch (error) {
+        logger.error(error);
+        return requestFailure(error);
+    }
+};
+
 const parseImage = async (url: string, options: ParseOptions = {}): ParseResult<string> => {
     try {
         const response = await ExternalRequestService.fetchText({
@@ -163,6 +192,14 @@ const parseImage = async (url: string, options: ParseOptions = {}): ParseResult<
         if (!postLinkSchema.safeParse(content).success) {
             return Result.error("Invalid image URL", "NotFound");
         }
+
+        const image = await validateImage(content, options);
+
+        if (image.success || image.retryable || isClearableImageError(image)) {
+            return image;
+        }
+
+        // Some hosts reject server-side checks but still allow the browser to load the image.
         return Result.ok(content);
     } catch (error) {
         logger.error(error);
@@ -223,8 +260,10 @@ const shouldParseAgain = async ({
 };
 
 export const ParseService = {
+    isClearableImageError,
     parseRssFeed,
     parseFavicon,
     parseImage,
+    validateImage,
     shouldParseAgain,
 };

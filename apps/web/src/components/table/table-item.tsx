@@ -6,11 +6,12 @@ import { Pattern } from "@/components/shared/pattern";
 import { TableType } from "@/components/table/table.types";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutateItem } from "@/hooks/backend/mutators/use-mutate-item";
+import { randomImageUrl } from "@/lib/utils";
 import { formatDistance } from "date-fns";
 import { ItemContent, ItemWithContent } from "db";
 import { motion } from "framer-motion";
 import Image from "rc-image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type CardPropsItem = {
     item: ItemWithContent;
@@ -32,6 +33,48 @@ type CardPropsContent = {
     onClick: () => void;
 };
 
+type ItemImageProps = {
+    content: ItemContent;
+    onClick: () => void;
+};
+
+const ItemImage = ({ content, onClick }: ItemImageProps) => {
+    const [contentFailed, setContentFailed] = useState(false);
+    const [fallbackFailed, setFallbackFailed] = useState(false);
+
+    useEffect(() => {
+        setContentFailed(false);
+        setFallbackFailed(false);
+    }, [content.imageUrl, content.hasFetchedImage]);
+
+    if (content.imageUrl && !contentFailed) {
+        return (
+            <Image
+                src={content.imageUrl}
+                onClick={onClick}
+                className="w-full h-44 object-cover cursor-pointer"
+                preview
+                loading="lazy"
+                onError={() => setContentFailed(true)}
+            />
+        );
+    }
+
+    if ((Boolean(content.imageUrl) || content.hasFetchedImage) && !fallbackFailed) {
+        return (
+            <img
+                src={randomImageUrl(content.id)}
+                alt=""
+                loading="lazy"
+                className="w-full h-44 object-cover"
+                onError={() => setFallbackFailed(true)}
+            />
+        );
+    }
+
+    return <Pattern name={content.title} className="w-full h-44 object-cover" />;
+};
+
 export const TableItem = ({
     item,
     type,
@@ -44,6 +87,7 @@ export const TableItem = ({
     const { toggleBookmarkStatus, toggleFavoriteStatus } = useMutateItem();
 
     const content = isSubscribed ? item.content : item;
+
     const since = useMemo(() => {
         const LongerThanOneMonth =
             new Date().getTime() - content.pubDate.getTime() > 1000 * 60 * 60 * 24 * 30 * 1;
@@ -80,17 +124,7 @@ export const TableItem = ({
                     isSubscribed && item.isRead ? "bg-slate-100" : undefined
                 }`}
             >
-                {content.imageUrl ? (
-                    <Image
-                        src={content.imageUrl}
-                        onClick={onClick}
-                        className="w-full h-44 object-cover cursor-pointer"
-                        preview={true}
-                        loading="lazy"
-                    />
-                ) : (
-                    <Pattern name={content.title} className="w-full h-44 object-cover" />
-                )}
+                <ItemImage content={content} onClick={onClick} />
 
                 <CardHeader className="cursor-pointer" onClick={onClick}>
                     <CardTitle className="line-clamp-2">{content.title}</CardTitle>
