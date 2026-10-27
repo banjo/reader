@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { test } from "node:test";
-import { consumeRateLimit } from "../src/shared/lib/rate-limit";
+import { after, test } from "node:test";
+import { closeRateLimitClient, consumeRateLimit } from "../src/shared/lib/rate-limit";
 
 const testRedisUrl = process.env.TEST_REDIS_URL;
 process.env.NODE_ENV = "test";
+
+after(closeRateLimitClient);
 
 test("rate limits consume a fixed window per key", { skip: !testRedisUrl }, async () => {
     const key = `rate-limit-test:${randomUUID()}`;

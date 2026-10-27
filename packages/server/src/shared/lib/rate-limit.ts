@@ -44,6 +44,22 @@ const ensureConnected = async (redis: Redis) => {
     await connecting;
 };
 
+export const closeRateLimitClient = async () => {
+    const current = client;
+    client = undefined;
+
+    if (!current) {
+        return;
+    }
+
+    if (current.status === "ready") {
+        await current.quit().catch(() => current.disconnect());
+        return;
+    }
+
+    current.disconnect();
+};
+
 export const pingRateLimitRedis = async () => {
     const redis = getClient();
     await ensureConnected(redis);

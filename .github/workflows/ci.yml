@@ -72,13 +72,18 @@ jobs:
             - name: Build
               run: pnpm build
 
+            # The runner can stay alive after the tests finish on Redis/undici handles.
+            # Force exit once every test has reported, and fail fast if a test hangs.
             - name: Server tests
-              run: pnpm exec tsx --test packages/server/tests/*.test.ts
+              timeout-minutes: 10
+              run: pnpm exec tsx --test --test-force-exit packages/server/tests/*.test.ts
 
             - name: API tests
+              timeout-minutes: 8
               env:
                   RATE_LIMIT_DISABLED: "true"
-              run: pnpm exec tsx --tsconfig apps/api/tsconfig.json --test apps/api/tests/*.test.ts
+              run: pnpm exec tsx --tsconfig apps/api/tsconfig.json --test --test-force-exit apps/api/tests/*.test.ts
 
             - name: Web tests
-              run: pnpm exec tsx --tsconfig apps/web/tsconfig.json --test apps/web/tests/*.test.ts
+              timeout-minutes: 3
+              run: pnpm exec tsx --tsconfig apps/web/tsconfig.json --test --test-force-exit apps/web/tests/*.test.ts
