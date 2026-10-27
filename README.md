@@ -12,6 +12,7 @@
 
 - 📰 Subscribe to a feed by URL, or search the feeds other readers already follow
 - 🔄 Feeds refresh in the background every hour, so new posts are waiting when you open the app
+- 🕰️ Older posts are rechecked in the background, so edited titles, summaries, and images stay current
 - 📥 Bring your subscriptions from another reader with an OPML import
 - ⭐️ Favorite and bookmark posts, and find them again in their own lists
 - ✅ Show only unread posts, and mark a whole feed as read in one click
@@ -93,6 +94,19 @@ pnpm logs:api         # Follow the API logs.
 
 In production, logs are sent to [Axiom](https://axiom.co), so the API and the worker also need
 `AXIOM_DATASET` and `AXIOM_TOKEN`.
+
+### Article refresh
+
+The worker rechecks older posts once a day. It picks posts that at least one reader has in their
+feed and that have not been checked recently, then updates the title, description, and image from
+the article's metadata. The original RSS body is kept.
+
+- `REFRESH_ARTICLES_LIMIT` (default `500`) sets how many posts one run may check.
+- `REFRESH_ARTICLES_OLDER_THAN_DAYS` (default `30`) sets how old a check must be before a post is
+  eligible again.
+
+Permanent failures such as a `404` are marked checked. Temporary failures stay eligible for the
+next run.
 
 ## License
 

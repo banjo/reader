@@ -16,7 +16,14 @@ const rssParser = new RssParser({ timeout: 15_000, maxRedirects: 3 });
 
 type ParseResult<T> = Promise<ResultType<T> & { retryable?: boolean; statusCode?: number }>;
 type ParseOptions = { attempts?: number };
+type ParseArticleOptions = ParseOptions & { siteName?: string };
 type ImageError = { success: boolean; retryable?: boolean; statusCode?: number };
+
+export type ArticleMetadata = {
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+};
 
 const requestFailure = <T>(
     error: unknown
@@ -47,6 +54,19 @@ const postLinkSchema = z
     .trim()
     .url()
     .refine(link => /^https?:\/\//i.test(link));
+
+const cleanTitle = (title: string, siteName?: string) => {
+    const normalized = title.replace(/\s+/g, " ").trim();
+    if (!siteName) {
+        return normalized;
+    }
+
+    const escaped = siteName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return normalized
+        .replace(new RegExp(`\\s*[|\\-–—]\\s*${escaped}\\s*$`, "i"), "")
+        .replace(new RegExp(`^\\s*${escaped}\\s*[|\\-–—]\\s*`, "i"), "")
+        .trim();
+};
 
 const prepareItem = (input: unknown): unknown => {
     if (typeof input !== "object" || input === null || Array.isArray(input)) {
@@ -207,6 +227,68 @@ const parseImage = async (url: string, options: ParseOptions = {}): ParseResult<
     }
 };
 
+const parseArticleMetadata = async (
+    url: string,
+    options: ParseArticleOptions = {}
+): ParseResult<ArticleMetadata> => {
+    const { siteName, ...requestOptions } = options;
+    try {
+        const response = await ExternalRequestService.fetchText({
+            url,
+            ...externalRequestLimits.html,
+            ...requestOptions,
+        });
+        const head = parseHTML(response.text).document.querySelector("head");
+
+        if (!head) {
+            return Result.error("Failed to parse article", "NotFound");
+        }
+
+        const metaContent = (selectors: string[]) => {
+            for (const selector of selectors) {
+                const meta = head.querySelector(selector) as HTMLMetaElement | null;
+                const content = meta?.content?.trim();
+                if (content) {
+                    return content;
+                }
+            }
+            return undefined;
+        };
+
+        const rawTitle = metaContent(["meta[property='og:title']", "meta[name='twitter:title']"]);
+        const description = metaContent([
+            "meta[property='og:description']",
+            "meta[name='description']",
+            "meta[name='twitter:description']",
+        ]);
+        const rawImage = metaContent([
+            "meta[property='og:image']",
+            "meta[property='og:image:url']",
+            "meta[name='twitter:image']",
+        ]);
+
+        let imageUrl: string | undefined;
+        if (rawImage) {
+            const content = new URL(rawImage, response.url).href;
+            if (postLinkSchema.safeParse(content).success) {
+                const image = await validateImage(content, requestOptions);
+                if (image.success) {
+                    imageUrl = image.data;
+                }
+            }
+        }
+
+        return Result.ok({
+            title: rawTitle ? cleanTitle(rawTitle, siteName) : undefined,
+            description: description?.replace(/\s+/g, " ").trim() || undefined,
+            imageUrl,
+        });
+    } catch (error) {
+        logger.error(error);
+        return requestFailure(error);
+    }
+};
+
 const parseFavicon = async (url: string, options: ParseOptions = {}): ParseResult<string> => {
     try {
         const response = await ExternalRequestService.fetchText({
@@ -261,6 +343,7 @@ const shouldParseAgain = async ({
 
 export const ParseService = {
     isClearableImageError,
+    parseArticleMetadata,
     parseRssFeed,
     parseFavicon,
     parseImage,

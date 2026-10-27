@@ -66,6 +66,8 @@ test(
             await import("../src/workers/runners/add-image/add-image-worker");
         const { verifyImagesWorker } =
             await import("../src/workers/runners/verify-images/verify-images-worker");
+        const { refreshArticlesWorker } =
+            await import("../src/workers/runners/refresh-articles/refresh-articles-worker");
         const { FeedRepository } = await import("../src/repositories/FeedRepository");
         const { ItemRepository } = await import("../src/repositories/ItemRepository");
         const { FeedService } = await import("../src/services/FeedService");
@@ -74,8 +76,10 @@ test(
         const images = fetchContentWithoutImageWorker();
         const imageLookup = addImageWorker();
         const verification = verifyImagesWorker();
+        const refresher = refreshArticlesWorker();
         const imageEvents = new QueueEvents(imageLookup.getQueue().name, { connection, prefix });
         const verifyEvents = new QueueEvents(verification.getQueue().name, { connection, prefix });
+        const refreshEvents = new QueueEvents(refresher.getQueue().name, { connection, prefix });
         const events = new QueueEvents(fetcher.getQueue().name, { connection, prefix });
         const deliveryEvents = new QueueEvents(delivery.getQueue().name, { connection, prefix });
         const legacyProducer = new Queue<{
@@ -89,12 +93,14 @@ test(
                 images.close(),
                 imageLookup.close(),
                 verification.close(),
+                refresher.close(),
             ]);
             await Promise.all([
                 events.close(),
                 deliveryEvents.close(),
                 imageEvents.close(),
                 verifyEvents.close(),
+                refreshEvents.close(),
                 legacyProducer.close(),
             ]);
             for (const name of [
@@ -103,6 +109,7 @@ test(
                 images.getQueue().name,
                 imageLookup.getQueue().name,
                 verification.getQueue().name,
+                refresher.getQueue().name,
             ]) {
                 const cleanup = new Queue(name, { connection, prefix });
                 try {
@@ -117,11 +124,13 @@ test(
             deliveryEvents.waitUntilReady(),
             imageEvents.waitUntilReady(),
             verifyEvents.waitUntilReady(),
+            refreshEvents.waitUntilReady(),
         ]);
         fetcher.start();
         delivery.start();
         imageLookup.start();
         verification.start();
+        refresher.start();
 
         let mainPosts = 2;
         let largePosts = 5000;
@@ -168,6 +177,15 @@ test(
                         '<html><head><meta property="og:image" content="/photo.png"></head></html>'
                     );
                 }, 100);
+                return;
+            }
+            if (path === "/main/post-0") {
+                res.setHeader("content-type", "text/html");
+                res.end(`<html><head>
+                    <meta property="og:title" content="Refreshed title">
+                    <meta property="og:description" content="Refreshed description">
+                    <meta property="og:image" content="/photo.png">
+                </head></html>`);
                 return;
             }
             if (path === "/image-recover") {
@@ -550,6 +568,35 @@ test(
             });
             assert.equal(retried.imageUrl, null);
             assert.equal(retried.hasFetchedImage, true);
+        });
+
+        await t.test("stale articles are refreshed with changed metadata", async () => {
+            const link = `${base}/main/post-0`;
+            const content = await prisma.itemContent.findUniqueOrThrow({
+                where: { feedId_link: { feedId: feed.id, link } },
+            });
+            await prisma.itemContent.update({
+                where: { id: content.id },
+                data: {
+                    title: "Old title",
+                    description: "Old description",
+                    imageUrl: null,
+                    hasFetchedImage: false,
+                    lastFetch: new Date("2020-01-01"),
+                },
+            });
+
+            const job = await refresher.getQueue().add("test-refresh-articles", {});
+            await job.waitUntilFinished(refreshEvents, 20_000);
+
+            const refreshed = await prisma.itemContent.findUniqueOrThrow({
+                where: { id: content.id },
+            });
+            assert.equal(refreshed.title, "Refreshed title");
+            assert.equal(refreshed.description, "Refreshed description");
+            assert.equal(refreshed.imageUrl, `${base}/photo.png`);
+            assert.equal(refreshed.hasFetchedImage, true);
+            assert.ok(refreshed.lastFetch > new Date("2024-01-01"));
         });
 
         await t.test("scheduled RSS refreshes retain the retry policy", async () => {

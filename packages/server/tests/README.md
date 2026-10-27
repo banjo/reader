@@ -36,7 +36,8 @@ temporary image lookups stay unchecked for the next hourly scan; successful page
 an image are marked checked. Permanent HTTP/format failures are not retried immediately.
 Image URLs must also return an image content type, and the image verifier clears stored URLs
 that return HTML, 404, or 410 responses, then leaves them for one retry before marking them
-checked.
+checked. The article refresh test updates a stale post's title, description, and image from
+the page metadata and verifies that `lastFetch` moves forward.
 
 `worker-lifecycle.test.ts` checks that a worker factory opens only its queue until `start()`
 is called, that repeated starts share one worker, and that closing a queue-only instance

@@ -105,6 +105,26 @@ test("bounded external requests", async t => {
             return;
         }
         res.setHeader("content-type", "text/html; charset=utf-8");
+        if (path === "/article") {
+            res.end(`<html><head>
+                <meta property="og:title" content="Updated post | Test Site">
+                <meta property="og:description" content="A better summary">
+                <meta property="og:image" content="/photo.png">
+            </head><body>Article</body></html>`);
+            return;
+        }
+        if (path === "/missing-article") {
+            res.writeHead(404);
+            res.end("Not found");
+            return;
+        }
+        if (path === "/article-bad-image") {
+            res.end(`<html><head>
+                <meta property="og:title" content="Only a title">
+                <meta property="og:image" content="/html-image">
+            </head></html>`);
+            return;
+        }
         if (path === "/fake-image") {
             res.end('<html><head><meta property="og:image" content="/html-image"></head></html>');
             return;
@@ -233,6 +253,25 @@ test("bounded external requests", async t => {
         assert.ok(!broken.success && !broken.retryable);
         assert.equal(hits.get("/html-image"), 2);
     });
+    await t.test("article metadata is parsed for stale posts", async () => {
+        const article = await ParseService.parseArticleMetadata(`${base}/article`, {
+            siteName: "Test Site",
+        });
+        assert.ok(article.success);
+        assert.equal(article.data.title, "Updated post");
+        assert.equal(article.data.description, "A better summary");
+        assert.equal(article.data.imageUrl, `${base}/photo.png`);
+
+        const noImage = await ParseService.parseArticleMetadata(`${base}/article-bad-image`);
+        assert.ok(noImage.success);
+        assert.equal(noImage.data.title, "Only a title");
+        assert.equal(noImage.data.imageUrl, undefined);
+
+        const missing = await ParseService.parseArticleMetadata(`${base}/missing-article`);
+        assert.ok(!missing.success && !missing.retryable);
+        assert.equal(missing.statusCode, 404);
+    });
+
     await t.test("non-HTML responses and missing metadata do not trigger retries", async () => {
         for (const parse of [ParseService.parseImage, ParseService.parseFavicon]) {
             const result = await parse(`${base}/json`);

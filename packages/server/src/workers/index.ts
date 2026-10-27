@@ -5,4 +5,5 @@ export * from "./runners/add-to-users/add-to-users-worker";
 export * from "./runners/fetch-content-without-image/fetch-content-without-image-worker";
 export * from "./runners/fetch-rss-feed/fetch-rss-feed-worker";
 export * from "./runners/import-feeds/import-feeds-worker";
+export * from "./runners/refresh-articles/refresh-articles-worker";
 export * from "./runners/verify-images/verify-images-worker";
