@@ -29,6 +29,7 @@ const processor = async (job: Job<AddImageWorker>) => {
     const addToDbResult = await ContentRepository.updateContentImageStatus(contentId, {
         hasFetchedImage: true,
         imageUrl: parseResult.success ? parseResult.data : undefined,
+        imageCheckedAt: new Date(),
     });
 
     if (!addToDbResult.success) {

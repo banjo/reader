@@ -19,8 +19,12 @@ Compose project used during browser testing:
 ```sh
 TEST_DATABASE_URL='postgresql://banjo:banjo@127.0.0.1:55432/banjo-rss' \
 TEST_REDIS_URL='redis://127.0.0.1:6379' \
+RATE_LIMIT_DISABLED=true \
   pnpm exec tsx --tsconfig apps/api/tsconfig.json --test apps/api/tests/*.test.ts
 ```
+
+`RATE_LIMIT_DISABLED=true` keeps the import suite from tripping the per-user import limit. The
+rate limiter has its own tests in `packages/server/tests/rate-limit.test.ts`.
 
 The import tests create a random Redis prefix and clean up all test queues and progress
 keys. They check immediate HTTP 202 responses with workers offline, five concurrent feeds,

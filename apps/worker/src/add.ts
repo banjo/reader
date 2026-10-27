@@ -1,4 +1,4 @@
-import { ensureDbReady, Feed, prisma } from "db";
+import { ensureDbReady, prisma, type Feed } from "db";
 import { fetchRssFeedWorker } from "server";
 import { createLogger } from "utils";
 
@@ -8,7 +8,10 @@ export const addFetchRss = async () => {
     ensureDbReady();
 
     logger.info("Adding fetch rss...");
-    const feeds: Feed[] = await prisma.feed.findMany();
+    const feeds: Pick<Feed, "id" | "url">[] = await prisma.feed.findMany({
+        where: { users: { some: {} } },
+        select: { id: true, url: true },
+    });
 
     logger.info(`Found ${feeds.length} feeds`);
 

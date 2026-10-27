@@ -16,9 +16,12 @@
         "bullmq": "^5.81.5",
         "change-case": "^5.4.4",
         "db": "workspace:*",
+        "ioredis": "^5",
+        "ipaddr.js": "^2.5.0",
         "linkedom": "^0.18.14",
         "rss-parser": "^3.13.0",
         "tsconfig": "workspace:*",
+        "undici": "^7",
         "zod": "^3.25.76"
     },
     "scripts": {

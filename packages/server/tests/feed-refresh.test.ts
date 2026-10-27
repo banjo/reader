@@ -1,3 +1,5 @@
+process.env.ALLOW_PRIVATE_NETWORK_REQUESTS = "true";
+
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -528,6 +530,7 @@ test(
                     link: `${base}/valid-image`,
                     imageUrl: `${base}/photo.png`,
                     hasFetchedImage: true,
+                    imageCheckedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
                     lastFetch: new Date(),
                     pubDate: new Date(),
                 },
@@ -539,6 +542,7 @@ test(
                     link: `${base}/broken-image`,
                     imageUrl: `${base}/html-image`,
                     hasFetchedImage: true,
+                    imageCheckedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
                     lastFetch: new Date(),
                     pubDate: new Date(),
                 },

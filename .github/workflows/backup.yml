@@ -1,0 +1,54 @@
+name: Database backup
+
+on:
+    schedule:
+        # 03:00 UTC every day.
+        - cron: "0 3 * * *"
+    workflow_dispatch:
+
+concurrency:
+    group: database-backup
+    cancel-in-progress: false
+
+jobs:
+    backup:
+        name: Back up production database
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Check backup configuration
+              id: config
+              env:
+                  DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+              run: |
+                  if [ -z "$DATABASE_URL" ]; then
+                      echo "configured=false" >> "$GITHUB_OUTPUT"
+                      echo "::warning::PRODUCTION_DATABASE_URL is not set; skipping the scheduled backup."
+                  else
+                      echo "configured=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Install PostgreSQL client
+              if: steps.config.outputs.configured == 'true'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install --yes postgresql-client
+
+            - name: Create backup
+              if: steps.config.outputs.configured == 'true'
+              env:
+                  DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+                  BACKUP_DIR: backups
+                  RETENTION_DAYS: 14
+              run: ./scripts/backup-db.sh
+
+            - name: Upload backup artifact
+              if: steps.config.outputs.configured == 'true'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: banjo-db-${{ github.run_id }}
+                  path: backups/*.dump
+                  retention-days: 30

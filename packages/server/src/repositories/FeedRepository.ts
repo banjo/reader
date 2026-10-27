@@ -189,6 +189,95 @@ const getFeedForRefresh = async (feedId: number): AsyncResultType<FeedForRefresh
     return Result.ok(feed);
 };
 
+export type OrphanedFeed = {
+    id: number;
+    name: string;
+    rssUrl: string;
+};
+
+const getOrphanedFeeds = async ({
+    olderThan,
+    limit = 100,
+}: {
+    olderThan: Date;
+    limit?: number;
+}): AsyncResultType<OrphanedFeed[]> => {
+    try {
+        const feeds = await prisma.feed.findMany({
+            where: {
+                users: { none: {} },
+                updatedAt: { lt: olderThan },
+            },
+            orderBy: [{ updatedAt: "asc" }, { id: "asc" }],
+            take: limit,
+            select: { id: true, name: true, rssUrl: true },
+        });
+
+        return Result.ok(feeds);
+    } catch (error: unknown) {
+        logger.error(`Could not find orphaned feeds - ${error}`);
+        return Result.error("Could not find orphaned feeds", "InternalError");
+    }
+};
+
+const deleteFeed = async (feedId: number): AsyncResultType<boolean> => {
+    try {
+        const deleted = await prisma.$transaction(async tx => {
+            const locked = await tx.$queryRaw<{ id: number }[]>`
+                SELECT "id" FROM "Feed" WHERE "id" = ${feedId} FOR UPDATE
+            `;
+
+            if (locked.length === 0) {
+                return false;
+            }
+
+            const subscribers = await tx.feed.count({
+                where: { id: feedId, users: { some: {} } },
+            });
+
+            if (subscribers > 0) {
+                return false;
+            }
+
+            // relationMode = "prisma" means the join table has no foreign keys.
+            await tx.$executeRaw`
+                DELETE FROM "_ItemToTag" AS tags
+                USING "Item" AS items
+                WHERE tags."A" = items."id" AND items."feedId" = ${feedId}
+            `;
+            await tx.item.deleteMany({ where: { feedId } });
+            await tx.itemContent.deleteMany({ where: { feedId } });
+            await tx.feed.delete({ where: { id: feedId } });
+
+            return true;
+        });
+
+        return Result.ok(deleted);
+    } catch (error: unknown) {
+        logger.error(`Could not delete feed ${feedId} - ${error}`);
+        return Result.error(`Could not delete feed ${feedId}`, "InternalError");
+    }
+};
+
+const countUserFeeds = async (userId: number): AsyncResultType<number> => {
+    try {
+        const count = await prisma.feed.count({
+            where: {
+                users: {
+                    some: {
+                        id: userId,
+                    },
+                },
+            },
+        });
+
+        return Result.ok(count);
+    } catch (error: unknown) {
+        logger.error(`Could not count feeds for user ${userId} - ${error}`);
+        return Result.error(`Could not count feeds for user ${userId}`, "InternalError");
+    }
+};
+
 const getFeedByRssUrl = async (rssUrl: string): AsyncResultType<Feed> => {
     const feed = await prisma.feed.findUnique({
         where: {
@@ -400,6 +489,9 @@ export const FeedRepository = {
     saveSubscription,
     getAllFeedsByUserId,
     getFeedForRefresh,
+    countUserFeeds,
+    getOrphanedFeeds,
+    deleteFeed,
     getFeedByRssUrl,
     getUserFeedByInternalIdentifier,
     getFeedByInternalIdentifier,

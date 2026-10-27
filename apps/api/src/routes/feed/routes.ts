@@ -1,4 +1,5 @@
 import { createHonoInstance } from "@app/instance";
+import { rateLimit } from "@app/middleware/rate-limit";
 import { parseFilters, parsePagination } from "@app/utils";
 import { zValidator } from "@hono/zod-validator";
 import { feedImportLimit, PaginationResponse } from "model";
@@ -39,56 +40,71 @@ const feedPostSchema = z.object({
     url: z.string().url(),
 });
 
-feed.post("/", zValidator("json", feedPostSchema), async c => {
-    const userId = c.get("userId");
-    const body = c.req.valid("json");
+feed.post(
+    "/",
+    rateLimit({ name: "feed-add", points: 30, durationMs: 10 * 60_000 }),
+    zValidator("json", feedPostSchema),
+    async c => {
+        const userId = c.get("userId");
+        const body = c.req.valid("json");
 
-    const item = await FeedService.addFeed(body.url, userId);
+        const item = await FeedService.addFeed(body.url, userId);
 
-    if (!item.success) {
-        logger.error(`Could not fetch feed with url ${body.url} for user ${userId}`);
-        return c.text(item.message, item.status);
+        if (!item.success) {
+            logger.error(`Could not fetch feed with url ${body.url} for user ${userId}`);
+            return c.text(item.message, item.status);
+        }
+
+        return c.json(Result.ok(item.data));
     }
-
-    return c.json(Result.ok(item.data));
-});
+);
 
 const feedMarkAllAsReadSchema = z.object({
     feedId: z.number(),
 });
 
-feed.post("/mark-all-as-read", zValidator("json", feedMarkAllAsReadSchema), async c => {
-    const userId = c.get("userId");
-    const body = c.req.valid("json");
-    const id = body.feedId;
+feed.post(
+    "/mark-all-as-read",
+    rateLimit({ name: "feed-mark-read", points: 60, durationMs: 60_000 }),
+    zValidator("json", feedMarkAllAsReadSchema),
+    async c => {
+        const userId = c.get("userId");
+        const body = c.req.valid("json");
+        const id = body.feedId;
 
-    const response = await FeedService.markAllAsRead(id, userId);
+        const response = await FeedService.markAllAsRead(id, userId);
 
-    if (!response.success) {
-        logger.error(`Could not mark all as read for feed ${id} for user ${userId}`);
-        return c.json(Result.error(response.message, response.type));
+        if (!response.success) {
+            logger.error(`Could not mark all as read for feed ${id} for user ${userId}`);
+            return c.json(Result.error(response.message, response.type));
+        }
+
+        return c.json(Result.okEmpty());
     }
-
-    return c.json(Result.okEmpty());
-});
+);
 
 const feedSearchQuerySchema = z.object({
     query: z.string().trim().min(1).max(100),
 });
 
-feed.get("/search", zValidator("query", feedSearchQuerySchema), async c => {
-    const { query } = c.req.valid("query");
-    const userId = c.get("userId");
+feed.get(
+    "/search",
+    rateLimit({ name: "feed-search", points: 60, durationMs: 60_000 }),
+    zValidator("query", feedSearchQuerySchema),
+    async c => {
+        const { query } = c.req.valid("query");
+        const userId = c.get("userId");
 
-    const item = await FeedService.searchFeeds(query, userId);
+        const item = await FeedService.searchFeeds(query, userId);
 
-    if (!item.success) {
-        logger.error(`Could not search for feeds with query ${query} for user ${userId}`);
-        return c.json(Result.error(item.message, item.type));
+        if (!item.success) {
+            logger.error(`Could not search for feeds with query ${query} for user ${userId}`);
+            return c.json(Result.error(item.message, item.type));
+        }
+
+        return c.json(Result.ok(item.data));
     }
-
-    return c.json(Result.ok(item.data));
-});
+);
 
 feed.get("/:internalIdentifier", async c => {
     const internalIdentifier = c.req.param("internalIdentifier");
@@ -129,37 +145,45 @@ feed.get("/:internalIdentifier", async c => {
     return c.json(Result.ok(paginationResponse));
 });
 
-feed.post("/:internalIdentifier/unsubscribe", async c => {
-    const userId = c.get("userId");
-    const internalIdentifier = c.req.param("internalIdentifier");
+feed.post(
+    "/:internalIdentifier/unsubscribe",
+    rateLimit({ name: "feed-unsubscribe", points: 60, durationMs: 60_000 }),
+    async c => {
+        const userId = c.get("userId");
+        const internalIdentifier = c.req.param("internalIdentifier");
 
-    const item = await FeedService.unsubscribeFromFeed(internalIdentifier, userId);
+        const item = await FeedService.unsubscribeFromFeed(internalIdentifier, userId);
 
-    if (!item.success) {
-        logger.error(
-            `Could not unsubscribe from feed with internal identifier ${internalIdentifier} for user ${userId}`
-        );
-        return c.json(Result.error(item.message, item.type));
+        if (!item.success) {
+            logger.error(
+                `Could not unsubscribe from feed with internal identifier ${internalIdentifier} for user ${userId}`
+            );
+            return c.json(Result.error(item.message, item.type));
+        }
+
+        return c.json(Result.ok(item.data));
     }
+);
 
-    return c.json(Result.ok(item.data));
-});
+feed.post(
+    "/:internalIdentifier/subscribe",
+    rateLimit({ name: "feed-subscribe", points: 60, durationMs: 60_000 }),
+    async c => {
+        const userId = c.get("userId");
+        const internalIdentifier = c.req.param("internalIdentifier");
 
-feed.post("/:internalIdentifier/subscribe", async c => {
-    const userId = c.get("userId");
-    const internalIdentifier = c.req.param("internalIdentifier");
+        const item = await FeedService.subscribeToFeed(internalIdentifier, userId);
 
-    const item = await FeedService.subscribeToFeed(internalIdentifier, userId);
+        if (!item.success) {
+            logger.error(
+                `Could not subscribe to feed with internal identifier ${internalIdentifier} for user ${userId}`
+            );
+            return c.json(Result.error(item.message, item.type));
+        }
 
-    if (!item.success) {
-        logger.error(
-            `Could not subscribe to feed with internal identifier ${internalIdentifier} for user ${userId}`
-        );
-        return c.json(Result.error(item.message, item.type));
+        return c.json(Result.ok(item.data));
     }
-
-    return c.json(Result.ok(item.data));
-});
+);
 
 const feedAddManyBodySchema = z.object({
     urls: z
@@ -177,6 +201,7 @@ const feedAddManyBodySchema = z.object({
 
 feed.post(
     "/add-many",
+    rateLimit({ name: "feed-import", points: 5, durationMs: 60 * 60_000 }),
     bodyLimit({ maxSize: 3 * 1024 * 1024 }),
     zValidator("json", feedAddManyBodySchema),
     async c => {

@@ -1,4 +1,5 @@
 import { createHonoInstance } from "@app/instance";
+import { rateLimit } from "@app/middleware/rate-limit";
 import { zValidator } from "@hono/zod-validator";
 import { ItemService } from "server";
 import { createLogger, Result } from "utils";
@@ -15,25 +16,30 @@ const itemStatusSchema = z.object({
     isFavorite: z.boolean().optional(),
 });
 
-item.put("/:id", zValidator("json", itemStatusSchema), async c => {
-    const userId = c.get("userId");
-    const status = c.req.valid("json");
-    const idResult = itemIdSchema.safeParse(c.req.param("id"));
+item.put(
+    "/:id",
+    rateLimit({ name: "item-update", points: 240, durationMs: 60_000 }),
+    zValidator("json", itemStatusSchema),
+    async c => {
+        const userId = c.get("userId");
+        const status = c.req.valid("json");
+        const idResult = itemIdSchema.safeParse(c.req.param("id"));
 
-    if (!idResult.success) {
-        return c.json(Result.error("Invalid item id", "BadRequest"), 400);
+        if (!idResult.success) {
+            return c.json(Result.error("Invalid item id", "BadRequest"), 400);
+        }
+
+        const id = idResult.data;
+        const itemResult = await ItemService.updateItemStatus(id, userId, status);
+
+        if (!itemResult.success) {
+            logger.error(`Could not update item with id ${id} for user ${userId}`);
+            return c.json(
+                Result.error(itemResult.message, itemResult.type),
+                itemResult.type === "NotFound" ? 404 : 500
+            );
+        }
+
+        return c.json(Result.okEmpty());
     }
-
-    const id = idResult.data;
-    const itemResult = await ItemService.updateItemStatus(id, userId, status);
-
-    if (!itemResult.success) {
-        logger.error(`Could not update item with id ${id} for user ${userId}`);
-        return c.json(
-            Result.error(itemResult.message, itemResult.type),
-            itemResult.type === "NotFound" ? 404 : 500
-        );
-    }
-
-    return c.json(Result.okEmpty());
-});
+);

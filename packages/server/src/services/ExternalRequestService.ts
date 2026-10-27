@@ -1,4 +1,5 @@
 import { setTimeout as delay } from "node:timers/promises";
+import { assertPublicHostname, parseHttpUrl, safeFetch, UnsafeUrlError } from "./UrlSafety";
 
 type RequestOptions = {
     timeoutMs: number;
@@ -41,14 +42,34 @@ export const externalRequestLimits = {
 
 const httpUrl = (input: string, base?: string) => {
     try {
-        const url = new URL(input, base);
-        if (url.protocol === "http:" || url.protocol === "https:") {
-            return url.href;
+        return parseHttpUrl(input, base).href;
+    } catch (error) {
+        // Invalid and unsafe URLs are permanent failures, not network errors.
+        if (error instanceof UnsafeUrlError) {
+            throw new ExternalRequestError(error.message, false);
         }
-    } catch {
-        // Invalid URLs are permanent failures, not network errors.
+        throw new ExternalRequestError("Expected an HTTP or HTTPS URL", false);
     }
-    throw new ExternalRequestError("Expected an HTTP or HTTPS URL", false);
+};
+
+const assertSafeUrl = async (url: string) => {
+    try {
+        await assertPublicHostname(new URL(url));
+    } catch (error) {
+        if (error instanceof UnsafeUrlError) {
+            throw new ExternalRequestError(error.message, false);
+        }
+        throw new ExternalRequestError("Could not verify the request host", false);
+    }
+};
+
+const isUnsafeUrlError = (error: unknown) => {
+    if (error instanceof UnsafeUrlError) {
+        return true;
+    }
+
+    const cause = (error as { cause?: unknown } | undefined)?.cause;
+    return cause instanceof UnsafeUrlError;
 };
 
 const readText = async ({ response, maxBytes, htmlOnly }: ReadBodyProps) => {
@@ -115,7 +136,11 @@ const fetchOnce = async ({ url, timeoutMs, maxBytes, maxRedirects, htmlOnly }: F
     let response: Response | undefined;
     try {
         for (let redirects = 0; ; redirects++) {
-            response = await fetch(currentUrl, { signal: controller.signal, redirect: "manual" });
+            await assertSafeUrl(currentUrl);
+            response = await safeFetch(currentUrl, {
+                signal: controller.signal,
+                redirect: "manual",
+            });
             if ([301, 302, 303, 307, 308].includes(response.status)) {
                 const location = response.headers.get("location");
                 await response.body?.cancel();
@@ -134,6 +159,12 @@ const fetchOnce = async ({ url, timeoutMs, maxBytes, maxRedirects, htmlOnly }: F
     } catch (error) {
         if (error instanceof ExternalRequestError) {
             throw error;
+        }
+        if (isUnsafeUrlError(error)) {
+            throw new ExternalRequestError(
+                error instanceof Error ? error.message : "Unsafe request URL",
+                false
+            );
         }
         const message = controller.signal.aborted
             ? `Request timed out after ${timeoutMs} ms`
@@ -175,7 +206,8 @@ const fetchImageOnce = async ({ url, timeoutMs, maxRedirects }: FetchImageProps)
     let response: Response | undefined;
     try {
         for (let redirects = 0; ; redirects++) {
-            response = await fetch(currentUrl, {
+            await assertSafeUrl(currentUrl);
+            response = await safeFetch(currentUrl, {
                 signal: controller.signal,
                 redirect: "manual",
                 headers: { Range: "bytes=0-0" },
@@ -212,6 +244,12 @@ const fetchImageOnce = async ({ url, timeoutMs, maxRedirects }: FetchImageProps)
     } catch (error) {
         if (error instanceof ExternalRequestError) {
             throw error;
+        }
+        if (isUnsafeUrlError(error)) {
+            throw new ExternalRequestError(
+                error instanceof Error ? error.message : "Unsafe request URL",
+                false
+            );
         }
         const message = controller.signal.aborted
             ? `Request timed out after ${timeoutMs} ms`

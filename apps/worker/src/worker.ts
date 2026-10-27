@@ -1,6 +1,7 @@
 import {
     addImageWorker,
     addToUsersWorker,
+    cleanupFeedsWorker,
     fetchContentWithoutImageWorker,
     fetchRssFeedWorker,
     importFeedsWorker,
@@ -16,6 +17,7 @@ export const start = async () => {
     fetchContentWithoutImageWorker().start();
     addImageWorker().start();
     importFeedsWorker().start();
+    cleanupFeedsWorker().start();
     refreshArticlesWorker().start();
     verifyImagesWorker().start();
 
@@ -24,10 +26,12 @@ export const start = async () => {
     await fetchContentWithoutImageWorker().stopRepeatable();
     await refreshArticlesWorker().stopRepeatable();
     await verifyImagesWorker().stopRepeatable();
+    await cleanupFeedsWorker().stopRepeatable();
 
     await fetchContentWithoutImageWorker().repeatable({});
     await refreshArticlesWorker().repeatable({}, 24 * 60 * 60 * 1000);
     await verifyImagesWorker().repeatable({}, 24 * 60 * 60 * 1000);
+    await cleanupFeedsWorker().repeatable({}, 24 * 60 * 60 * 1000);
 
     await addFetchRss();
 };

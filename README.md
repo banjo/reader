@@ -81,6 +81,9 @@ The repository is a [pnpm workspace](https://pnpm.io/workspaces) run with
 - `packages/firebase-server`: Firebase Admin, used to verify sign-ins
 - `packages/model` and `packages/utils`: Shared types, logging, and helpers
 
+GitHub Actions runs the typecheck, lint, build, and test suites on every push to `main` and on
+pull requests. The workflow is in `.github/workflows/ci.yml`.
+
 ## Deployment
 
 The API and the worker are deployed to [CapRover](https://caprover.com) with the Dockerfiles in
@@ -95,6 +98,12 @@ pnpm logs:api         # Follow the API logs.
 In production, logs are sent to [Axiom](https://axiom.co), so the API and the worker also need
 `AXIOM_DATASET` and `AXIOM_TOKEN`.
 
+Apply database migrations before deploying a release that adds one:
+
+```bash
+DATABASE_URL=... pnpm --filter db db:migrate:prod
+```
+
 ### Article refresh
 
 The worker rechecks older posts once a day. It picks posts that at least one reader has in their
@@ -107,6 +116,70 @@ the article's metadata. The original RSS body is kept.
 
 Permanent failures such as a `404` are marked checked. Temporary failures stay eligible for the
 next run.
+
+### Image verification
+
+The worker rechecks a rotating slice of stored images once a day, so it never walks the whole
+table or hammers publishers.
+
+- `VERIFY_IMAGES_LIMIT` (default `2000`) sets how many images one run may check.
+- `VERIFY_IMAGES_OLDER_THAN_DAYS` (default `14`) sets how old a check must be for an image to be
+  eligible again.
+- `VERIFY_IMAGES_CONCURRENCY` (default `5`) sets how many image checks run at once.
+
+Broken images are cleared and left for one new lookup by the hourly image scan.
+
+### Orphaned feed cleanup
+
+When the last reader unsubscribes, the feed and its posts are kept for a grace period and then
+deleted along with the hourly refresh job.
+
+- `CLEANUP_ORPHANED_FEEDS_AFTER_DAYS` (default `30`) sets the grace period.
+- `CLEANUP_ORPHANED_FEEDS_LIMIT` (default `100`) sets how many feeds one run may delete.
+
+### Limits and outbound requests
+
+- `MAX_FEEDS_PER_USER` (default `500`) caps how many feeds one account can follow. Set it on both
+  the API and the worker, since imports are processed by the worker.
+- Feed adds, imports, searches, and item updates are rate limited in Redis. The limits are
+  per-user and return HTTP `429` with a `Retry-After` header.
+- Outbound requests reject loopback, private, link-local, and metadata addresses, non-HTTP
+  protocols, and ports other than `80` and `443`. Redirects are checked again at every hop.
+- `ALLOW_PRIVATE_NETWORK_REQUESTS=true` disables that guard. It exists for tests that fetch local
+  fixture servers and is ignored when `NODE_ENV=production`.
+- `RATE_LIMIT_DISABLED=true` disables rate limiting. It is ignored when `NODE_ENV=production`.
+
+### Health checks
+
+- `GET /health` is a liveness check and only confirms the process is running.
+- `GET /health/ready` checks PostgreSQL and Redis, returning `503` when either is unavailable.
+- The worker exposes `GET /health` as well.
+
+`.github/workflows/uptime.yml` checks the production web app hourly. Set the repository variable
+`API_HEALTH_URL` to also check API readiness. For tighter monitoring, point an external uptime
+service at the same URLs.
+
+### Backups
+
+`scripts/backup-db.sh` writes a compressed `pg_dump` and removes old local copies:
+
+```bash
+DATABASE_URL=... BACKUP_DIR=/var/backups/banjo ./scripts/backup-db.sh
+```
+
+Restore a dump with `pg_restore --clean --if-exists --dbname "$DATABASE_URL" <file>`.
+
+Set `BACKUP_S3_URI` to upload with the AWS CLI as well. A daily cron entry keeps the schedule
+outside the application process:
+
+```cron
+0 3 * * * DATABASE_URL=... BACKUP_DIR=/var/backups/banjo /path/to/reader/scripts/backup-db.sh
+```
+
+`.github/workflows/backup.yml` can also run the backup and store it as a GitHub artifact. It is
+disabled until the `PRODUCTION_DATABASE_URL` repository secret is set; the database must be
+reachable from GitHub Actions. Artifacts expire, so keep a separate off-site copy for real
+disaster recovery.
 
 ## License
 

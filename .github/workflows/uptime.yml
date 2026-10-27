@@ -1,0 +1,31 @@
+name: Uptime
+
+on:
+    schedule:
+        # Hourly. A failed run sends GitHub's workflow-failure notification to watchers.
+        - cron: "0 * * * *"
+    workflow_dispatch:
+
+concurrency:
+    group: uptime
+    cancel-in-progress: false
+
+jobs:
+    check:
+        name: Check production endpoints
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+
+        env:
+            WEB_URL: ${{ vars.WEB_URL || 'https://reader.banjoanton.com' }}
+            API_HEALTH_URL: ${{ vars.API_HEALTH_URL }}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Check web app
+              run: ./scripts/check-health.sh "$WEB_URL"
+
+            - name: Check API readiness
+              if: env.API_HEALTH_URL != ''
+              run: ./scripts/check-health.sh "$API_HEALTH_URL"

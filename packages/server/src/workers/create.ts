@@ -126,6 +126,17 @@ export const createWorker = <T extends object>(
             });
         },
         stopRepeatable,
+        removeRepeatableById: async (jobId: string) => {
+            const repeatableJobs = await queue.getRepeatableJobs();
+            const job = repeatableJobs.find(candidate => candidate.id === jobId);
+
+            if (!job) {
+                return false;
+            }
+
+            await queue.removeRepeatableByKey(job.key);
+            return true;
+        },
         activeCount: async () => {
             logger.info("Getting active count...");
             return await queue.getActiveCount();

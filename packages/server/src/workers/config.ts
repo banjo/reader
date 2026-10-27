@@ -1,7 +1,22 @@
 import { raise } from "@banjoanton/utils";
 import { QueueOptions } from "bullmq";
 
-const getConnection = () => {
+export type RedisConnection = {
+    host: string;
+    port: number;
+    password?: string;
+};
+
+export const getRedisConnection = (): RedisConnection => {
+    if (process.env.NODE_ENV === "test" && process.env.TEST_REDIS_URL) {
+        const url = new URL(process.env.TEST_REDIS_URL);
+        return {
+            host: url.hostname,
+            port: Number.parseInt(url.port) || 6379,
+            password: decodeURIComponent(url.password) || undefined,
+        };
+    }
+
     const isProd = process.env.NODE_ENV === "production";
 
     if (isProd) {
@@ -20,5 +35,5 @@ const getConnection = () => {
 };
 
 export const redisConfig: QueueOptions = {
-    connection: getConnection(),
+    connection: getRedisConnection(),
 };

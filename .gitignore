@@ -6,3 +6,4 @@ build
 .DS_Store
 out
 apps/api/banjo-rss-service-key.json
+backups/

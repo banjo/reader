@@ -58,6 +58,29 @@ type AddFeedResponse = {
 };
 type AddFeedOptions = { requestAttempts?: number; scheduleExisting?: boolean };
 
+const defaultMaxFeedsPerUser = 500;
+
+export const maxFeedsPerUser = () => {
+    const parsed = Number.parseInt(process.env.MAX_FEEDS_PER_USER ?? "", 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : defaultMaxFeedsPerUser;
+};
+
+const feedCapError = () =>
+    Result.error<never>(
+        `You can follow at most ${maxFeedsPerUser()} feeds. Unfollow one to add another.`,
+        "Forbidden"
+    );
+
+const isAtFeedCap = async (userId: number) => {
+    const count = await FeedRepository.countUserFeeds(userId);
+
+    if (!count.success) {
+        return Result.error<boolean>("Could not check feed limit", "InternalError");
+    }
+
+    return Result.ok(count.data >= maxFeedsPerUser());
+};
+
 const addFeed = async (
     rssUrl: string,
     userId: number,
@@ -72,6 +95,16 @@ const addFeed = async (
                 return Result.ok({ feedId });
             }
         } else {
+            const atCap = await isAtFeedCap(userId);
+
+            if (!atCap.success) {
+                return atCap;
+            }
+
+            if (atCap.data) {
+                return feedCapError();
+            }
+
             const parseResult = await ParseService.parseRssFeed(rssUrl, {
                 attempts: requestAttempts,
             });
@@ -219,6 +252,24 @@ const subscribeToFeed = async (
     if (!feedResult.success) {
         logger.error(`Could not find feed with identifier ${internalIdentifier}`);
         return Result.error("Could not find feed", "NotFound");
+    }
+
+    const subscribedResult = await FeedRepository.isSubscribedToFeed(internalIdentifier, userId);
+
+    if (!subscribedResult.success) {
+        return Result.error("Could not check feed subscription", "InternalError");
+    }
+
+    if (!subscribedResult.data) {
+        const atCap = await isAtFeedCap(userId);
+
+        if (!atCap.success) {
+            return atCap;
+        }
+
+        if (atCap.data) {
+            return feedCapError();
+        }
     }
 
     const addResult = await FeedRepository.addFeedToUser(feedResult.data.id, userId);

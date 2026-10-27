@@ -30,6 +30,14 @@ declared/streamed/gzip-expanded RSS size limits, HTML truncation, content types,
 classification. Request-level and BullMQ retries both use three attempts, with 1s and 2s
 delays. Worker calls disable request-level retries to avoid nine attempts per job.
 
+Outbound requests block private addresses by default. `url-safety.test.ts` covers the address
+ranges, protocol and port rules, and rejected requests. Fixture-server suites opt in with
+`ALLOW_PRIVATE_NETWORK_REQUESTS=true` in the test file.
+
+`cleanup-feeds.test.ts` checks that orphaned feeds are deleted with their content, join rows, and
+repeatable refresh job while active and recently orphaned feeds are kept. `rate-limit.test.ts`
+checks the Redis window and the test-only disable flag.
+
 The integration suite also checks image recovery, retry exhaustion, a real 10-second image
 timeout, five concurrent image requests, and retry options on scheduled RSS jobs. Failed
 temporary image lookups stay unchecked for the next hourly scan; successful pages without

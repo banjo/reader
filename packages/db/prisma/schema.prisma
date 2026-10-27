@@ -54,6 +54,7 @@ model ItemContent {
   updatedAt       DateTime @updatedAt
   imageUrl        String?
   hasFetchedImage Boolean  @default(false)
+  imageCheckedAt  DateTime @default(now())
   title           String
   description     String?  @db.Text
   link            String
@@ -63,6 +64,8 @@ model ItemContent {
 
   @@unique([feedId, link])
   @@index([hasFetchedImage, id])
+  @@index([imageCheckedAt, id])
+  @@index([lastFetch, id])
 }
 
 model User {

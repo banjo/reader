@@ -590,4 +590,57 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
             }
         }
     );
+
+    await t.test("feed caps apply to new feeds and subscriptions", async () => {
+        const previousLimit = process.env.MAX_FEEDS_PER_USER;
+        process.env.MAX_FEEDS_PER_USER = "1";
+
+        try {
+            const cappedUser = await prisma.user.create({
+                data: {
+                    email: "capped@test.invalid",
+                    externalId: "capped",
+                },
+            });
+            const followed = await prisma.feed.create({
+                data: {
+                    name: "Followed",
+                    url: "https://followed.test",
+                    rssUrl: "https://followed.test/rss",
+                    users: { connect: { id: cappedUser.id } },
+                },
+            });
+            const other = await prisma.feed.create({
+                data: {
+                    name: "Other",
+                    url: "https://other.test",
+                    rssUrl: "https://other.test/rss",
+                },
+            });
+
+            const newFeed = await FeedService.addFeed("https://new-feed.test/rss", cappedUser.id);
+            assert.equal(newFeed.success, false);
+            if (!newFeed.success) {
+                assert.equal(newFeed.type, "Forbidden");
+            }
+
+            const existingFeed = await FeedService.addFeed(followed.rssUrl, cappedUser.id);
+            assert.equal(existingFeed.success, true);
+
+            const subscription = await FeedService.subscribeToFeed(
+                other.internalIdentifier,
+                cappedUser.id
+            );
+            assert.equal(subscription.success, false);
+            if (!subscription.success) {
+                assert.equal(subscription.type, "Forbidden");
+            }
+        } finally {
+            if (previousLimit === undefined) {
+                delete process.env.MAX_FEEDS_PER_USER;
+            } else {
+                process.env.MAX_FEEDS_PER_USER = previousLimit;
+            }
+        }
+    });
 });

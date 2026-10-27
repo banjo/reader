@@ -1,3 +1,5 @@
+process.env.ALLOW_PRIVATE_NETWORK_REQUESTS = "true";
+
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";

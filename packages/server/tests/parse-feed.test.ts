@@ -1,3 +1,5 @@
+process.env.ALLOW_PRIVATE_NETWORK_REQUESTS = "true";
+
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { test, type TestContext } from "node:test";

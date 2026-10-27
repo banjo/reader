@@ -22,7 +22,11 @@ const getAllContentById = async (feedId: number): AsyncResultType<ItemContent[]>
 
 const updateContentImageStatus = async (
     contentId: number,
-    status: { imageUrl?: string | null; hasFetchedImage?: boolean }
+    status: {
+        imageUrl?: string | null;
+        hasFetchedImage?: boolean;
+        imageCheckedAt?: Date;
+    }
 ): AsyncResultType<ItemContent> => {
     let content: ItemContent | null;
     try {
@@ -33,6 +37,7 @@ const updateContentImageStatus = async (
             data: {
                 imageUrl: status.imageUrl === undefined ? undefined : status.imageUrl,
                 hasFetchedImage: status.hasFetchedImage ?? undefined,
+                imageCheckedAt: status.imageCheckedAt,
             },
         });
     } catch (error: unknown) {
@@ -71,22 +76,20 @@ const getContentWithoutImage = async ({
 };
 
 const getContentWithImage = async ({
-    cursorId,
+    olderThan,
     limit = 200,
 }: {
-    cursorId?: number;
+    olderThan: Date;
     limit?: number;
-} = {}): AsyncResultType<ItemContent[]> => {
+}): AsyncResultType<ItemContent[]> => {
     let items: ItemContent[];
     try {
         items = await prisma.itemContent.findMany({
             where: {
                 imageUrl: { not: null },
-                ...(cursorId ? { id: { gt: cursorId } } : {}),
+                imageCheckedAt: { lt: olderThan },
             },
-            orderBy: {
-                id: "asc",
-            },
+            orderBy: [{ imageCheckedAt: "asc" }, { id: "asc" }],
             take: limit,
         });
 

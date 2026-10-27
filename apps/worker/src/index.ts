@@ -8,6 +8,7 @@ import morgan from "morgan";
 import {
     addImageWorker,
     addToUsersWorker,
+    cleanupFeedsWorker,
     fetchContentWithoutImageWorker,
     fetchRssFeedWorker,
     importFeedsWorker,
@@ -34,6 +35,7 @@ const run = async () => {
             new BullMQAdapter(fetchContentWithoutImageWorker().getQueue()),
             new BullMQAdapter(addImageWorker().getQueue()),
             new BullMQAdapter(importFeedsWorker().getQueue()),
+            new BullMQAdapter(cleanupFeedsWorker().getQueue()),
             new BullMQAdapter(refreshArticlesWorker().getQueue()),
             new BullMQAdapter(verifyImagesWorker().getQueue()),
         ],
@@ -41,6 +43,13 @@ const run = async () => {
     });
 
     app.use("/api", morgan("tiny"));
+
+    const healthHandler = (_req: express.Request, res: express.Response) => {
+        res.json({ status: "ok", message: "Worker is running" });
+    };
+
+    app.get("/health", healthHandler);
+    app.get("/api/health", healthHandler);
 
     // eslint-disable-next-line consistent-return
     app.use((req, res, next) => {

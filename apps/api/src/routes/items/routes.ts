@@ -1,4 +1,5 @@
 import { createHonoInstance } from "@app/instance";
+import { rateLimit } from "@app/middleware/rate-limit";
 import { parseFilters, parsePagination } from "@app/utils";
 import { zValidator } from "@hono/zod-validator";
 import { PaginationResponse } from "model";
@@ -42,16 +43,21 @@ const itemsPostReadSchema = z.object({
     ids: z.array(z.number().int()).max(500),
 });
 
-items.post("/read", zValidator("json", itemsPostReadSchema), async c => {
-    const userId = c.get("userId");
-    const body = c.req.valid("json");
+items.post(
+    "/read",
+    rateLimit({ name: "items-read", points: 120, durationMs: 60_000 }),
+    zValidator("json", itemsPostReadSchema),
+    async c => {
+        const userId = c.get("userId");
+        const body = c.req.valid("json");
 
-    const item = await ItemService.markItemsAsRead(body.ids, userId);
+        const item = await ItemService.markItemsAsRead(body.ids, userId);
 
-    if (!item.success) {
-        logger.error(`Could not mark items as read`);
-        return c.json(Result.error(item.message, item.type));
+        if (!item.success) {
+            logger.error(`Could not mark items as read`);
+            return c.json(Result.error(item.message, item.type));
+        }
+
+        return c.json(Result.okEmpty());
     }
-
-    return c.json(Result.okEmpty());
-});
+);

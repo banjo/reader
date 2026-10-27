@@ -1,12 +1,14 @@
 import { ZodIssue } from "zod";
 
-export type ErrorType = "NotFound" | "BadRequest" | "Unauthorized" | "Forbidden" | "InternalError";
+export type ErrorType =
+    "NotFound" | "BadRequest" | "Unauthorized" | "Forbidden" | "TooManyRequests" | "InternalError";
 
 export const ErrorStatus = {
     NotFound: 404,
     BadRequest: 400,
     Unauthorized: 401,
     Forbidden: 403,
+    TooManyRequests: 429,
     InternalError: 500,
 } as const satisfies Record<ErrorType, number>;
 
