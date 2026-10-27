@@ -1,5 +1,5 @@
 import { ItemWithContent, ItemWithContentAndFeed, Prisma, prisma } from "db";
-import { AsyncResultType, Filter, Pagination } from "model";
+import { AsyncResultType, Filter, ItemUnreadCounts, Pagination } from "model";
 import { Result, createLogger } from "utils";
 import { getFilterWhere, getPagination, itemOrderBy } from "../shared/lib/utils";
 
@@ -192,22 +192,6 @@ const createContentIds = async (
     }
 };
 
-const removeFeedItemsForUser = async (feedId: number, userId: number): AsyncResultType<void> => {
-    try {
-        await prisma.item.deleteMany({
-            where: {
-                feedId,
-                userId,
-            },
-        });
-
-        return Result.okEmpty();
-    } catch (error: unknown) {
-        logger.error(`Could not remove items for feed with id ${feedId} - ${error}`);
-        return Result.error(`Could not remove items for feed with id ${feedId}`, "InternalError");
-    }
-};
-
 const getItemCount = async (userId: number, filter: Filter): AsyncResultType<number> => {
     let count: number;
 
@@ -226,13 +210,40 @@ const getItemCount = async (userId: number, filter: Filter): AsyncResultType<num
     return Result.ok(count);
 };
 
+const getUnreadCounts = async (userId: number): AsyncResultType<ItemUnreadCounts> => {
+    try {
+        const [counts] = await prisma.$queryRaw<
+            {
+                totalUnread: bigint;
+                bookmarksUnread: bigint;
+                favoritesUnread: bigint;
+            }[]
+        >`
+            SELECT count(*) AS "totalUnread",
+                   count(*) FILTER (WHERE "isBookmarked") AS "bookmarksUnread",
+                   count(*) FILTER (WHERE "isFavorite") AS "favoritesUnread"
+            FROM "Item"
+            WHERE "userId" = ${userId} AND NOT "isRead"
+        `;
+
+        return Result.ok({
+            totalUnread: Number(counts?.totalUnread ?? 0),
+            bookmarksUnread: Number(counts?.bookmarksUnread ?? 0),
+            favoritesUnread: Number(counts?.favoritesUnread ?? 0),
+        });
+    } catch (error: unknown) {
+        logger.error({ err: error, userId }, "Could not count unread items");
+        return Result.error("Could not count unread items", "InternalError");
+    }
+};
+
 export const ItemRepository = {
+    getUnreadCounts,
     assignContentToFollowers,
     assignFeedItemsToUser,
     getItemById,
     markItemsAsRead,
     updateItemStatus,
-    removeFeedItemsForUser,
     getAllItemsByUserId,
     createContentIds,
     getItemCount,

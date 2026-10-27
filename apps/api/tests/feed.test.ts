@@ -340,6 +340,187 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
         }
     );
 
+    await t.test(
+        "unsubscribing keeps saved posts, flags, and tags without affecting other readers",
+        async () => {
+            const reader = await prisma.user.create({
+                data: { email: "saved@test.invalid", externalId: "saved" },
+            });
+            const source = await prisma.feed.create({
+                data: {
+                    name: "Saved feed",
+                    url: "https://saved.test",
+                    rssUrl: "https://saved.test/rss",
+                    users: { connect: [{ id: reader.id }, { id: secondUser.id }] },
+                },
+            });
+            const posts = await Promise.all(
+                Array.from({ length: 5 }, (_, index) =>
+                    prisma.itemContent.create({
+                        data: {
+                            feedId: source.id,
+                            title: `Saved post ${index}`,
+                            link: `https://saved.test/${index}`,
+                            lastFetch: new Date(),
+                            pubDate: new Date(),
+                        },
+                    })
+                )
+            );
+            const originals = await Promise.all(
+                posts.map((post, index) =>
+                    prisma.item.create({
+                        data: {
+                            feedId: source.id,
+                            contentId: post.id,
+                            userId: reader.id,
+                            isBookmarked: [0, 2, 3].includes(index),
+                            isFavorite: [1, 2].includes(index),
+                            isRead: index === 3,
+                        },
+                    })
+                )
+            );
+            await ItemRepository.assignFeedItemsToUser({
+                feedId: source.id,
+                userId: secondUser.id,
+            });
+            const otherItems = await prisma.item.findMany({
+                where: { feedId: source.id, userId: secondUser.id },
+                orderBy: { id: "asc" },
+            });
+            const tag = await prisma.tag.create({
+                data: {
+                    name: "Saved tag",
+                    userId: reader.id,
+                    items: { connect: originals.map(item => ({ id: item.id })) },
+                },
+            });
+            signedInUserId = reader.id;
+
+            try {
+                const path = `/feed/${source.internalIdentifier}`;
+                for (let attempt = 0; attempt < 2; attempt++) {
+                    const response = await app.request(`${path}/unsubscribe`, { method: "POST" });
+                    assert.equal((await response.json()).success, true);
+                }
+                const remaining = await prisma.item.findMany({
+                    where: { userId: reader.id },
+                    orderBy: { id: "asc" },
+                });
+                assert.deepEqual(
+                    remaining,
+                    originals.slice(0, 4).sort((a, b) => a.id - b.id)
+                );
+                const savedTag = await prisma.tag.findUniqueOrThrow({
+                    where: { id: tag.id },
+                    include: { items: { orderBy: { id: "asc" } } },
+                });
+                assert.deepEqual(savedTag.items, remaining);
+                const ordinary = originals[4];
+                assert.ok(ordinary);
+                const danglingTags = await prisma.$queryRaw<{ count: bigint }[]>`
+                    SELECT count(*) FROM "_ItemToTag" WHERE "A" = ${ordinary.id}
+                `;
+                assert.equal(Number(danglingTags[0]?.count ?? 0), 0);
+                assert.deepEqual((await (await app.request("/feed")).json()).data, []);
+                assert.deepEqual((await (await app.request("/items/counts")).json()).data, {
+                    totalUnread: 3,
+                    bookmarksUnread: 2,
+                    favoritesUnread: 2,
+                });
+                for (const [query, expected] of [
+                    ["", 4],
+                    ["isBookmarked=true", 3],
+                    ["isFavorite=true", 2],
+                ] as const) {
+                    const result = await (await app.request(`/items?${query}`)).json();
+                    assert.equal(result.data.pagination.total, expected);
+                }
+                const newPost = await prisma.itemContent.create({
+                    data: {
+                        feedId: source.id,
+                        title: "New post",
+                        link: "https://saved.test/new",
+                        lastFetch: new Date(),
+                        pubDate: new Date(),
+                    },
+                });
+                await ItemRepository.assignContentToFollowers({
+                    feedId: source.id,
+                    contentIds: [newPost.id],
+                });
+                assert.equal(await prisma.item.count({ where: { userId: reader.id } }), 4);
+                assert.deepEqual(
+                    await prisma.item.findMany({
+                        where: {
+                            feedId: source.id,
+                            userId: secondUser.id,
+                            contentId: { not: newPost.id },
+                        },
+                        orderBy: { id: "asc" },
+                    }),
+                    otherItems
+                );
+
+                for (const subscribe of [
+                    () => FeedService.subscribeToFeed(source.internalIdentifier, reader.id),
+                    () => FeedService.addFeed(source.rssUrl, reader.id),
+                ]) {
+                    assert.equal((await subscribe()).success, true);
+                    assert.equal(await prisma.item.count({ where: { userId: reader.id } }), 6);
+                    assert.deepEqual(
+                        await prisma.item.findMany({
+                            where: { id: { in: remaining.map(item => item.id) } },
+                            orderBy: { id: "asc" },
+                        }),
+                        remaining
+                    );
+                }
+
+                await prisma.$executeRawUnsafe(`
+                    CREATE FUNCTION reject_unsubscribe_delete() RETURNS trigger AS $$
+                    BEGIN RAISE EXCEPTION 'forced unsubscribe failure'; END;
+                    $$ LANGUAGE plpgsql
+                `);
+                await prisma.$executeRawUnsafe(`
+                    CREATE TRIGGER reject_unsubscribe_delete BEFORE DELETE ON "Item"
+                    FOR EACH ROW EXECUTE FUNCTION reject_unsubscribe_delete()
+                `);
+                try {
+                    const failed = await FeedService.unsubscribeFromFeed(
+                        source.internalIdentifier,
+                        reader.id
+                    );
+                    assert.equal(failed.success, false);
+                    assert.deepEqual(
+                        await FeedRepository.isSubscribedToFeed(
+                            source.internalIdentifier,
+                            reader.id
+                        ),
+                        {
+                            success: true,
+                            data: true,
+                        }
+                    );
+                    assert.equal(await prisma.item.count({ where: { userId: reader.id } }), 6);
+                    const retainedTag = await prisma.tag.findUniqueOrThrow({
+                        where: { id: tag.id },
+                        include: { items: { orderBy: { id: "asc" } } },
+                    });
+                    assert.deepEqual(retainedTag.items, remaining);
+                } finally {
+                    await prisma.$executeRawUnsafe(
+                        'DROP TRIGGER reject_unsubscribe_delete ON "Item"'
+                    );
+                    await prisma.$executeRawUnsafe("DROP FUNCTION reject_unsubscribe_delete()");
+                }
+            } finally {
+                signedInUserId = firstUser.id;
+            }
+        }
+    );
+
     await t.test("search is case-insensitive, capped, and excludes subscribed feeds", async () => {
         signedInUserId = firstUser.id;
         await prisma.feed.createMany({

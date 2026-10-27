@@ -173,16 +173,6 @@ const unsubscribeFromFeed = async (
         return Result.error("Failed to remove feed from user", "InternalError");
     }
 
-    const removeItemsResult = await ItemRepository.removeFeedItemsForUser(
-        feedResult.data.id,
-        userId
-    );
-
-    if (!removeItemsResult.success) {
-        logger.error(`failed to remove items for feed with id ${feedResult.data.id}`);
-        return Result.error("Failed to remove items for feed", "InternalError");
-    }
-
     return Result.okEmpty();
 };
 

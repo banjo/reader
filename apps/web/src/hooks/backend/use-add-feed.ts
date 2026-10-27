@@ -1,8 +1,8 @@
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useAuth } from "@/contexts/auth-context";
 import { FeedImport } from "@/lib/feed-import";
-import { feedsQueryKey } from "@/hooks/backend/query-keys";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInvalidate } from "@/hooks/backend/use-invalidate";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { FeedImportAccepted, FeedImportStatus } from "model";
 import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 export const useAddFeed = () => {
     const api = useAuthFetcher();
     const { userId = "" } = useAuth();
-    const queryClient = useQueryClient();
+    const { invalidate } = useInvalidate();
     const [importId, setImportId] = useState(() => FeedImport.load(userId));
     const lastImported = useRef(-1);
     const announced = useRef<string>();
@@ -30,8 +30,7 @@ export const useAddFeed = () => {
         onSuccess: status => {
             if (status.imported !== lastImported.current) {
                 lastImported.current = status.imported;
-                void queryClient.invalidateQueries({ queryKey: feedsQueryKey });
-                void queryClient.invalidateQueries({ queryKey: ["items"] });
+                void invalidate();
             }
             if (status.finished && announced.current !== status.importId) {
                 announced.current = status.importId;

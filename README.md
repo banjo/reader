@@ -15,6 +15,7 @@
 - 🕰️ Older posts are rechecked in the background, so edited titles, summaries, and images stay current
 - 📥 Bring your subscriptions from another reader with an OPML import
 - ⭐️ Favorite and bookmark posts, and find them again in their own lists
+- Keep bookmarked and favorite posts when you unsubscribe from a feed
 - ✅ Show only unread posts, and mark a whole feed as read in one click
 - 🗂️ Switch between a compact list and cards with images
 - 🔐 Sign in with Google, and your feeds follow you across devices
@@ -131,8 +132,13 @@ Broken images are cleared and left for one new lookup by the hourly image scan.
 
 ### Orphaned feed cleanup
 
-When the last reader unsubscribes, the feed and its posts are kept for a grace period and then
-deleted along with the hourly refresh job.
+Unsubscribing removes ordinary posts from that reader's lists, but keeps bookmarks, favorites,
+read status, and tags on saved posts. Saved posts remain in All, Read later, and Favorites.
+Subscribing again keeps those flags and does not create duplicate items.
+
+When the last reader unsubscribes, feeds without any bookmarked or favorite items are kept for
+a grace period and then deleted along with the hourly refresh job. Feeds with saved items are
+not deleted. They become eligible for cleanup after those items are no longer saved.
 
 - `CLEANUP_ORPHANED_FEEDS_AFTER_DAYS` (default `30`) sets the grace period.
 - `CLEANUP_ORPHANED_FEEDS_LIMIT` (default `100`) sets how many feeds one run may delete.

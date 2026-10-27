@@ -13,6 +13,11 @@ database URL from `.env`. The feed suite also covers case-insensitive search, it
 cap, the subscribed-feed exclusion, selected fields only, and rejected blank or oversized
 queries.
 
+Unsubscribe coverage checks bookmarked and favorite posts (including read posts), tags,
+other-reader isolation, no new delivery after unfollowing, and resubscription without duplicate
+items or lost flags. `/items/counts` includes saved posts from unfollowed feeds, while `/feed`
+lists only current subscriptions.
+
 Background imports also use Redis from `docker/docker-compose.yml`. For the isolated local
 Compose project used during browser testing:
 

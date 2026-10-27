@@ -206,6 +206,7 @@ const getOrphanedFeeds = async ({
         const feeds = await prisma.feed.findMany({
             where: {
                 users: { none: {} },
+                items: { none: { OR: [{ isBookmarked: true }, { isFavorite: true }] } },
                 updatedAt: { lt: olderThan },
             },
             orderBy: [{ updatedAt: "asc" }, { id: "asc" }],
@@ -236,6 +237,17 @@ const deleteFeed = async (feedId: number): AsyncResultType<boolean> => {
             });
 
             if (subscribers > 0) {
+                return false;
+            }
+
+            await tx.$queryRaw`
+                SELECT "id" FROM "Item" WHERE "feedId" = ${feedId} ORDER BY "id" FOR UPDATE
+            `;
+            const savedItems = await tx.item.count({
+                where: { feedId, OR: [{ isBookmarked: true }, { isFavorite: true }] },
+            });
+
+            if (savedItems > 0) {
                 return false;
             }
 
@@ -371,21 +383,30 @@ const addFeedToUser = async (feedId: number, userId: number): AsyncResultType<Fe
 };
 
 const removeFeedFromUser = async (feedId: number, userId: number): AsyncResultType<void> => {
-    const feed = await prisma.feed.update({
-        where: {
-            id: feedId,
-        },
-        data: {
-            users: {
-                disconnect: {
-                    id: userId,
-                },
-            },
-        },
-    });
-
-    if (!feed) {
-        logger.error("Could not remove feed from user");
+    try {
+        await prisma.$transaction(async tx => {
+            await tx.feed.update({
+                where: { id: feedId },
+                data: { users: { disconnect: { id: userId } } },
+            });
+            await tx.$queryRaw`
+                SELECT "id" FROM "Item"
+                WHERE "feedId" = ${feedId} AND "userId" = ${userId}
+                ORDER BY "id" FOR UPDATE
+            `;
+            await tx.$executeRaw`
+                DELETE FROM "_ItemToTag" AS tags
+                USING "Item" AS items
+                WHERE tags."A" = items."id"
+                  AND items."feedId" = ${feedId} AND items."userId" = ${userId}
+                  AND NOT items."isBookmarked" AND NOT items."isFavorite"
+            `;
+            await tx.item.deleteMany({
+                where: { feedId, userId, isBookmarked: false, isFavorite: false },
+            });
+        });
+    } catch (error: unknown) {
+        logger.error({ err: error, feedId, userId }, "Could not remove feed from user");
         return Result.error("Could not remove feed from user", "InternalError");
     }
 

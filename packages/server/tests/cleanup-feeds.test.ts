@@ -55,6 +55,7 @@ test(
             await import("../src/workers/runners/cleanup-feeds/cleanup-feeds-worker");
         const { fetchRssFeedWorker } =
             await import("../src/workers/runners/fetch-rss-feed/fetch-rss-feed-worker");
+        const { FeedRepository } = await import("../src/repositories/FeedRepository");
 
         const user = await prisma.user.create({
             data: { email: "cleanup@test.invalid", externalId: "cleanup" },
@@ -106,8 +107,43 @@ test(
             },
         });
 
+        const savedFeeds = await Promise.all(
+            ["bookmarked", "favorite"].map(async kind => {
+                const saved = await prisma.feed.create({
+                    data: {
+                        name: kind,
+                        url: `https://${kind}.test`,
+                        rssUrl: `https://${kind}.test/rss`,
+                    },
+                });
+                const post = await prisma.itemContent.create({
+                    data: {
+                        feedId: saved.id,
+                        title: kind,
+                        link: `https://${kind}.test/post`,
+                        lastFetch: new Date(),
+                        pubDate: new Date(),
+                    },
+                });
+                await prisma.item.create({
+                    data: {
+                        userId: user.id,
+                        feedId: saved.id,
+                        contentId: post.id,
+                        isBookmarked: kind === "bookmarked",
+                        isFavorite: kind === "favorite",
+                    },
+                });
+                return saved;
+            })
+        );
+
         const old = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000);
         await prisma.$executeRaw`UPDATE "Feed" SET "updatedAt" = ${old} WHERE "id" IN (${active.id}, ${orphan.id})`;
+        await prisma.feed.updateMany({
+            where: { id: { in: savedFeeds.map(feed => feed.id) } },
+            data: { updatedAt: old },
+        });
 
         await fetchRssFeedWorker().repeatable({ feedId: orphan.id }, 60 * 60 * 1_000);
 
@@ -135,5 +171,21 @@ test(
             false
         );
         assert.ok(logs.some(message => message.includes("Deleted orphaned feed")));
+
+        for (const saved of savedFeeds) {
+            // Also guard the delete itself if a bookmark was added after candidate selection.
+            assert.deepEqual(await FeedRepository.deleteFeed(saved.id), {
+                success: true,
+                data: false,
+            });
+            assert.equal(await prisma.item.count({ where: { feedId: saved.id } }), 1);
+            assert.equal(await prisma.itemContent.count({ where: { feedId: saved.id } }), 1);
+        }
+        await prisma.item.updateMany({
+            where: { feedId: { in: savedFeeds.map(feed => feed.id) } },
+            data: { isBookmarked: false, isFavorite: false },
+        });
+        const afterUnsave = await cleanupOrphanedFeeds({ info: () => {}, error: () => {} });
+        assert.deepEqual(afterUnsave, { found: 2, deleted: 2, skipped: 0, failed: 0 });
     }
 );

@@ -7,10 +7,11 @@ import { Icons } from "@/components/shared/icons";
 import { ResponsiveIcon } from "@/components/shared/responsive-icon";
 import { feedsQueryKey } from "@/hooks/backend/query-keys";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
+import { useUnreadCounts } from "@/hooks/backend/use-unread-counts";
 import { avatarUrl } from "@/lib/utils";
 import { useMenuStore } from "@/stores/use-menu-store";
 import { useQuery } from "@tanstack/react-query";
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 type Props = {
@@ -55,23 +56,7 @@ export const SideMenuContainer: FC<Props> = ({ prefix }) => {
         return pathname === prefixUrl(url);
     };
 
-    const totalUnread = useMemo(() => {
-        return data.reduce((acc, feed) => {
-            return acc + feed.totalItemsUnreadCount;
-        }, 0);
-    }, [data]);
-
-    const bookmarksUnread = useMemo(() => {
-        return data.reduce((acc, feed) => {
-            return acc + feed.bookmarkedItemsUnreadCount;
-        }, 0);
-    }, [data]);
-
-    const favoritesUnread = useMemo(() => {
-        return data.reduce((acc, feed) => {
-            return acc + feed.favoriteItemsUnreadCount;
-        }, 0);
-    }, [data]);
+    const { totalUnread, bookmarksUnread, favoritesUnread } = useUnreadCounts();
 
     useEffect(() => {
         const currentTitle = document.title.replace(/\([0-9]+\)/, "");

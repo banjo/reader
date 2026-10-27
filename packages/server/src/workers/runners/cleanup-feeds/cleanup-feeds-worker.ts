@@ -68,7 +68,9 @@ export const cleanupOrphanedFeeds = async (logger: CleanupLogger): Promise<Clean
         }
 
         if (!deleteResult.data) {
-            logger.info(`Feed ${feed.id} got a new subscriber, restoring its refresh job`);
+            logger.info(
+                `Feed ${feed.id} has subscribers or saved posts, keeping it and restoring its refresh job`
+            );
             try {
                 await fetchRssFeedWorker().repeatable({ feedId: feed.id });
             } catch (error) {

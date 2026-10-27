@@ -1,11 +1,14 @@
-import { feedsQueryKey } from "@/hooks/backend/query-keys";
+import { feedsQueryKey, itemCountsQueryKey } from "@/hooks/backend/query-keys";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useInvalidate = () => {
     const queryClient = useQueryClient();
 
     const invalidateFeeds = async () => {
-        await queryClient.invalidateQueries({ queryKey: feedsQueryKey });
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: feedsQueryKey }),
+            queryClient.invalidateQueries({ queryKey: itemCountsQueryKey }),
+        ]);
     };
 
     const invalidate = async () => {

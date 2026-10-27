@@ -69,6 +69,7 @@ const getItemCount = async (userId: number, filter: Filter): AsyncResultType<num
 };
 
 export const ItemService = {
+    getUnreadCounts: ItemRepository.getUnreadCounts,
     getItemById,
     updateItemStatus,
     markItemsAsRead,

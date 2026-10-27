@@ -38,6 +38,9 @@ ranges, protocol and port rules, and rejected requests. Fixture-server suites op
 repeatable refresh job while active and recently orphaned feeds are kept. `rate-limit.test.ts`
 checks the Redis window and the test-only disable flag.
 
+Orphan cleanup also keeps feeds with bookmarks or favorites, including a final check inside the
+delete transaction. Removing the saved flags makes those feeds eligible for cleanup again.
+
 The integration suite also checks image recovery, retry exhaustion, a real 10-second image
 timeout, five concurrent image requests, and retry options on scheduled RSS jobs. Failed
 temporary image lookups stay unchecked for the next hourly scan; successful pages without

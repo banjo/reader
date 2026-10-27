@@ -10,6 +10,14 @@ import { z } from "zod";
 export const items = createHonoInstance();
 const logger = createLogger("api:items");
 
+items.get("/counts", async c => {
+    const result = await ItemService.getUnreadCounts(c.get("userId"));
+    if (!result.success) {
+        return c.json(result, result.status);
+    }
+    return c.json(result);
+});
+
 items.get("/", async c => {
     const userId = c.get("userId");
     const pagination = parsePagination(c);
