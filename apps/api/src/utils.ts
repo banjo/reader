@@ -1,17 +1,29 @@
 import { Context } from "hono";
-import { Filter, Pagination } from "model";
+import { Filter, filterSchema, Pagination } from "model";
 
 export const isDev = () =>
     process.env.NODE_ENV === "development" && process.env.LOCAL_DEVELOPMENT === "true";
 
+const parseOptionalBoolean = (value: string | undefined) => (value ? value === "true" : undefined);
+
 export const parseFilters = (context: Context): Filter => {
     const queryParams = context.req.query();
+    const parsed = filterSchema.safeParse({
+        isRead: parseOptionalBoolean(queryParams.isRead),
+        isBookmarked: parseOptionalBoolean(queryParams.isBookmarked),
+        isFavorite: parseOptionalBoolean(queryParams.isFavorite),
+        search: queryParams.search ?? queryParams.query,
+    });
 
-    return {
-        isRead: queryParams.isRead ? queryParams.isRead === "true" : undefined,
-        isBookmarked: queryParams.isBookmarked ? queryParams.isBookmarked === "true" : undefined,
-        isFavorite: queryParams.isFavorite ? queryParams.isFavorite === "true" : undefined,
-    };
+    if (!parsed.success) {
+        return {
+            isRead: parseOptionalBoolean(queryParams.isRead),
+            isBookmarked: parseOptionalBoolean(queryParams.isBookmarked),
+            isFavorite: parseOptionalBoolean(queryParams.isFavorite),
+        };
+    }
+
+    return parsed.data;
 };
 
 const DEFAULT_PAGE_SIZE = 12;

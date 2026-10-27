@@ -36,6 +36,7 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
 
     const { FeedRepository, FeedService, ItemRepository } = await import("server");
     const { feed: feedRoutes } = await import("../src/routes/feed/routes");
+    const { items: itemRoutes } = await import("../src/routes/items/routes");
     const users = await Promise.all(
         ["first", "second", "third"].map(name =>
             prisma.user.create({ data: { email: `${name}@test.invalid`, externalId: name } })
@@ -118,6 +119,7 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
         await next();
     });
     app.route("/feed", feedRoutes);
+    app.route("/items", itemRoutes);
 
     await t.test("sidebar counts are user-scoped, numeric, and include empty feeds", async () => {
         const result = await FeedRepository.getAllFeedsByUserId(firstUser.id);
@@ -396,4 +398,196 @@ test("feed counts, lookups, and subscriptions", { skip: !testDatabaseUrl }, asyn
             assert.equal((await app.request(`/feed/search?query=${query}`)).status, 400);
         }
     });
+
+    await t.test(
+        "article search filters title, description, and content with matching totals",
+        async () => {
+            const reader = await prisma.user.create({
+                data: { email: "searcher@test.invalid", externalId: "searcher" },
+            });
+            const other = await prisma.user.create({
+                data: { email: "other-searcher@test.invalid", externalId: "other-searcher" },
+            });
+            const followed = await prisma.feed.create({
+                data: {
+                    name: "Searchable",
+                    url: "https://searchable.test",
+                    rssUrl: "https://searchable.test/rss",
+                    users: { connect: [{ id: reader.id }, { id: other.id }] },
+                },
+            });
+            const preview = await prisma.feed.create({
+                data: {
+                    name: "Search preview",
+                    url: "https://search-preview.test",
+                    rssUrl: "https://search-preview.test/rss",
+                },
+            });
+            const now = new Date("2026-02-01T00:00:00Z");
+            const posts = await Promise.all(
+                [
+                    {
+                        title: "Alpha Needle Title",
+                        description: "overview",
+                        content: "body",
+                    },
+                    {
+                        title: "Plain",
+                        description: "A beta NEEDLE in the summary",
+                        content: null,
+                    },
+                    {
+                        title: "Plain body",
+                        description: null,
+                        content: "Gamma needle inside the article",
+                    },
+                    {
+                        title: "100%_done",
+                        description: "weather",
+                        content: "sunshine",
+                    },
+                    {
+                        title: "Q".repeat(120),
+                        description: "capped",
+                        content: "capped body",
+                    },
+                ].map((post, index) =>
+                    prisma.itemContent.create({
+                        data: {
+                            feedId: followed.id,
+                            link: `https://searchable.test/${index}`,
+                            lastFetch: now,
+                            pubDate: new Date(now.getTime() + index * 1000),
+                            ...post,
+                        },
+                    })
+                )
+            );
+            await prisma.itemContent.createMany({
+                data: [
+                    {
+                        feedId: preview.id,
+                        title: "Preview Needle",
+                        link: "https://search-preview.test/needle",
+                        lastFetch: now,
+                        pubDate: now,
+                    },
+                    {
+                        feedId: preview.id,
+                        title: "Other preview",
+                        link: "https://search-preview.test/other",
+                        lastFetch: now,
+                        pubDate: now,
+                    },
+                ],
+            });
+            const [bookmarked, read, , wildcard, capped] = posts;
+            assert.ok(bookmarked && read && wildcard && capped);
+            await prisma.item.createMany({
+                data: posts.map(post => ({
+                    feedId: followed.id,
+                    contentId: post.id,
+                    userId: reader.id,
+                    isRead: post.id === read.id,
+                    isBookmarked: post.id === bookmarked.id,
+                    isFavorite: post.id === read.id,
+                })),
+            });
+            await prisma.item.create({
+                data: {
+                    feedId: followed.id,
+                    contentId: bookmarked.id,
+                    userId: other.id,
+                },
+            });
+            signedInUserId = reader.id;
+
+            try {
+                const needle = "nEeDlE";
+                const list = await app.request(`/items?search=${needle}&pageSize=1`);
+                assert.equal(list.status, 200);
+                const listBody = await list.json();
+                assert.equal(listBody.data.pagination.total, 3);
+                assert.equal(listBody.data.data.length, 1);
+                assert.match(JSON.stringify(listBody.data.data[0].content), /needle/i);
+
+                const bookmarkedOnly = await app.request(
+                    `/items?search=${needle}&isBookmarked=true&pageSize=12`
+                );
+                const bookmarkedBody = await bookmarkedOnly.json();
+                assert.equal(bookmarkedBody.data.pagination.total, 1);
+                assert.equal(bookmarkedBody.data.data[0].content.title, "Alpha Needle Title");
+
+                const unread = await app.request(`/items?search=${needle}&isRead=false`);
+                assert.equal((await unread.json()).data.pagination.total, 2);
+
+                const wildcardResponse = await app.request(
+                    `/items?search=${encodeURIComponent("100%_done")}&pageSize=12`
+                );
+                const wildcardBody = await wildcardResponse.json();
+                assert.equal(wildcardBody.data.pagination.total, 1);
+                assert.equal(wildcardBody.data.data[0].content.title, "100%_done");
+
+                const blank = await app.request("/items?search=%20%20&pageSize=12");
+                assert.equal((await blank.json()).data.pagination.total, 5);
+
+                const cappedResponse = await app.request(
+                    `/items?query=${"Q".repeat(150)}&pageSize=12`
+                );
+                const cappedBody = await cappedResponse.json();
+                assert.equal(cappedResponse.status, 200);
+                assert.equal(cappedBody.data.pagination.total, 1);
+                assert.equal(cappedBody.data.data[0].contentId, capped.id);
+
+                const missed = await app.request(`/items?search=${`Z${"Q".repeat(100)}`}`);
+                assert.equal((await missed.json()).data.pagination.total, 0);
+
+                const repositoryCount = await ItemRepository.getItemCount(reader.id, {
+                    search: "needle",
+                });
+                const repositoryPage = await ItemRepository.getAllItemsByUserId(
+                    reader.id,
+                    { page: 2, pageSize: 1 },
+                    { search: "  needle  " }
+                );
+                assert.ok(repositoryCount.success && repositoryPage.success);
+                assert.equal(repositoryCount.data, 3);
+                assert.equal(repositoryPage.data.length, 1);
+
+                const feedResponse = await app.request(
+                    `/feed/${followed.internalIdentifier}?search=needle&pageSize=1`
+                );
+                const feedBody = await feedResponse.json();
+                assert.equal(feedBody.data.pagination.total, 3);
+                assert.equal(feedBody.data.data.items.length, 1);
+                const feedCount = await FeedRepository.getFeedItemsCount({
+                    internalIdentifier: followed.internalIdentifier,
+                    userId: reader.id,
+                    filter: { search: "NEEDLE", isFavorite: true },
+                });
+                assert.ok(feedCount.success);
+                assert.equal(feedCount.data, 1);
+
+                const previewResponse = await app.request(
+                    `/feed/${preview.internalIdentifier}?search=needle&pageSize=12`
+                );
+                const previewBody = await previewResponse.json();
+                assert.equal(previewBody.data.pagination.total, 1);
+                assert.deepEqual(
+                    previewBody.data.data.contentItems.map(
+                        (entry: { title: string }) => entry.title
+                    ),
+                    ["Preview Needle"]
+                );
+                const previewCount = await FeedRepository.getFeedContentCount(
+                    preview.internalIdentifier,
+                    { search: "   " }
+                );
+                assert.ok(previewCount.success);
+                assert.equal(previewCount.data, 2);
+            } finally {
+                signedInUserId = firstUser.id;
+            }
+        }
+    );
 });

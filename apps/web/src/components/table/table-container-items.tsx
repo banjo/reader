@@ -30,7 +30,7 @@ export const TableContainerItems: FC<TableContainerProps> = ({
     paginate,
     filter,
 }) => {
-    const { filters, actions } = useTableFiltersItems(items, filter);
+    const { filters, actions } = useTableFiltersItems(items, filter, paginate);
     const { updateItem } = useMutateItem();
 
     const onClick = (item: ItemWithContent) => {
@@ -72,7 +72,9 @@ export const TableContainerItems: FC<TableContainerProps> = ({
                 {items.length === 0 && (
                     <Alert>
                         <AlertTitle>Ops!</AlertTitle>
-                        <AlertDescription>No items found</AlertDescription>
+                        <AlertDescription>
+                            {filters.search ? "No articles match your search" : "No items found"}
+                        </AlertDescription>
                     </Alert>
                 )}
             </Table>

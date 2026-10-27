@@ -1,9 +1,16 @@
+import { useArticleSearch } from "@/components/table/use-article-search";
 import { useAuthFetcher } from "@/hooks/backend/use-auth-fetcher";
 import { useInvalidate } from "@/hooks/backend/use-invalidate";
+import { Filter } from "@/hooks/shared/use-filters";
+import { Paginate } from "@/hooks/shared/use-pagination";
 import { useMutation } from "@tanstack/react-query";
 import { ItemContent } from "db";
 
-export type TableFiltersContent = object;
+export type TableFiltersContent = {
+    search: string;
+    setSearch: (value: string) => void;
+    clearSearch: () => void;
+};
 
 export type TableActionsContent = {
     subscribe: (internalIdentifier: string) => Promise<void>;
@@ -15,9 +22,14 @@ type TableFiltersOut = {
     actions: TableActionsContent;
 };
 
-export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => {
+export const useTableFiltersContent = (
+    data: ItemContent[],
+    filter?: Filter,
+    paginate?: Paginate
+): TableFiltersOut => {
     const { invalidate } = useInvalidate();
     const api = useAuthFetcher();
+    const articleSearch = useArticleSearch(filter, paginate);
 
     const mutateSubscribe = useMutation({
         mutationFn: async (internalIdentifier: string) => {
@@ -32,8 +44,8 @@ export const useTableFiltersContent = (data: ItemContent[]): TableFiltersOut => 
     };
 
     return {
-        filters: {},
-        data: data,
+        filters: articleSearch,
+        data,
         actions: { subscribe },
     };
 };

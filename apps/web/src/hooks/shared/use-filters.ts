@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { normalizeArticleSearch } from "model";
+import { useCallback, useMemo, useState } from "react";
 
 export type InitialFilter = {
     isRead?: boolean;
@@ -9,6 +10,8 @@ export type InitialFilter = {
 export type Filter = {
     toggleIsRead: () => void;
     isRead: () => boolean;
+    search: () => string;
+    setSearch: (search: string) => void;
 };
 
 export const useFilters = (initialFilter?: InitialFilter) => {
@@ -36,6 +39,12 @@ export const useFilters = (initialFilter?: InitialFilter) => {
         return false;
     });
 
+    const [search, setSearchState] = useState("");
+
+    const setSearch = useCallback((value: string) => {
+        setSearchState(normalizeArticleSearch(value) ?? "");
+    }, []);
+
     const paramString = useMemo(() => {
         const params = new URLSearchParams();
 
@@ -52,20 +61,26 @@ export const useFilters = (initialFilter?: InitialFilter) => {
             params.append("isFavorite", isFavorite.toString());
         }
 
+        if (search) {
+            params.append("search", search);
+        }
+
         return params.toString();
-    }, [isRead, isBookmarked, isFavorite]);
+    }, [isRead, isBookmarked, isFavorite, search]);
 
     const keys = useMemo(
-        () => [isRead, isBookmarked, isFavorite] as const,
-        [isRead, isBookmarked, isFavorite]
+        () => [isRead, isBookmarked, isFavorite, search] as const,
+        [isRead, isBookmarked, isFavorite, search]
     );
 
     const filter: Filter = useMemo(() => {
         return {
             isRead: () => isRead,
             toggleIsRead: () => setIsRead(prev => !prev),
+            search: () => search,
+            setSearch,
         };
-    }, [isRead]);
+    }, [isRead, search, setSearch]);
 
-    return { paramString, filter, isRead, keys };
+    return { paramString, filter, isRead, keys, search, setSearch };
 };

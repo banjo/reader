@@ -41,6 +41,7 @@ export const useItemsFetcher = (initialFilter?: InitialFilter) => {
         queryKey: ["items", ...paginationKeys, ...filterKeys],
         queryFn: async () => await fetcher(url),
         staleTime: toMilliseconds({ hours: 1 }),
+        keepPreviousData: true,
         initialData: initialData,
         initialDataUpdatedAt: 0,
     });

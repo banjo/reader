@@ -10,10 +10,12 @@ import {
 } from "@/components/table/use-table-filters-content";
 import { TableActionsItems, TableFiltersItems } from "@/components/table/use-table-filters-items";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Paginate } from "@/hooks/shared/use-pagination";
 import { avatarUrl } from "@/lib/utils";
 import { capitalize } from "@banjoanton/utils";
 import { FeedWithContent, FeedWithItems } from "db";
+import { articleSearchMaxLength } from "model";
 import { FC } from "react";
 
 type FilterBarProps = {
@@ -36,6 +38,41 @@ type FilterBarPropsContent = {
     paginate?: Paginate;
 };
 
+const SearchIcon = Icons.search;
+const CloseIcon = Icons.close;
+
+const ArticleSearchField: FC<{
+    value: string;
+    onSearchChange: (value: string) => void;
+    onClearSearch: () => void;
+}> = ({ value, onSearchChange, onClearSearch }) => (
+    <div className="relative order-last flex h-9 w-full min-w-0 items-center sm:order-none sm:w-64">
+        <SearchIcon
+            className="pointer-events-none absolute left-2.5 h-4 w-4 text-muted-foreground"
+            aria-hidden
+        />
+        <Input
+            type="search"
+            value={value}
+            maxLength={articleSearchMaxLength}
+            onChange={event => onSearchChange(event.target.value)}
+            placeholder="Search articles"
+            aria-label="Search articles"
+            className="h-9 pl-8 pr-8 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+        />
+        {value.length > 0 ? (
+            <button
+                type="button"
+                aria-label="Clear search"
+                className="absolute right-2 inline-flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={onClearSearch}
+            >
+                <CloseIcon className="h-4 w-4" />
+            </button>
+        ) : null}
+    </div>
+);
+
 export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     filters,
     actions,
@@ -45,6 +82,13 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     feed,
     paginate,
 }) => {
+    const handleSearchChange = (value: string) => {
+        filters.setSearch(value);
+    };
+    const handleClearSearch = () => {
+        filters.clearSearch();
+    };
+
     const paginationControls = paginate && (
         <div className="ml-6 flex gap-2">
             <ResponsiveIcon
@@ -64,10 +108,11 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
     );
 
     return (
-        <div className="flex h-16 w-full items-center justify-end gap-4 rounded-md border border-border p-4">
-            <div className="flex mr-auto">
+        <div className="flex min-h-16 w-full flex-wrap items-center justify-end gap-3 rounded-md border border-border p-3 sm:gap-4 sm:p-4">
+            <div className="mr-auto flex min-w-0 items-center">
                 {feed && (
                     <img
+                        className="h-10 w-10 shrink-0"
                         height={40}
                         width={40}
                         alt="feed avatar"
@@ -94,14 +139,20 @@ export const FilterBar: FC<FilterBarProps | FilterBarPropsContent> = ({
                         </Dropdown>
                     </>
                 ) : (
-                    <span className="mr-auto text-lg font-medium flex items-center ml-2">
+                    <span className="ml-2 mr-auto flex min-w-0 items-center truncate text-lg font-medium">
                         {title}
                     </span>
                 )}
             </div>
 
+            <ArticleSearchField
+                value={filters.search}
+                onSearchChange={handleSearchChange}
+                onClearSearch={handleClearSearch}
+            />
+
             {isSubscribed && (
-                <div className="mr-2 flex items-center gap-4">
+                <div className="mr-2 flex shrink-0 items-center gap-4">
                     <Dropdown
                         align="start"
                         side="bottom"
