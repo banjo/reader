@@ -65,3 +65,66 @@ test("worker lifecycle", { skip: !testRedisUrl, timeout: 30_000 }, async t => {
     await idle.close();
     assert.equal(idle.getWorker(), undefined);
 });
+
+test("repeat slots", { skip: !testRedisUrl, timeout: 30_000 }, async t => {
+    assert.ok(testRedisUrl);
+    const redis = new URL(testRedisUrl);
+    const connection = {
+        host: redis.hostname,
+        port: Number(redis.port) || 6379,
+        password: decodeURIComponent(redis.password) || undefined,
+        db: Number(redis.pathname.slice(1)) || 0,
+    };
+    const prefix = `worker-test-${randomUUID().replaceAll("-", "")}`;
+    const { redisConfig } = await import("../src/workers/config");
+    redisConfig.connection = connection;
+    redisConfig.prefix = prefix;
+    const { createWorker } = await import("../src/workers/create");
+    const { Result } = await import("utils");
+
+    const every = 2_000;
+    const slot = 700;
+    const runs: number[] = [];
+    const worker = createWorker<{ slot: number }>(
+        "slottedWorkerTest",
+        async () => {
+            runs.push(Date.now());
+            return Result.okEmpty();
+        },
+        { repeatSlot: data => data.slot }
+    );
+    t.after(async () => {
+        await worker.close();
+        const cleanup = new Queue(worker.getQueue().name, { connection, prefix });
+        try {
+            await cleanup.obliterate({ force: true });
+        } finally {
+            await cleanup.close();
+        }
+    });
+    await worker.getQueue().waitUntilReady();
+
+    // Wait until the slot is still ahead in this interval, so the job must not run right away.
+    while (Date.now() % every > slot - 300) {
+        await new Promise(resolve => setTimeout(resolve, 20));
+    }
+    await worker.repeatable({ slot }, every);
+    // Adding it again, as a restart does, keeps the one scheduled run.
+    await worker.repeatable({ slot }, every);
+    assert.equal(await worker.getQueue().getWaitingCount(), 0);
+    assert.equal(await worker.getQueue().getDelayedCount(), 1);
+
+    worker.start();
+    while (runs.length < 3) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+    }
+
+    for (const run of runs) {
+        const distance = (run - slot + every) % every;
+        assert.ok(distance < 500, `run at ${run % every} ms is not near the ${slot} ms slot`);
+    }
+    for (let index = 1; index < runs.length; index++) {
+        const gap = runs[index]! - runs[index - 1]!;
+        assert.ok(Math.abs(gap - every) < 500, `gap ${gap} ms should be about ${every} ms`);
+    }
+});

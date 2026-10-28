@@ -1,3 +1,4 @@
+import { toMilliseconds } from "@banjoanton/utils";
 import { Job } from "bullmq";
 import { Result } from "utils";
 import { ContentRepository } from "../../../repositories/ContentRepository";
@@ -105,4 +106,8 @@ const processor = async (job: Job) => {
     return Result.okEmpty();
 };
 
-export const verifyImagesWorker = () => createWorker("verifyImages", processor, { concurrency: 1 });
+export const verifyImagesWorker = () =>
+    createWorker("verifyImages", processor, {
+        concurrency: 1,
+        repeatSlot: () => toMilliseconds({ hours: 3 }),
+    });

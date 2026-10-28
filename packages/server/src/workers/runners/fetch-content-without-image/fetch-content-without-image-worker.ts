@@ -1,3 +1,4 @@
+import { toMilliseconds } from "@banjoanton/utils";
 import { Job } from "bullmq";
 import { Result } from "utils";
 import { ContentRepository } from "../../../repositories/ContentRepository";
@@ -33,10 +34,11 @@ const processor = async (job: Job) => {
         logger.info(`Fetched batch of ${content.length} content items without image`);
 
         for (const item of content) {
-            await addImageWorker().add({
-                contentId: item.id,
-                url: item.link,
-            });
+            // Skip posts that still have a queued or retrying lookup from an earlier scan.
+            await addImageWorker().add(
+                { contentId: item.id, url: item.link },
+                { deduplication: { id: `add-image-${item.id}` } }
+            );
         }
 
         totalQueued += content.length;
@@ -53,4 +55,6 @@ const processor = async (job: Job) => {
 };
 
 export const fetchContentWithoutImageWorker = () =>
-    createWorker("fetchContentWithoutImageWorker", processor);
+    createWorker("fetchContentWithoutImageWorker", processor, {
+        repeatSlot: () => toMilliseconds({ minutes: 30 }),
+    });

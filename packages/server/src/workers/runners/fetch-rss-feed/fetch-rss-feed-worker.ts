@@ -72,8 +72,13 @@ const processor = async (job: Job<FetchJobData>) => {
     return Result.okEmpty();
 };
 
+// Sequential feed ids land far apart, which spreads refreshes evenly across the hour.
+const GOLDEN_RATIO_FRACTION = 0.618_033_988_75;
+
 export const fetchRssFeedWorker = () =>
     createWorker<FetchJobData>("fetchRssFeedWorker", processor, {
         jobOptions: externalRequestRetry,
         repeatJobId: ({ feedId }) => `feed-${feedId}`,
+        repeatSlot: ({ feedId }, every) =>
+            Math.floor(((feedId * GOLDEN_RATIO_FRACTION) % 1) * every),
     });

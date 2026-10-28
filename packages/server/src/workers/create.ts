@@ -1,4 +1,4 @@
-import { randomString, toMilliseconds, toSeconds } from "@banjoanton/utils";
+import { toMilliseconds, toSeconds } from "@banjoanton/utils";
 import { Job, JobsOptions, Queue, Worker } from "bullmq";
 import { kebabCase } from "change-case";
 import { ResultType } from "model";
@@ -10,6 +10,11 @@ type WorkerOptions<T> = {
     concurrency?: number;
     jobOptions?: Pick<JobsOptions, "attempts" | "backoff">;
     repeatJobId?: (data: T) => string;
+    /**
+     * Run a repeatable job at a fixed point (in ms) of each interval instead of right away.
+     * Use it to spread jobs out and to keep restarts from running every job at once.
+     */
+    repeatSlot?: (data: T, every: number) => number;
     onFailed?: (job: Job<T> | undefined, error: Error) => Promise<void>;
 };
 
@@ -90,13 +95,10 @@ export const createWorker = <T extends object>(
     );
 
     const stopRepeatable = async () => {
-        const repeatableJobs = await queue.getRepeatableJobs();
-        logger.info(`Stopping ${repeatableJobs.length} repeatable jobs...`);
-        await Promise.all(
-            repeatableJobs.map(async job => {
-                await queue.removeRepeatableByKey(job.key);
-            })
-        );
+        // Also lists repeatable jobs created with the older `queue.add(..., { repeat })` API.
+        const schedulers = await queue.getJobSchedulers();
+        logger.info(`Stopping ${schedulers.length} repeatable jobs...`);
+        await Promise.all(schedulers.map(scheduler => queue.removeJobScheduler(scheduler.key)));
     };
 
     const wrapper = {
@@ -115,28 +117,21 @@ export const createWorker = <T extends object>(
         },
         repeatable: async (data: T, timeInMs = toMilliseconds({ minutes: 60 })) => {
             logger.info(`Adding repeatable job every ${Math.round(timeInMs / 60_000)} minutes...`);
+            const slot = options.repeatSlot?.(data, timeInMs);
             // TODO: add try catch with Result return type
-            await queue.add(JOB_NAME, data, {
-                ...options.jobOptions,
-                repeat: {
+            await queue.upsertJobScheduler(
+                options.repeatJobId?.(data) ?? JOB_NAME,
+                {
                     every: timeInMs,
-                    immediately: true,
+                    // Without an offset, the first run starts right away.
+                    offset:
+                        slot === undefined ? undefined : ((slot % timeInMs) + timeInMs) % timeInMs,
                 },
-                jobId: options.repeatJobId?.(data) ?? `${JOB_NAME}-${randomString()}`,
-            });
+                { name: JOB_NAME, data, opts: options.jobOptions }
+            );
         },
         stopRepeatable,
-        removeRepeatableById: async (jobId: string) => {
-            const repeatableJobs = await queue.getRepeatableJobs();
-            const job = repeatableJobs.find(candidate => candidate.id === jobId);
-
-            if (!job) {
-                return false;
-            }
-
-            await queue.removeRepeatableByKey(job.key);
-            return true;
-        },
+        removeRepeatableById: (jobId: string) => queue.removeJobScheduler(jobId),
         activeCount: async () => {
             logger.info("Getting active count...");
             return await queue.getActiveCount();

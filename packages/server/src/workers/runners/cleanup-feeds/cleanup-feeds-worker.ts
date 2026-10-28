@@ -1,3 +1,4 @@
+import { toMilliseconds } from "@banjoanton/utils";
 import { Job } from "bullmq";
 import { Result } from "utils";
 import { FeedRepository } from "../../../repositories/FeedRepository";
@@ -109,4 +110,5 @@ export const cleanupFeedsWorker = () =>
     createWorker("cleanupFeeds", processor, {
         concurrency: 1,
         repeatJobId: () => "cleanup-feeds",
+        repeatSlot: () => toMilliseconds({ hours: 4 }),
     });

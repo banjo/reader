@@ -52,4 +52,6 @@ the page metadata and verifies that `lastFetch` moves forward.
 
 `worker-lifecycle.test.ts` checks that a worker factory opens only its queue until `start()`
 is called, that repeated starts share one worker, and that closing a queue-only instance
-never creates a worker. It needs Redis but no database.
+never creates a worker. It also checks that a repeatable job with a slot waits for that slot,
+keeps it on every run, and is not added twice when scheduled again after a restart. It needs
+Redis but no database.

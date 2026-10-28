@@ -165,10 +165,9 @@ test(
         `;
         assert.equal(Number(tagLinks[0]?.count ?? 0), 0);
 
-        const repeatable = await fetchRssFeedWorker().getQueue().getRepeatableJobs();
         assert.equal(
-            repeatable.some(job => job.id === `feed-${orphan.id}`),
-            false
+            await fetchRssFeedWorker().getQueue().getJobScheduler(`feed-${orphan.id}`),
+            undefined
         );
         assert.ok(logs.some(message => message.includes("Deleted orphaned feed")));
 

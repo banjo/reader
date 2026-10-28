@@ -54,10 +54,9 @@ const getContentWithoutImage = async ({
 }: {
     cursorId?: number;
     limit?: number;
-} = {}): AsyncResultType<ItemContent[]> => {
-    let items: ItemContent[];
+} = {}): AsyncResultType<Pick<ItemContent, "id" | "link">[]> => {
     try {
-        items = await prisma.itemContent.findMany({
+        const items = await prisma.itemContent.findMany({
             where: {
                 hasFetchedImage: false,
                 ...(cursorId ? { id: { gt: cursorId } } : {}),
@@ -66,6 +65,7 @@ const getContentWithoutImage = async ({
                 id: "asc",
             },
             take: limit,
+            select: { id: true, link: true },
         });
 
         return Result.ok(items);
@@ -81,16 +81,16 @@ const getContentWithImage = async ({
 }: {
     olderThan: Date;
     limit?: number;
-}): AsyncResultType<ItemContent[]> => {
-    let items: ItemContent[];
+}): AsyncResultType<Pick<ItemContent, "id" | "imageUrl">[]> => {
     try {
-        items = await prisma.itemContent.findMany({
+        const items = await prisma.itemContent.findMany({
             where: {
                 imageUrl: { not: null },
                 imageCheckedAt: { lt: olderThan },
             },
             orderBy: [{ imageCheckedAt: "asc" }, { id: "asc" }],
             take: limit,
+            select: { id: true, imageUrl: true },
         });
 
         return Result.ok(items);

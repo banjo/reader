@@ -105,6 +105,20 @@ Apply database migrations before deploying a release that adds one:
 DATABASE_URL=... pnpm --filter db db:migrate:prod
 ```
 
+### Background schedule
+
+Each feed refreshes once an hour at its own fixed minute, so refreshes are spread across the
+hour instead of all starting at once. The other scheduled jobs run at fixed times (UTC):
+
+| Job                   | Runs               |
+| --------------------- | ------------------ |
+| Missing image scan    | Every hour at :30  |
+| Article refresh       | Every day at 02:00 |
+| Image verification    | Every day at 03:00 |
+| Orphaned feed cleanup | Every day at 04:00 |
+
+Restarting the worker does not run these jobs early. They keep their times.
+
 ### Article refresh
 
 The worker rechecks older posts once a day. It picks posts that at least one reader has in their

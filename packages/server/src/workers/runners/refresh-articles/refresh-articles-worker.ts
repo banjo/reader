@@ -1,3 +1,4 @@
+import { toMilliseconds } from "@banjoanton/utils";
 import { Job } from "bullmq";
 import { Result } from "utils";
 import { ContentForRefresh, ContentRepository } from "../../../repositories/ContentRepository";
@@ -119,4 +120,7 @@ const processor = async (job: Job) => {
 };
 
 export const refreshArticlesWorker = () =>
-    createWorker("refreshArticles", processor, { concurrency: 1 });
+    createWorker("refreshArticles", processor, {
+        concurrency: 1,
+        repeatSlot: () => toMilliseconds({ hours: 2 }),
+    });
