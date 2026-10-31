@@ -86,28 +86,34 @@ export const assertPublicHostname = async (url: URL): Promise<void> => {
 // Undici resolves inside the connection, so a hostname cannot resolve to one address during a
 // preflight check and another address when the socket opens.
 export const safeLookup: LookupFunction = (hostname, options, callback) => {
-    if (allowsPrivateNetworkRequests()) {
-        lookupCallback(hostname, { family: options.family }, (error, address, family) => {
-            callback(error, address, family);
-        });
-        return;
-    }
+    lookupCallback(
+        hostname,
+        { family: options.family, hints: options.hints, all: true, verbatim: true },
+        (error, addresses) => {
+            if (error) {
+                callback(error, "", 0);
+                return;
+            }
 
-    lookupCallback(hostname, { all: true, verbatim: true }, (error, addresses) => {
-        if (error) {
-            callback(error, "", 0);
-            return;
+            const allowedAddresses = allowsPrivateNetworkRequests()
+                ? addresses
+                : addresses.filter(entry => isPublicAddress(entry.address));
+
+            const address = allowedAddresses[0];
+            if (!address) {
+                callback(new UnsafeUrlError(`Blocked non-public address for ${hostname}`), "", 0);
+                return;
+            }
+
+            // Node's auto-family selection requests all addresses and expects an array.
+            // Single-address callers still expect the legacy (address, family) arguments.
+            if (options.all) {
+                callback(null, allowedAddresses);
+            } else {
+                callback(null, address.address, address.family);
+            }
         }
-
-        const publicAddress = addresses.find(entry => isPublicAddress(entry.address));
-
-        if (!publicAddress) {
-            callback(new UnsafeUrlError(`Blocked non-public address for ${hostname}`), "", 0);
-            return;
-        }
-
-        callback(null, publicAddress.address, publicAddress.family);
-    });
+    );
 };
 
 const safeAgent = new Agent({

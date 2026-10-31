@@ -8,6 +8,8 @@ import {
     assertPublicHostname,
     isPublicAddress,
     parseHttpUrl,
+    safeFetch,
+    safeLookup,
     UnsafeUrlError,
 } from "../src/services/UrlSafety";
 
@@ -52,6 +54,56 @@ test("hostnames resolving to internal addresses are rejected", async () => {
     await assert.rejects(() => assertPublicHostname(new URL("http://localhost")), UnsafeUrlError);
     await assert.rejects(() => assertPublicHostname(new URL("http://[::1]")), UnsafeUrlError);
     await assert.doesNotReject(() => assertPublicHostname(new URL("https://example.com")));
+});
+
+test("DNS lookup returns an address array when Node requests all addresses", async () => {
+    const addresses = await new Promise<unknown>((resolve, reject) => {
+        safeLookup("example.com", { all: true }, (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+        });
+    });
+    assert.ok(Array.isArray(addresses));
+    assert.ok(addresses.length > 0);
+    for (const entry of addresses) {
+        assert.equal(isPublicAddress(entry.address), true);
+        assert.ok(entry.family === 4 || entry.family === 6);
+    }
+});
+
+test("DNS lookup respects the requested address family for single results", async () => {
+    await new Promise<void>((resolve, reject) => {
+        safeLookup("example.com", { family: 4 }, (error, address, family) => {
+            if (error) return reject(error);
+            assert.equal(typeof address, "string");
+            assert.equal(isPublicAddress(address as string), true);
+            assert.equal(family, 4);
+            resolve();
+        });
+    });
+});
+
+test("DNS lookup rejects private addresses in both callback modes", async () => {
+    for (const all of [false, true]) {
+        await assert.rejects(
+            () =>
+                new Promise((resolve, reject) => {
+                    safeLookup("localhost", { all }, (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    });
+                }),
+            UnsafeUrlError
+        );
+    }
+});
+
+test("safe fetch connects to a public hostname using Node auto-family selection", async () => {
+    const response = await safeFetch("https://example.com", {
+        signal: AbortSignal.timeout(15_000),
+    });
+    assert.equal(response.status, 200);
+    await response.body?.cancel();
 });
 
 test("requests to internal addresses fail as permanent request errors", async () => {
